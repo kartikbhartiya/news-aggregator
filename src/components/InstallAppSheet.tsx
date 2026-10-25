@@ -52,7 +52,7 @@ export default function InstallAppSheet({ isOpen, onClose }: InstallAppSheetProp
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden bg-zinc-950/40 backdrop-blur-sm flex justify-center items-end sm:items-center p-0 sm:p-4 animate-in fade-in duration-200">
-      <div className="relative w-full max-w-lg bg-white/95 backdrop-blur-2xl rounded-t-[32px] sm:rounded-[32px] border border-white/60 shadow-2xl p-6 sm:p-8 animate-in slide-in-from-bottom duration-300 flex flex-col space-y-6">
+      <div className="relative w-full max-w-lg clay-card rounded-t-[32px] sm:rounded-[32px] p-6 sm:p-8 animate-in slide-in-from-bottom duration-300 flex flex-col space-y-6">
         {/* iOS Sheet Grabber Handle */}
         <div className="w-10 h-1.5 rounded-full bg-zinc-300 mx-auto -mt-2 mb-1 sm:hidden" />
 
@@ -60,17 +60,17 @@ export default function InstallAppSheet({ isOpen, onClose }: InstallAppSheetProp
         <div className="flex items-start justify-between">
           <div className="flex items-center space-x-3.5">
             {/* App Icon */}
-            <div className="w-14 h-14 rounded-2xl bg-zinc-950 p-2.5 shadow-md flex items-center justify-center border border-white/20">
-              <div className="w-7 h-7 rounded-md bg-gradient-to-tr from-emerald-400 via-teal-300 to-cyan-400 rotate-45 shadow-sm" />
+            <div className="clay-btn-dark w-12 h-12 rounded-2xl p-2 shadow-md flex items-center justify-center">
+              <span className="font-serif font-black text-xl text-white">P</span>
             </div>
             <div>
               <div className="flex items-center space-x-2">
-                <h3 className="text-lg font-extrabold text-zinc-950 tracking-tight">Prism Mobile</h3>
-                <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-[10px] font-semibold text-emerald-700 border border-emerald-200">
+                <h3 className="font-serif text-lg font-bold text-zinc-950 tracking-tight">Prism Mobile</h3>
+                <span className="px-2 py-0.5 rounded-full bg-zinc-100 text-[10px] font-mono font-bold text-zinc-900 border border-zinc-200">
                   Native PWA
                 </span>
               </div>
-              <p className="text-xs text-zinc-500 font-medium">Full-screen web application</p>
+              <p className="text-xs text-zinc-500 font-medium">Standalone editorial web application</p>
             </div>
           </div>
 
@@ -80,7 +80,7 @@ export default function InstallAppSheet({ isOpen, onClose }: InstallAppSheetProp
               handleButtonClickGlow(e);
               onClose();
             }}
-            className="p-2 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-600 transition-colors"
+            className="clay-btn p-2 rounded-full text-zinc-600 hover:text-zinc-950 transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -88,20 +88,20 @@ export default function InstallAppSheet({ isOpen, onClose }: InstallAppSheetProp
 
         {/* Benefits Pill Cards */}
         <div className="grid grid-cols-2 gap-2.5 text-xs">
-          <div className="p-3 rounded-2xl bg-zinc-50 border border-zinc-200/60 flex items-center space-x-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-500" />
-            <span className="font-semibold text-zinc-800">Edge-to-Edge Glass</span>
+          <div className="p-3 rounded-2xl bg-zinc-50 border border-zinc-200 flex items-center space-x-2">
+            <span className="w-2 h-2 rounded-full bg-zinc-950" />
+            <span className="font-semibold text-zinc-800">Tactile Claymorphism</span>
           </div>
-          <div className="p-3 rounded-2xl bg-zinc-50 border border-zinc-200/60 flex items-center space-x-2">
-            <span className="w-2 h-2 rounded-full bg-sky-500" />
+          <div className="p-3 rounded-2xl bg-zinc-50 border border-zinc-200 flex items-center space-x-2">
+            <span className="w-2 h-2 rounded-full bg-zinc-700" />
             <span className="font-semibold text-zinc-800">Zero Browser Bars</span>
           </div>
-          <div className="p-3 rounded-2xl bg-zinc-50 border border-zinc-200/60 flex items-center space-x-2">
-            <span className="w-2 h-2 rounded-full bg-amber-500" />
-            <span className="font-semibold text-zinc-800">Tactile Haptics</span>
+          <div className="p-3 rounded-2xl bg-zinc-50 border border-zinc-200 flex items-center space-x-2">
+            <span className="w-2 h-2 rounded-full bg-zinc-500" />
+            <span className="font-semibold text-zinc-800">Full Story Reader</span>
           </div>
-          <div className="p-3 rounded-2xl bg-zinc-50 border border-zinc-200/60 flex items-center space-x-2">
-            <span className="w-2 h-2 rounded-full bg-purple-500" />
+          <div className="p-3 rounded-2xl bg-zinc-50 border border-zinc-200 flex items-center space-x-2">
+            <span className="w-2 h-2 rounded-full bg-zinc-400" />
             <span className="font-semibold text-zinc-800">Cloud Dossier Sync</span>
           </div>
         </div>
@@ -126,7 +126,7 @@ export default function InstallAppSheet({ isOpen, onClose }: InstallAppSheetProp
                 <span>2. Scroll down and tap <strong>&ldquo;Add to Home Screen&rdquo;</strong></span>
               </div>
               <div className="flex items-center space-x-3">
-                <div className="w-7 h-7 rounded-xl bg-white border border-zinc-200 flex items-center justify-center shrink-0 text-emerald-600 font-bold">
+                <div className="w-7 h-7 rounded-xl bg-white border border-zinc-200 flex items-center justify-center shrink-0 text-zinc-950 font-bold">
                   <Check className="w-3.5 h-3.5" />
                 </div>
                 <span>3. Tap <strong>Add</strong> in the top-right corner</span>
@@ -138,9 +138,9 @@ export default function InstallAppSheet({ isOpen, onClose }: InstallAppSheetProp
             <button
               type="button"
               onClick={handleInstallClick}
-              className="apple-prominent-btn apple-btn w-full py-3.5 px-4 rounded-2xl text-xs font-bold tracking-tight flex items-center justify-center space-x-2 cursor-pointer shadow-lg"
+              className="clay-btn-dark w-full py-3.5 px-4 rounded-2xl text-xs font-bold tracking-tight flex items-center justify-center space-x-2 cursor-pointer shadow-lg"
             >
-              <Smartphone className="w-4 h-4 text-emerald-400" />
+              <Smartphone className="w-4 h-4 text-white" />
               <span>Install Prism App to Home Screen</span>
             </button>
           </div>

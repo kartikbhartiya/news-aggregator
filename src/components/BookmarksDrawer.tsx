@@ -101,19 +101,20 @@ ${b.userNotes ? `- **Research Notes**: ${b.userNotes}\n` : ''}`
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden bg-zinc-950/40 backdrop-blur-md flex justify-end animate-in fade-in duration-200">
-      <div className="w-full max-w-xl liquid-glass-panel h-full shadow-2xl flex flex-col border-l border-white/60 animate-in slide-in-from-right duration-300">
+    <div className="fixed inset-0 z-50 overflow-hidden bg-black/60 flex justify-end animate-in fade-in duration-200">
+      <div className="fixed inset-0" onClick={onClose} />
+      <div className="relative w-full max-w-xl bg-white h-full shadow-2xl flex flex-col border-l border-zinc-200 animate-in slide-in-from-right duration-300 z-10">
         {/* Header */}
-        <div className="p-5 sm:p-6 border-b border-zinc-200/60 bg-white/70 backdrop-blur-xl flex items-center justify-between">
+        <div className="p-5 sm:p-6 border-b border-zinc-200 bg-white flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="w-9 h-9 rounded-xl bg-zinc-950 text-white flex items-center justify-center shadow-xs">
-              <Bookmark className="w-4 h-4" />
+            <div className="clay-btn-dark w-9 h-9 rounded-xl flex items-center justify-center text-white shadow-xs">
+              <Bookmark className="w-4 h-4 text-white" />
             </div>
             <div>
               <div className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 font-bold">
                 SUPABASE CLOUD DOSSIER
               </div>
-              <h3 className="text-lg font-extrabold text-zinc-950 tracking-tight">
+              <h3 className="font-serif text-lg font-bold text-zinc-950 tracking-tight">
                 Saved Dispatches ({bookmarks.length})
               </h3>
             </div>
@@ -124,10 +125,10 @@ ${b.userNotes ? `- **Research Notes**: ${b.userNotes}\n` : ''}`
               <button
                 type="button"
                 onClick={handleExportMarkdown}
-                className="apple-glass-btn apple-btn inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-zinc-700 cursor-pointer"
+                className="clay-btn inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-zinc-800 cursor-pointer"
                 title="Export Dossier as Markdown"
               >
-                {copiedExport ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Download className="w-3.5 h-3.5" />}
+                {copiedExport ? <Check className="w-3.5 h-3.5 text-zinc-950" /> : <Download className="w-3.5 h-3.5" />}
                 <span className="hidden sm:inline">Export</span>
               </button>
             )}
@@ -137,7 +138,7 @@ ${b.userNotes ? `- **Research Notes**: ${b.userNotes}\n` : ''}`
                 handleButtonClickGlow(e);
                 onClose();
               }}
-              className="apple-glass-btn apple-btn p-2 rounded-xl text-zinc-600 cursor-pointer"
+              className="clay-btn p-2 rounded-xl text-zinc-700 cursor-pointer hover:bg-zinc-100"
             >
               <X className="w-4 h-4" />
             </button>
@@ -146,7 +147,7 @@ ${b.userNotes ? `- **Research Notes**: ${b.userNotes}\n` : ''}`
 
         {/* Search saved items */}
         {bookmarks.length > 0 && (
-          <div className="p-3 border-b border-zinc-200/60 bg-white/50">
+          <div className="p-3 border-b border-zinc-200 bg-zinc-50">
             <div className="relative">
               <Search className="w-3.5 h-3.5 text-zinc-400 absolute left-3 top-2.5" />
               <input
@@ -154,24 +155,24 @@ ${b.userNotes ? `- **Research Notes**: ${b.userNotes}\n` : ''}`
                 placeholder="Search saved dispatches or research notes..."
                 value={filterQuery}
                 onChange={(e) => setFilterQuery(e.target.value)}
-                className="w-full pl-8 pr-3 py-1.5 bg-white border border-zinc-200/80 rounded-xl text-xs text-zinc-900 focus:outline-none focus:border-zinc-900 shadow-2xs"
+                className="w-full pl-8 pr-3 py-1.5 bg-white border border-zinc-200 rounded-xl text-xs text-zinc-900 focus:outline-none focus:border-zinc-900 shadow-2xs"
               />
             </div>
           </div>
         )}
 
         {/* Bookmarks List */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 divide-y divide-zinc-200/50">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 divide-y divide-zinc-200">
           {bookmarks.length === 0 ? (
             <div className="py-24 text-center">
               <BookOpen className="w-10 h-10 text-zinc-300 mx-auto mb-3" />
-              <h4 className="text-base font-bold text-zinc-900">Your Dossier is Empty</h4>
+              <h4 className="font-serif text-base font-bold text-zinc-900">Your Dossier is Empty</h4>
               <p className="mt-1 text-xs text-zinc-500 max-w-xs mx-auto">
-                Bookmark dispatches from the live wire. Saved items synchronize to Supabase cloud automatically.
+                Bookmark dispatches from the wire. Saved items synchronize to Supabase cloud automatically.
               </p>
             </div>
           ) : filteredBookmarks.length === 0 ? (
-            <div className="py-12 text-center text-xs text-zinc-500">
+            <div className="py-12 text-center text-xs text-zinc-500 font-mono">
               No saved dispatches match &ldquo;{filterQuery}&rdquo;
             </div>
           ) : (
@@ -183,18 +184,18 @@ ${b.userNotes ? `- **Research Notes**: ${b.userNotes}\n` : ''}`
                   onSelectArticle(art);
                   onClose();
                 }}
-                className="py-4 group hover:bg-white/60 -mx-2 px-3 rounded-2xl transition-all cursor-pointer"
+                className="py-4 group hover:bg-zinc-50 -mx-2 px-3 rounded-2xl transition-all cursor-pointer"
               >
                 <div className="flex items-center justify-between text-[11px] font-mono text-zinc-500 mb-1">
                   <span className="font-bold text-zinc-950 uppercase">{art.source.name}</span>
                   <div className="flex items-center space-x-2">
-                    <span className="px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-700 text-[10px] uppercase font-semibold">
+                    <span className="px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-800 text-[10px] uppercase font-semibold border border-zinc-200">
                       {art.category}
                     </span>
                     <button
                       type="button"
                       onClick={(e) => handleRemove(art.id, e)}
-                      className="apple-btn text-zinc-400 hover:text-rose-600 transition-colors p-1"
+                      className="text-zinc-400 hover:text-zinc-950 transition-colors p-1"
                       title="Remove from dossier"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -202,7 +203,7 @@ ${b.userNotes ? `- **Research Notes**: ${b.userNotes}\n` : ''}`
                   </div>
                 </div>
 
-                <h4 className="font-bold text-sm sm:text-base text-zinc-950 group-hover:text-zinc-600 transition-colors leading-snug">
+                <h4 className="font-serif font-bold text-sm sm:text-base text-zinc-950 group-hover:text-zinc-700 transition-colors leading-snug">
                   {art.title}
                 </h4>
 
@@ -225,14 +226,14 @@ ${b.userNotes ? `- **Research Notes**: ${b.userNotes}\n` : ''}`
                         <button
                           type="button"
                           onClick={() => setActiveNoteEditId(null)}
-                          className="apple-btn px-2.5 py-1 text-xs text-zinc-600 hover:bg-zinc-100 rounded-lg"
+                          className="clay-btn px-2.5 py-1 text-xs text-zinc-600 hover:bg-zinc-100 rounded-lg"
                         >
                           Cancel
                         </button>
                         <button
                           type="button"
                           onClick={(e) => handleSaveNote(art.id, e)}
-                          className="apple-prominent-btn apple-btn px-3 py-1 text-xs rounded-lg font-bold"
+                          className="clay-btn-dark px-3 py-1 text-xs rounded-lg font-bold"
                         >
                           Save
                         </button>
@@ -249,7 +250,7 @@ ${b.userNotes ? `- **Research Notes**: ${b.userNotes}\n` : ''}`
                       <button
                         type="button"
                         onClick={(e) => handleStartEditNote(art, e)}
-                        className="apple-btn text-[11px] font-semibold text-zinc-700 hover:text-zinc-950 underline ml-2 shrink-0"
+                        className="text-[11px] font-semibold text-zinc-700 hover:text-zinc-950 underline ml-2 shrink-0 cursor-pointer"
                       >
                         {art.userNotes ? 'Edit' : '+ Note'}
                       </button>

@@ -150,15 +150,16 @@ export default function SupabaseSettingsModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-zinc-950/45 backdrop-blur-md flex justify-center items-center p-3 sm:p-6 animate-in fade-in duration-200">
-      <div className="relative w-full max-w-2xl liquid-glass-panel rounded-3xl sm:rounded-[36px] shadow-2xl my-auto flex flex-col max-h-[90vh] overflow-hidden border border-white/70">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 flex justify-center items-center p-3 sm:p-6 animate-in fade-in duration-200">
+      <div className="fixed inset-0" onClick={onClose} />
+      <div className="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl my-auto flex flex-col max-h-[90vh] overflow-hidden border border-zinc-200 z-10">
         {/* Header */}
-        <div className="px-6 py-4.5 border-b border-zinc-200/60 bg-white/70 backdrop-blur-xl flex items-center justify-between">
+        <div className="px-6 py-4.5 border-b border-zinc-200 bg-white flex items-center justify-between">
           <div className="flex items-center space-x-2.5">
-            <div className="w-8 h-8 rounded-xl bg-zinc-900 text-white flex items-center justify-center">
-              <Database className="w-4 h-4 text-emerald-400" />
+            <div className="clay-btn-dark w-8 h-8 rounded-xl flex items-center justify-center text-white">
+              <Database className="w-4 h-4 text-white" />
             </div>
-            <h2 className="text-sm font-extrabold text-zinc-950 tracking-tight">
+            <h2 className="font-serif text-base font-bold text-zinc-950 tracking-tight">
               Cloud & API Engine
             </h2>
           </div>
@@ -167,14 +168,14 @@ export default function SupabaseSettingsModal({
               handleButtonClickGlow(e);
               onClose();
             }}
-            className="apple-glass-btn apple-btn p-2 rounded-xl text-zinc-600 cursor-pointer"
+            className="clay-btn p-2 rounded-xl text-zinc-700 cursor-pointer hover:bg-zinc-100"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Sub-tabs */}
-        <div className="px-6 border-b border-zinc-200/60 bg-white/60 flex space-x-2 text-xs py-2 overflow-x-auto no-scrollbar">
+        <div className="px-6 border-b border-zinc-200 bg-zinc-50 flex space-x-2 text-xs py-2 overflow-x-auto no-scrollbar">
           {[
             { id: 'supabase', label: 'Supabase Cloud' },
             { id: 'newsdata', label: 'NewsData.io API' },
@@ -186,10 +187,10 @@ export default function SupabaseSettingsModal({
                 handleButtonClickGlow(e);
                 setActiveTab(tab.id as any);
               }}
-              className={`apple-btn px-3.5 py-1.5 rounded-full text-xs font-semibold cursor-pointer transition-all ${
+              className={`clay-pill px-3.5 py-1.5 text-xs font-semibold cursor-pointer transition-all ${
                 activeTab === tab.id
-                  ? 'apple-prominent-btn text-white shadow-xs'
-                  : 'apple-glass-btn text-zinc-600 hover:text-zinc-950'
+                  ? 'clay-pill-active'
+                  : 'text-zinc-600 hover:text-zinc-950'
               }`}
             >
               {tab.label}
@@ -420,8 +421,8 @@ create trigger on_auth_user_created
                     https://newsdata.io/api/1/latest
                   </div>
                   <div className="mt-2 flex items-center space-x-3 text-xs">
-                    <span className="inline-flex items-center text-emerald-700 font-medium">
-                      <span className="w-2 h-2 rounded-full bg-emerald-500 mr-1.5 animate-live-pulse" />
+                    <span className="inline-flex items-center text-zinc-900 font-medium">
+                      <span className="w-2 h-2 rounded-full bg-zinc-950 mr-1.5" />
                       API Connected & Verified
                     </span>
                     <span className="text-stone-300">•</span>

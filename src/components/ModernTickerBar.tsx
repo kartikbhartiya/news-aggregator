@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { MarketTickerItem } from '@/types/news';
 import { MARKET_TICKER_ITEMS } from '@/lib/market-ticker';
-import { TrendingUp, TrendingDown } from 'lucide-react';
+import { TrendingUp, TrendingDown, Activity } from 'lucide-react';
 import { handleButtonClickGlow } from '@/lib/button-glow';
 
 export default function ModernTickerBar({ className = '' }: { className?: string }) {
@@ -27,39 +27,37 @@ export default function ModernTickerBar({ className = '' }: { className?: string
   }, []);
 
   return (
-    <div className={`border-b border-zinc-200/80 bg-white/80 backdrop-blur-md text-xs select-none overflow-hidden ${className}`}>
-      <div className="max-w-7xl mx-auto flex items-center px-4 sm:px-6">
-        {/* Modern Live Pulse Badge */}
-        <div className="shrink-0 flex items-center gap-1.5 py-2 pr-4 border-r border-zinc-200/60 z-10 text-zinc-700">
-          <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
-          </span>
-          <span className="text-[10px] font-mono font-bold tracking-widest text-zinc-950 uppercase">
-            LIVE SIGNALS
+    <div className={`border-b border-zinc-200 bg-white text-xs select-none overflow-hidden ${className}`}>
+      <div className="max-w-7xl mx-auto flex items-center px-3 sm:px-6">
+        
+        {/* Architectural Desk Label (Zero Green Lights / Zero Pings) */}
+        <div className="shrink-0 flex items-center gap-1.5 py-2 pr-3.5 border-r border-zinc-200 z-10 text-zinc-950">
+          <Activity className="w-3.5 h-3.5 text-zinc-950" />
+          <span className="text-[10px] font-mono font-bold tracking-wider uppercase">
+            MARKET WIRE
           </span>
         </div>
 
-        {/* Scrolling Modern Ticker Stream */}
+        {/* Scrolling Ticker Stream (Pure Black & White Clay Pills) */}
         <div className="overflow-hidden relative flex-1 py-1.5">
-          <div className="animate-ticker flex items-center space-x-4 whitespace-nowrap pl-4">
+          <div className="animate-ticker flex items-center space-x-3 whitespace-nowrap pl-3">
             {[...tickers, ...tickers].map((item, idx) => (
               <div
                 key={`${item.symbol}-${idx}`}
                 onClick={(e) => handleButtonClickGlow(e)}
-                className="apple-btn inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-zinc-100/90 hover:bg-white border border-zinc-200/80 shadow-2xs transition-all text-[11px] cursor-pointer"
+                className="clay-pill inline-flex items-center space-x-2 px-3 py-1 text-[11px] cursor-pointer hover:bg-zinc-50"
               >
-                <span className="font-bold text-zinc-950">{item.symbol}</span>
-                <span className="text-zinc-500 font-mono text-[10px]">{item.price}</span>
+                <span className="font-bold text-zinc-950 font-sans">{item.symbol}</span>
+                <span className="text-zinc-600 font-mono text-[10px]">{item.price}</span>
                 <span
                   className={`inline-flex items-center text-[10px] font-mono font-bold ${
-                    item.isPositive ? 'text-emerald-600' : 'text-rose-600'
+                    item.isPositive ? 'text-zinc-950' : 'text-zinc-500'
                   }`}
                 >
                   {item.isPositive ? (
-                    <TrendingUp className="w-2.5 h-2.5 mr-0.5 inline" />
+                    <TrendingUp className="w-2.5 h-2.5 mr-0.5 inline text-zinc-950" />
                   ) : (
-                    <TrendingDown className="w-2.5 h-2.5 mr-0.5 inline" />
+                    <TrendingDown className="w-2.5 h-2.5 mr-0.5 inline text-zinc-500" />
                   )}
                   {item.change}
                 </span>

@@ -3,13 +3,12 @@
 import React, { useState } from 'react';
 import { 
   Clock, 
-  ShieldCheck, 
   ChevronDown, 
   Check, 
   Sparkles,
   Zap,
   BookOpen,
-  Radio
+  Filter
 } from 'lucide-react';
 import { handleButtonClickGlow } from '@/lib/button-glow';
 
@@ -51,10 +50,10 @@ export default function GlassFilterBar({
   const [isSortMenuOpen, setIsSortMenuOpen] = useState(false);
 
   const sortLabels = {
-    latest: { label: 'Latest Dispatches', icon: Clock },
-    impact: { label: 'Trending & Impact', icon: Sparkles },
-    quick: { label: 'Quick Reads First', icon: Zap },
-    longread: { label: 'Deep Dives (6m+)', icon: BookOpen },
+    latest: { label: 'Latest Wire', icon: Clock },
+    impact: { label: 'Top Impact', icon: Sparkles },
+    quick: { label: 'Quick Reads', icon: Zap },
+    longread: { label: 'Deep Dives', icon: BookOpen },
   };
 
   const currentSort = sortLabels[sortBy] || sortLabels.latest;
@@ -62,16 +61,17 @@ export default function GlassFilterBar({
 
   const currentSourceName = 
     selectedSource === 'all' 
-      ? `All Sources (${totalArticles})` 
+      ? `All Publishers (${totalArticles})` 
       : availableSources.find(s => s.id === selectedSource)?.name || selectedSource;
 
   return (
-    <div className={`relative max-w-7xl mx-auto px-4 sm:px-6 py-2 ${className}`}>
-      {/* Floating Apple Soft Frosted Glass Island */}
-      <div className="apple-glass-island bg-white/90 backdrop-blur-2xl border border-zinc-200/90 rounded-2xl sm:rounded-[26px] p-2 sm:p-2.5 flex flex-wrap items-center justify-between gap-2.5 transition-all shadow-sm">
+    <div className={`relative max-w-7xl mx-auto px-3 sm:px-6 py-2 ${className}`}>
+      {/* Tactile Sculpted Clay Filter Strip */}
+      <div className="clay-card rounded-2xl p-2 sm:p-2.5 flex flex-wrap items-center justify-between gap-2.5 transition-all">
         
         {/* Left Side: Source Selector & Verified Toggle */}
         <div className="flex items-center space-x-2 flex-wrap gap-y-2">
+          
           {/* Source Dropdown Popover */}
           <div className="relative">
             <button
@@ -81,16 +81,16 @@ export default function GlassFilterBar({
                 setIsSourceMenuOpen(!isSourceMenuOpen);
                 setIsSortMenuOpen(false);
               }}
-              className="apple-btn inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full text-xs font-semibold text-zinc-900 bg-zinc-100/90 hover:bg-white border border-zinc-200/90 shadow-2xs transition-all cursor-pointer"
+              className="clay-btn inline-flex items-center space-x-2 px-3 py-1.5 rounded-full text-xs font-semibold text-zinc-900 cursor-pointer"
             >
-              <Radio className="w-3.5 h-3.5 text-zinc-600" />
-              <span className="truncate max-w-[140px] sm:max-w-[200px]">{currentSourceName}</span>
+              <Filter className="w-3.5 h-3.5 text-zinc-600" />
+              <span className="truncate max-w-[130px] sm:max-w-[200px]">{currentSourceName}</span>
               <ChevronDown className={`w-3.5 h-3.5 text-zinc-400 transition-transform ${isSourceMenuOpen ? 'rotate-180' : ''}`} />
             </button>
 
-            {/* Source Menu Popover (Solid Opaque Backdrop with Maximum Visibility) */}
+            {/* Source Menu Popover (Pure Opaque White Clay Card) */}
             {isSourceMenuOpen && (
-              <div className="absolute top-full left-0 mt-2 w-72 bg-white/98 backdrop-blur-3xl rounded-2xl shadow-2xl border border-zinc-200 p-1.5 z-50 max-h-80 overflow-y-auto no-scrollbar ring-1 ring-black/5 animate-in fade-in zoom-in-95 duration-150">
+              <div className="absolute top-full left-0 mt-2 w-72 bg-white rounded-2xl shadow-xl border border-zinc-200 p-1.5 z-50 max-h-80 overflow-y-auto ring-1 ring-black/5 animate-in fade-in zoom-in-95 duration-150">
                 <button
                   type="button"
                   onClick={(e) => {
@@ -98,16 +98,16 @@ export default function GlassFilterBar({
                     onSelectSource('all');
                     setIsSourceMenuOpen(false);
                   }}
-                  className={`apple-btn w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs cursor-pointer transition-colors ${
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs cursor-pointer transition-colors ${
                     selectedSource === 'all' 
-                      ? 'bg-zinc-950 text-white font-bold' 
-                      : 'text-zinc-800 hover:bg-zinc-100/90 font-medium'
+                      ? 'bg-zinc-950 text-white font-bold shadow-xs' 
+                      : 'text-zinc-800 hover:bg-zinc-100 font-medium'
                   }`}
                 >
-                  <span>All Sources ({totalArticles})</span>
+                  <span>All Publishers ({totalArticles})</span>
                   {selectedSource === 'all' && <Check className="w-3.5 h-3.5" />}
                 </button>
-                <div className="my-1 border-t border-zinc-200/70" />
+                <div className="my-1 border-t border-zinc-100" />
                 {availableSources.map((source) => (
                   <button
                     key={source.id}
@@ -117,10 +117,10 @@ export default function GlassFilterBar({
                       onSelectSource(source.id);
                       setIsSourceMenuOpen(false);
                     }}
-                    className={`apple-btn w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs cursor-pointer transition-colors ${
+                    className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs cursor-pointer transition-colors ${
                       selectedSource === source.id 
-                        ? 'bg-zinc-950 text-white font-bold' 
-                        : 'text-zinc-800 hover:bg-zinc-100/90 font-medium'
+                        ? 'bg-zinc-950 text-white font-bold shadow-xs' 
+                        : 'text-zinc-800 hover:bg-zinc-100 font-medium'
                     }`}
                   >
                     <span className="truncate mr-2">{source.name}</span>
@@ -131,45 +131,47 @@ export default function GlassFilterBar({
             )}
           </div>
 
-          {/* Reading Time Segmented Control */}
-          <div className="inline-flex items-center p-0.5 rounded-full bg-zinc-100/90 border border-zinc-200/80 shadow-2xs">
+          {/* Reading Time Pill Group (Clay Inset Track) */}
+          <div className="clay-inset p-0.5 rounded-full inline-flex items-center">
             <button
               type="button"
               onClick={(e) => {
                 handleButtonClickGlow(e);
                 onSelectReadTime('all');
               }}
-              className={`apple-btn px-3 py-1 rounded-full text-xs font-semibold cursor-pointer transition-all ${
-                readTimeFilter === 'all' 
-                  ? 'bg-zinc-950 text-white font-bold shadow-xs' 
+              className={`px-2.5 sm:px-3 py-1 rounded-full text-[11px] font-bold transition-all cursor-pointer ${
+                readTimeFilter === 'all'
+                  ? 'clay-pill-active'
                   : 'text-zinc-600 hover:text-zinc-950'
               }`}
             >
-              Any Time
+              All Times
             </button>
+
             <button
               type="button"
               onClick={(e) => {
                 handleButtonClickGlow(e);
                 onSelectReadTime('short');
               }}
-              className={`apple-btn px-3 py-1 rounded-full text-xs font-semibold cursor-pointer transition-all ${
-                readTimeFilter === 'short' 
-                  ? 'bg-zinc-950 text-white font-bold shadow-xs' 
+              className={`px-2.5 sm:px-3 py-1 rounded-full text-[11px] font-bold transition-all cursor-pointer ${
+                readTimeFilter === 'short'
+                  ? 'clay-pill-active'
                   : 'text-zinc-600 hover:text-zinc-950'
               }`}
             >
-              &lt; 3m Quick
+              &lt; 3m
             </button>
+
             <button
               type="button"
               onClick={(e) => {
                 handleButtonClickGlow(e);
                 onSelectReadTime('long');
               }}
-              className={`apple-btn px-3 py-1 rounded-full text-xs font-semibold cursor-pointer transition-all ${
-                readTimeFilter === 'long' 
-                  ? 'bg-zinc-950 text-white font-bold shadow-xs' 
+              className={`px-2.5 sm:px-3 py-1 rounded-full text-[11px] font-bold transition-all cursor-pointer ${
+                readTimeFilter === 'long'
+                  ? 'clay-pill-active'
                   : 'text-zinc-600 hover:text-zinc-950'
               }`}
             >
@@ -177,33 +179,31 @@ export default function GlassFilterBar({
             </button>
           </div>
 
-          {/* Verified Dispatch Toggle */}
+          {/* Verified Editorial Toggle */}
           <button
             type="button"
             onClick={(e) => {
               handleButtonClickGlow(e);
               onToggleVerified();
             }}
-            className={`apple-btn inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-semibold cursor-pointer transition-all border ${
+            className={`px-3 py-1.5 rounded-full text-xs font-semibold inline-flex items-center space-x-1.5 transition-all cursor-pointer ${
               verifiedOnly
-                ? 'bg-emerald-600 text-white border-emerald-500 shadow-xs'
-                : 'bg-zinc-100/90 text-zinc-700 border-zinc-200/80 hover:bg-white'
+                ? 'clay-pill-active'
+                : 'clay-btn text-zinc-700'
             }`}
-            title="Filter by verified wire dispatches with confirmed attribution"
           >
-            <ShieldCheck className={`w-3.5 h-3.5 ${verifiedOnly ? 'text-white' : 'text-emerald-600'}`} />
-            <span>Verified Wire</span>
+            <span>Verified Desk</span>
           </button>
         </div>
 
-        {/* Right Side: Sort Order Popover & Stats Pill */}
-        <div className="flex items-center space-x-2 shrink-0 ml-auto">
-          {/* Result Count Indicator */}
-          <span className="hidden md:inline-flex items-center px-2.5 py-1 rounded-full bg-zinc-100/80 text-[11px] font-mono font-medium text-zinc-600 border border-zinc-200/80">
-            {filteredCount} {filteredCount === 1 ? 'Dispatch' : 'Dispatches'}
+        {/* Right Side: Sort Order & Count */}
+        <div className="flex items-center space-x-2">
+          {/* Dispatch Count */}
+          <span className="text-[11px] font-mono text-zinc-500 hidden sm:inline">
+            Showing <strong className="text-zinc-900">{filteredCount}</strong> stories
           </span>
 
-          {/* Sort Menu Popover (Solid Opaque Backdrop) */}
+          {/* Sort Dropdown Popover */}
           <div className="relative">
             <button
               type="button"
@@ -212,18 +212,17 @@ export default function GlassFilterBar({
                 setIsSortMenuOpen(!isSortMenuOpen);
                 setIsSourceMenuOpen(false);
               }}
-              className="apple-btn inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold text-zinc-900 bg-zinc-100/90 hover:bg-white border border-zinc-200/90 shadow-2xs transition-all cursor-pointer"
+              className="clay-btn inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-semibold text-zinc-900 cursor-pointer"
             >
-              <SortIcon className="w-3.5 h-3.5 text-zinc-600" />
+              <SortIcon className="w-3.5 h-3.5 text-zinc-700" />
               <span>{currentSort.label}</span>
               <ChevronDown className={`w-3.5 h-3.5 text-zinc-400 transition-transform ${isSortMenuOpen ? 'rotate-180' : ''}`} />
             </button>
 
             {isSortMenuOpen && (
-              <div className="absolute top-full right-0 mt-2 w-56 bg-white/98 backdrop-blur-3xl rounded-2xl shadow-2xl border border-zinc-200 p-1.5 z-50 ring-1 ring-black/5 animate-in fade-in zoom-in-95 duration-150">
+              <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-2xl shadow-xl border border-zinc-200 p-1.5 z-50 ring-1 ring-black/5 animate-in fade-in zoom-in-95 duration-150">
                 {(Object.keys(sortLabels) as Array<keyof typeof sortLabels>).map((key) => {
-                  const item = sortLabels[key];
-                  const ItemIcon = item.icon;
+                  const ItemIcon = sortLabels[key].icon;
                   const isSelected = sortBy === key;
                   return (
                     <button
@@ -234,15 +233,15 @@ export default function GlassFilterBar({
                         onSelectSortBy(key);
                         setIsSortMenuOpen(false);
                       }}
-                      className={`apple-btn w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs cursor-pointer transition-colors ${
+                      className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs cursor-pointer transition-colors ${
                         isSelected 
-                          ? 'bg-zinc-950 text-white font-bold' 
-                          : 'text-zinc-800 hover:bg-zinc-100/90 font-medium'
+                          ? 'bg-zinc-950 text-white font-bold shadow-xs' 
+                          : 'text-zinc-800 hover:bg-zinc-100 font-medium'
                       }`}
                     >
                       <div className="flex items-center space-x-2">
                         <ItemIcon className="w-3.5 h-3.5" />
-                        <span>{item.label}</span>
+                        <span>{sortLabels[key].label}</span>
                       </div>
                       {isSelected && <Check className="w-3.5 h-3.5" />}
                     </button>

@@ -320,50 +320,47 @@ export default function AuthScreen({
         <div className="relative z-10">
           <Link
             href="/"
-            className="inline-flex items-center space-x-2 text-white/80 hover:text-white transition-colors group"
+            className="inline-flex items-center space-x-2.5 text-white/90 hover:text-white transition-colors group"
           >
-            <div className="w-9 h-9 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
-              <div className="w-3.5 h-3.5 rounded-sm bg-gradient-to-tr from-emerald-400 via-teal-300 to-cyan-400 rotate-45 shadow-xs" />
+            <div className="w-9 h-9 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
+              <span className="font-serif font-black text-white text-base">P</span>
             </div>
-            <span className="font-extrabold text-xl tracking-tight text-white">PRISM</span>
-            <span className="text-[10px] font-mono tracking-widest px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 uppercase font-bold">
-              LIVE NEWS WIRE
+            <span className="font-serif font-extrabold text-xl tracking-tight text-white">PRISM</span>
+            <span className="text-[10px] font-mono tracking-widest px-2.5 py-0.5 rounded-full bg-white/10 text-zinc-300 border border-white/20 uppercase font-bold">
+              EDITORIAL WIRE
             </span>
           </Link>
         </div>
 
         {/* Center Editorial Value Proposition */}
         <div className="relative z-10 max-w-xl my-auto py-8">
-          <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-xs text-white/90 mb-4">
-            <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-            <span className="font-semibold tracking-wide">Real-Time News Intelligence</span>
+          <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-white/10 border border-white/15 text-xs text-white/90 mb-4">
+            <Sparkles className="w-3.5 h-3.5 text-white" />
+            <span className="font-semibold tracking-wide">Editorial Intelligence</span>
           </div>
 
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-[1.12] text-white drop-shadow-md">
+          <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight leading-[1.12] text-white">
             Refracting Global Noise into Verified Signal.
           </h2>
 
-          <p className="mt-4 text-sm sm:text-base text-zinc-300 leading-relaxed max-w-lg font-normal drop-shadow-xs">
-            Over 400+ parallel RSS and live wire feeds aggregated into an ad-free, high-speed
-            intelligence canvas powered by Groq Qwen-3 AI syntheses.
+          <p className="mt-4 text-sm sm:text-base text-zinc-300 leading-relaxed max-w-lg font-normal">
+            Curated parallel RSS and publisher feeds aggregated into an ad-free, high-speed
+            intelligence wire with full in-app reading.
           </p>
 
           {/* Prism Category Stream Pills */}
           <div className="mt-6 flex flex-wrap gap-2 text-xs font-mono">
-            <span className="px-3 py-1 rounded-full bg-sky-500/20 text-sky-300 border border-sky-400/30 backdrop-blur-md">
-              ⚡ TECH & AI
+            <span className="px-3 py-1 rounded-full bg-white/10 text-white border border-white/20">
+              TECH & AI
             </span>
-            <span className="px-3 py-1 rounded-full bg-rose-500/20 text-rose-300 border border-rose-400/30 backdrop-blur-md">
-              🏛️ POLITICS
+            <span className="px-3 py-1 rounded-full bg-white/10 text-white border border-white/20">
+              POLITICS
             </span>
-            <span className="px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/30 backdrop-blur-md">
-              📈 BUSINESS & MARKETS
+            <span className="px-3 py-1 rounded-full bg-white/10 text-white border border-white/20">
+              MARKETS & ECONOMY
             </span>
-            <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 backdrop-blur-md">
-              🏏 SPORTS
-            </span>
-            <span className="px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 border border-purple-400/30 backdrop-blur-md">
-              🌐 WORLD DISPATCH
+            <span className="px-3 py-1 rounded-full bg-white/10 text-white border border-white/20">
+              WORLD DISPATCH
             </span>
           </div>
         </div>

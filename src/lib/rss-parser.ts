@@ -9,7 +9,7 @@ const parser = new XMLParser({
   parseTagValue: false,
 });
 
-function cleanHtml(html: any): string {
+export function cleanHtml(html: any): string {
   if (!html) return '';
   let str = '';
   if (typeof html === 'string') {
@@ -19,17 +19,42 @@ function cleanHtml(html: any): string {
   } else {
     str = String(html);
   }
+
   return str
     .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
     .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
+    // Replace paragraph and break tags with actual newlines to preserve reading structure
+    .replace(/<\/p>/gi, '\n\n')
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/div>/gi, '\n\n')
+    .replace(/<\/li>/gi, '\n')
     .replace(/<[^>]+>/g, ' ')
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&amp;/g, '&')
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/\s+/g, ' ')
+    // HTML entity replacements
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&amp;/gi, '&')
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;/gi, "'")
+    .replace(/&#x27;/gi, "'")
+    .replace(/&apos;/gi, "'")
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
+    .replace(/&rsquo;/gi, "'")
+    .replace(/&lsquo;/gi, "'")
+    .replace(/&rdquo;/gi, '"')
+    .replace(/&ldquo;/gi, '"')
+    .replace(/&mdash;/gi, ' — ')
+    .replace(/&ndash;/gi, ' – ')
+    .replace(/&#8217;/gi, "'")
+    .replace(/&#8216;/gi, "'")
+    .replace(/&#8220;/gi, '"')
+    .replace(/&#8221;/gi, '"')
+    .replace(/&#8212;/gi, ' — ')
+    .replace(/&#8211;/gi, ' – ')
+    // Normalize spacing per line while keeping line breaks
+    .split('\n')
+    .map(line => line.replace(/[ \t]+/g, ' ').trim())
+    .filter(Boolean)
+    .join('\n\n')
     .trim();
 }
 
@@ -114,18 +139,28 @@ export function parseRssFeed(
       }
       if (!link) continue;
 
-      const rawDesc = raw.description || raw.summary || raw['content:encoded'] || '';
-      const description = cleanHtml(rawDesc);
-      const rawContent = raw['content:encoded'] || raw.content || raw.description || '';
-      const content = cleanHtml(rawContent || description);
+      const rawDesc = raw.description || raw.summary || '';
+      const cleanDesc = cleanHtml(rawDesc);
+      
+      const rawContent = raw['content:encoded'] || raw.content || '';
+      const cleanBody = cleanHtml(rawContent);
+
+      // Ensure description is rich and never truncated
+      const finalDescription = cleanDesc || (cleanBody.length > 0 ? cleanBody.split('\n\n')[0] : title);
+      
+      // Ensure content contains full readable multi-paragraph article body
+      let finalContent = cleanBody;
+      if (!finalContent || finalContent.length < finalDescription.length) {
+        finalContent = finalDescription;
+      }
 
       const pubDate = raw.pubDate || raw.published || raw.updated || new Date().toISOString();
       const author = cleanHtml(raw['dc:creator'] || raw.author?.name || raw.author || sourceInfo.name);
 
       const imageUrl = extractImageUrl(raw);
 
-      // Estimate reading time (roughly 200 words/min)
-      const words = (title + ' ' + description + ' ' + content).split(/\s+/).length;
+      // Estimate reading time
+      const words = (title + ' ' + finalDescription + ' ' + finalContent).split(/\s+/).length;
       const readTime = Math.max(2, Math.round(words / 150));
 
       // Hash id from url
@@ -134,8 +169,8 @@ export function parseRssFeed(
       articles.push({
         id,
         title,
-        description: description.slice(0, 320) + (description.length > 320 ? '...' : ''),
-        content: content.length > 50 ? content : description,
+        description: finalDescription,
+        content: finalContent,
         url: link,
         source: sourceInfo,
         author: author || sourceInfo.name,

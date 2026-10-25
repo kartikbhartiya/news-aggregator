@@ -1,6 +1,13 @@
 import type { Metadata, Viewport } from 'next';
-import { Plus_Jakarta_Sans, Inter } from 'next/font/google';
+import { Newsreader, Plus_Jakarta_Sans, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
+
+const newsreader = Newsreader({
+  subsets: ['latin'],
+  variable: '--font-serif',
+  display: 'swap',
+  style: ['normal', 'italic'],
+});
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
@@ -9,10 +16,11 @@ const plusJakarta = Plus_Jakarta_Sans({
   weight: ['400', '500', '600', '700', '800'],
 });
 
-const inter = Inter({
+const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
-  variable: '--font-mono-sans',
+  variable: '--font-mono',
   display: 'swap',
+  weight: ['400', '500', '600', '700'],
 });
 
 export const viewport: Viewport = {
@@ -21,12 +29,12 @@ export const viewport: Viewport = {
   maximumScale: 1,
   userScalable: false,
   viewportFit: 'cover',
-  themeColor: '#FFFFFF',
+  themeColor: '#09090B',
 };
 
 export const metadata: Metadata = {
-  title: 'PRISM — Apple-Grade News & Intelligence Aggregator',
-  description: 'Ultra-premium, real-time news aggregator with Liquid Glass physics, NewsData.io integration, and Supabase cloud sync.',
+  title: 'PRISM — Editorial Intelligence & Real-Time Wire',
+  description: 'High-signal, black & white editorial news aggregator with full readable articles, tactile claymorphic architecture, and verified source intelligence.',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
@@ -45,8 +53,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${plusJakarta.variable} ${inter.variable} antialiased`}>
-      <body className="min-h-screen bg-white text-zinc-900 selection:bg-zinc-950 selection:text-white font-sans overflow-x-hidden">
+    <html lang="en" className={`${newsreader.variable} ${plusJakarta.variable} ${jetbrainsMono.variable} antialiased`}>
+      <body className="min-h-screen bg-[#FBFBFB] text-zinc-950 selection:bg-zinc-950 selection:text-white font-sans overflow-x-hidden">
         {children}
       </body>
     </html>

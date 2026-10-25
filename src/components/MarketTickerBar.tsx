@@ -29,8 +29,7 @@ export default function MarketTickerBar() {
     <div className="border-y border-stone-200/80 bg-white/80 backdrop-blur-sm text-xs select-none overflow-hidden">
       <div className="max-w-7xl mx-auto flex items-center">
         {/* Wire label */}
-        <div className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 bg-stone-900 text-stone-100 font-mono text-[10px] uppercase tracking-wider font-semibold border-r border-stone-800 z-10">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-live-pulse" />
+        <div className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 bg-zinc-950 text-white font-mono text-[10px] uppercase tracking-wider font-semibold border-r border-zinc-800 z-10">
           <span>MARKETS WIRE</span>
         </div>
 

@@ -107,20 +107,18 @@ export default function Masthead({
               title="NewsData.io Global Wire API Connected"
               className="hidden sm:inline-flex items-center space-x-1.5 px-2 py-0.5 rounded bg-white border border-stone-200 hover:border-stone-400 transition-colors text-stone-700 font-sans cursor-pointer"
             >
-              <Radio className="w-3 h-3 text-emerald-600" />
+              <Radio className="w-3 h-3 text-stone-700" />
               <span className="text-[10px] font-medium tracking-tight">NewsData.io API</span>
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-live-pulse" />
             </button>
             <button
               onClick={onOpenSettings}
               title="Supabase Cloud Synchronization Status"
               className="inline-flex items-center space-x-1.5 px-2 py-0.5 rounded bg-white border border-stone-200 hover:border-stone-400 transition-colors text-stone-700 font-sans cursor-pointer"
             >
-              <Database className="w-3 h-3 text-emerald-600" />
+              <Database className="w-3 h-3 text-stone-700" />
               <span className="text-[10px] font-medium tracking-tight">
                 {supabaseConnected ? 'Supabase Synced' : 'Supabase Cloud'}
               </span>
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
             </button>
           </div>
         </div>

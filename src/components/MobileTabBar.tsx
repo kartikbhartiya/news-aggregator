@@ -22,9 +22,9 @@ export default function MobileTabBar({
   return (
     <nav
       aria-label="Mobile Bottom Navigation"
-      className="md:hidden fixed bottom-0 left-0 right-0 z-40 px-3 pb-[max(12px,env(safe-area-inset-bottom))] pt-2"
+      className="md:hidden fixed bottom-0 left-0 right-0 z-40 px-3 pb-[max(10px,env(safe-area-inset-bottom))] pt-2"
     >
-      <div className="max-w-md mx-auto liquid-glass-nav rounded-3xl p-1.5 shadow-xl flex items-center justify-around border border-white/70">
+      <div className="max-w-md mx-auto clay-card rounded-3xl p-1.5 shadow-xl flex items-center justify-around border border-zinc-200">
         {/* Tab 1: Signals (Feed) */}
         <button
           type="button"
@@ -32,8 +32,8 @@ export default function MobileTabBar({
             handleButtonClickGlow(e);
             onSelectTab('signals');
           }}
-          className={`apple-btn flex flex-col items-center justify-center py-1.5 px-3 rounded-2xl transition-all cursor-pointer ${
-            activeTab === 'signals' ? 'text-zinc-950 font-bold bg-white/70 shadow-xs' : 'text-zinc-500'
+          className={`flex flex-col items-center justify-center py-1.5 px-3 rounded-2xl transition-all cursor-pointer ${
+            activeTab === 'signals' ? 'text-zinc-950 font-bold bg-zinc-100 shadow-xs' : 'text-zinc-500'
           }`}
         >
           <Newspaper className="w-5 h-5 mb-0.5" />
@@ -47,25 +47,25 @@ export default function MobileTabBar({
             handleButtonClickGlow(e);
             onSelectTab('search');
           }}
-          className={`apple-btn flex flex-col items-center justify-center py-1.5 px-3 rounded-2xl transition-all cursor-pointer ${
-            activeTab === 'search' ? 'text-zinc-950 font-bold bg-white/70 shadow-xs' : 'text-zinc-500'
+          className={`flex flex-col items-center justify-center py-1.5 px-3 rounded-2xl transition-all cursor-pointer ${
+            activeTab === 'search' ? 'text-zinc-950 font-bold bg-zinc-100 shadow-xs' : 'text-zinc-500'
           }`}
         >
           <Search className="w-5 h-5 mb-0.5" />
           <span className="text-[10px] tracking-tight">Search</span>
         </button>
 
-        {/* Tab 3: AI Brief (Center Prominent) */}
+        {/* Tab 3: AI Brief (Center Prominent Dark Clay Pill) */}
         <button
           type="button"
           onClick={(e) => {
             handleButtonClickGlow(e);
             onSelectTab('brief');
           }}
-          className="apple-prominent-btn apple-btn -my-2 flex flex-col items-center justify-center w-12 h-12 rounded-full shadow-lg border border-white/30 text-white cursor-pointer"
-          title="3-Minute AI Intelligence Brief"
+          className="clay-btn-dark -my-1 flex flex-col items-center justify-center w-11 h-11 rounded-full shadow-md text-white cursor-pointer"
+          title="Executive Intelligence Brief"
         >
-          <Sparkles className="w-5 h-5 text-amber-300" />
+          <Sparkles className="w-5 h-5 text-white" />
         </button>
 
         {/* Tab 4: Saved Dossier */}
@@ -75,8 +75,8 @@ export default function MobileTabBar({
             handleButtonClickGlow(e);
             onSelectTab('dossier');
           }}
-          className={`apple-btn relative flex flex-col items-center justify-center py-1.5 px-3 rounded-2xl transition-all cursor-pointer ${
-            activeTab === 'dossier' ? 'text-zinc-950 font-bold bg-white/70 shadow-xs' : 'text-zinc-500'
+          className={`relative flex flex-col items-center justify-center py-1.5 px-3 rounded-2xl transition-all cursor-pointer ${
+            activeTab === 'dossier' ? 'text-zinc-950 font-bold bg-zinc-100 shadow-xs' : 'text-zinc-500'
           }`}
         >
           <Bookmark className="w-5 h-5 mb-0.5" />
@@ -99,14 +99,14 @@ export default function MobileTabBar({
               onSelectTab('settings');
             }
           }}
-          className={`apple-btn flex flex-col items-center justify-center py-1.5 px-3 rounded-2xl transition-all cursor-pointer ${
-            activeTab === 'settings' ? 'text-zinc-950 font-bold bg-white/70 shadow-xs' : 'text-zinc-500'
+          className={`flex flex-col items-center justify-center py-1.5 px-3 rounded-2xl transition-all cursor-pointer ${
+            activeTab === 'settings' ? 'text-zinc-950 font-bold bg-zinc-100 shadow-xs' : 'text-zinc-500'
           }`}
         >
           {showInstallButton ? (
             <>
-              <Smartphone className="w-5 h-5 mb-0.5 text-emerald-600 animate-bounce" />
-              <span className="text-[10px] tracking-tight font-bold text-emerald-700">Add App</span>
+              <Smartphone className="w-5 h-5 mb-0.5 text-zinc-900" />
+              <span className="text-[10px] tracking-tight font-bold text-zinc-900">App</span>
             </>
           ) : (
             <>

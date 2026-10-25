@@ -106,14 +106,22 @@ export async function fetchNewsDataArticles(options?: {
 
       const title = item.title.trim();
       const rawDesc = item.description || '';
-      const description = rawDesc.replace(/<[^>]+>/g, '').trim();
+      const description = rawDesc
+        .replace(/<\/p>/gi, '\n\n')
+        .replace(/<br\s*\/?>/gi, '\n')
+        .replace(/<[^>]+>/g, '')
+        .trim();
 
       // In free tier, content often says "ONLY AVAILABLE IN PAID PLANS"
       let content = item.content;
       if (!content || content.includes('ONLY AVAILABLE IN PAID PLANS')) {
-        content = `${description}\n\nFull wire coverage dispatched by ${item.source_name || 'NewsData Wire'}. Direct telemetry and primary publisher report available at source link.`;
+        content = description;
       } else {
-        content = content.replace(/<[^>]+>/g, '').trim();
+        content = content
+          .replace(/<\/p>/gi, '\n\n')
+          .replace(/<br\s*\/?>/gi, '\n')
+          .replace(/<[^>]+>/g, '')
+          .trim();
       }
 
       const words = (title + ' ' + description).split(/\s+/).length;
@@ -132,8 +140,8 @@ export async function fetchNewsDataArticles(options?: {
       articles.push({
         id,
         title,
-        description: description.slice(0, 320) + (description.length > 320 ? '...' : ''),
-        content,
+        description: description || title,
+        content: content || description || title,
         url: item.link,
         source: {
           id: `newsdata-${item.source_id || 'wire'}`,

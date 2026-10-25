@@ -74,20 +74,21 @@ export default function CommandPalette({
   ];
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-zinc-950/45 backdrop-blur-md flex justify-center p-4 sm:p-12 animate-in fade-in duration-150">
-      <div className="relative w-full max-w-2xl liquid-glass-panel rounded-3xl shadow-2xl my-auto flex flex-col max-h-[80vh] overflow-hidden border border-white/70">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 flex justify-center p-3 sm:p-12 animate-in fade-in duration-150">
+      <div className="fixed inset-0" onClick={onClose} />
+      <div className="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl my-auto flex flex-col max-h-[80vh] overflow-hidden border border-zinc-200 z-10">
         {/* Input bar */}
-        <div className="p-4 border-b border-zinc-200/60 flex items-center space-x-3 bg-white/70 backdrop-blur-xl">
+        <div className="p-4 border-b border-zinc-200 flex items-center space-x-3 bg-white">
           <Search className="w-4 h-4 text-zinc-400 shrink-0" />
           <input
             type="text"
             autoFocus
-            placeholder="Type a headline, company, category, or command..."
+            placeholder="Search dispatches, categories, or commands..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className="w-full text-sm text-zinc-900 placeholder-zinc-400 focus:outline-none font-sans bg-transparent"
           />
-          <kbd className="px-2 py-0.5 text-[10px] font-mono text-zinc-400 border border-zinc-200 rounded-md bg-white">
+          <kbd className="px-2 py-0.5 text-[10px] font-mono text-zinc-400 border border-zinc-200 rounded-md bg-zinc-50">
             ESC
           </kbd>
         </div>
@@ -147,10 +148,10 @@ export default function CommandPalette({
                   onOpenBriefing();
                   onClose();
                 }}
-                className="apple-glass-btn apple-btn w-full text-left px-3.5 py-2.5 rounded-2xl flex items-center space-x-2.5 transition-colors cursor-pointer"
+                className="clay-btn w-full text-left px-3.5 py-2.5 rounded-2xl flex items-center space-x-2.5 transition-colors cursor-pointer"
               >
-                <Sparkles className="w-4 h-4 text-amber-500" />
-                <span className="text-xs text-zinc-900 font-bold">3-Min AI Executive Brief</span>
+                <Sparkles className="w-4 h-4 text-zinc-950" />
+                <span className="text-xs text-zinc-950 font-bold">3-Min Executive Brief</span>
               </button>
 
               <button
@@ -160,10 +161,10 @@ export default function CommandPalette({
                   onOpenBookmarks();
                   onClose();
                 }}
-                className="apple-glass-btn apple-btn w-full text-left px-3.5 py-2.5 rounded-2xl flex items-center space-x-2.5 transition-colors cursor-pointer"
+                className="clay-btn w-full text-left px-3.5 py-2.5 rounded-2xl flex items-center space-x-2.5 transition-colors cursor-pointer"
               >
                 <Bookmark className="w-4 h-4 text-zinc-700" />
-                <span className="text-xs text-zinc-900 font-bold">Open Saved Dossier</span>
+                <span className="text-xs text-zinc-950 font-bold">Open Saved Dossier</span>
               </button>
 
               <button
@@ -173,10 +174,10 @@ export default function CommandPalette({
                   onOpenSettings();
                   onClose();
                 }}
-                className="apple-glass-btn apple-btn w-full text-left px-3.5 py-2.5 rounded-2xl flex items-center space-x-2.5 transition-colors cursor-pointer"
+                className="clay-btn w-full text-left px-3.5 py-2.5 rounded-2xl flex items-center space-x-2.5 transition-colors cursor-pointer"
               >
-                <Database className="w-4 h-4 text-emerald-600" />
-                <span className="text-xs text-zinc-900 font-bold">Cloud & API Engine</span>
+                <Database className="w-4 h-4 text-zinc-700" />
+                <span className="text-xs text-zinc-950 font-bold">Cloud & API Engine</span>
               </button>
 
               <button
@@ -186,10 +187,10 @@ export default function CommandPalette({
                   onRefresh();
                   onClose();
                 }}
-                className="apple-glass-btn apple-btn w-full text-left px-3.5 py-2.5 rounded-2xl flex items-center space-x-2.5 transition-colors cursor-pointer"
+                className="clay-btn w-full text-left px-3.5 py-2.5 rounded-2xl flex items-center space-x-2.5 transition-colors cursor-pointer"
               >
                 <RotateCw className="w-4 h-4 text-zinc-700" />
-                <span className="text-xs text-zinc-900 font-bold">Refresh Global Wire</span>
+                <span className="text-xs text-zinc-950 font-bold">Refresh News Wire</span>
               </button>
             </div>
           </div>
@@ -209,7 +210,7 @@ export default function CommandPalette({
                     onSelectCategory(cat.id);
                     onClose();
                   }}
-                  className="apple-glass-btn apple-btn px-3 py-1 text-xs rounded-full cursor-pointer font-bold text-zinc-800"
+                  className="clay-pill px-3 py-1 text-xs cursor-pointer font-bold text-zinc-800"
                 >
                   {cat.label}
                 </button>
@@ -219,9 +220,9 @@ export default function CommandPalette({
         </div>
 
         {/* Footer info */}
-        <div className="p-3.5 border-t border-zinc-200/60 bg-white/70 text-[10px] font-mono text-zinc-400 flex items-center justify-between">
+        <div className="p-3.5 border-t border-zinc-200 bg-zinc-50 text-[10px] font-mono text-zinc-400 flex items-center justify-between">
           <span>Navigate with arrow keys • Enter to select</span>
-          <span>Apple Spotlight Command</span>
+          <span>Spotlight Command</span>
         </div>
       </div>
     </div>

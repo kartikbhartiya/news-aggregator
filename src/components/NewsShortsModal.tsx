@@ -164,21 +164,21 @@ export default function NewsShortsModal({
             <span className="px-3 py-1 rounded-full bg-white/95 text-zinc-950 text-xs font-bold shadow-md">
               {current.source.name}
             </span>
-            <span className="px-2 py-0.5 rounded-full bg-white/10 text-emerald-400 font-mono text-[10px] font-bold uppercase border border-white/10">
+            <span className="px-2 py-0.5 rounded-full bg-white/10 text-white font-mono text-[10px] font-bold uppercase border border-white/10">
               {current.category}
             </span>
           </div>
 
           {/* Headline */}
-          <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight leading-snug text-white drop-shadow-md">
+          <h2 className="font-serif text-xl sm:text-2xl font-bold tracking-tight leading-snug text-white drop-shadow-md">
             {current.title}
           </h2>
 
           {/* AI Bullet Takeaways */}
-          <div className="p-3.5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 space-y-2">
-            <div className="text-[10px] font-mono uppercase tracking-wider text-amber-300 font-bold flex items-center space-x-1">
-              <Sparkles className="w-3 h-3" />
-              <span>QUICK AI INTELLIGENCE</span>
+          <div className="p-3.5 rounded-2xl bg-black/60 border border-white/15 space-y-2">
+            <div className="text-[10px] font-mono uppercase tracking-wider text-zinc-300 font-bold flex items-center space-x-1">
+              <Sparkles className="w-3 h-3 text-white" />
+              <span>QUICK INTELLIGENCE</span>
             </div>
             <ul className="space-y-1.5 text-xs text-zinc-200 leading-relaxed font-sans">
               {(current.bulletPoints && current.bulletPoints.length > 0
@@ -189,7 +189,7 @@ export default function NewsShortsModal({
                   ]
               ).slice(0, 3).map((bp, i) => (
                 <li key={i} className="flex items-start space-x-2">
-                  <span className="text-emerald-400 font-bold mt-0.5">•</span>
+                  <span className="text-white font-bold mt-0.5">•</span>
                   <span>{bp}</span>
                 </li>
               ))}
@@ -207,7 +207,7 @@ export default function NewsShortsModal({
                 type="button"
                 onClick={handleToggleAudio}
                 className={`apple-btn p-3 rounded-full transition-all cursor-pointer flex items-center space-x-1.5 text-xs font-bold ${
-                  isSpeaking ? 'bg-emerald-500 text-zinc-950 shadow-md' : 'bg-white/10 text-white hover:bg-white/20'
+                  isSpeaking ? 'bg-white text-zinc-950 shadow-md' : 'bg-white/10 text-white hover:bg-white/20'
                 }`}
                 title={isSpeaking ? 'Stop Audio' : 'Listen to Short'}
               >
@@ -234,7 +234,7 @@ export default function NewsShortsModal({
                 className="apple-btn p-3 rounded-full bg-white/10 text-white hover:bg-white/20 transition-all cursor-pointer"
                 title="Copy Link"
               >
-                {copiedShare ? <Check className="w-4 h-4 text-emerald-400" /> : <Share2 className="w-4 h-4" />}
+                {copiedShare ? <Check className="w-4 h-4 text-white" /> : <Share2 className="w-4 h-4" />}
               </button>
             </div>
 

@@ -14,8 +14,9 @@ import {
   ShieldCheck, 
   Save, 
   MessageSquare, 
-  Sparkles, 
-  Volume2 
+  Sparkles,
+  BookOpen,
+  RotateCw
 } from 'lucide-react';
 import { updateBookmarkNotes, markArticleAsRead } from '@/lib/supabase';
 import { handleButtonClickGlow } from '@/lib/button-glow';
@@ -46,18 +47,63 @@ export default function ModernArticleReader({
   const [isSavingNotes, setIsSavingNotes] = useState(false);
   const [notesSavedToast, setNotesSavedToast] = useState(false);
 
+  // Full In-App Article Paragraphs Fetching
+  const [articleParagraphs, setArticleParagraphs] = useState<string[]>([]);
+  const [isLoadingFullText, setIsLoadingFullText] = useState(false);
+
   // Groq AI dynamic summary
   const [groqSummary, setGroqSummary] = useState<{ keyTakeaway?: string; bulletPoints?: string[] } | null>(null);
   const [isLoadingSummary, setIsLoadingSummary] = useState(false);
 
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
 
+  // Fetch full article text automatically so news is 100% readable on-site
   useEffect(() => {
-    if (article) {
-      markArticleAsRead(article.id);
-      setUserNotes(article.userNotes || '');
-      setGroqSummary(null);
+    if (!article) return;
+
+    markArticleAsRead(article.id);
+    setUserNotes(article.userNotes || '');
+    setGroqSummary(null);
+
+    // Initial paragraphs from article object
+    const initial = article.content
+      ? article.content.split(/\n\s*\n/).filter((p) => p.trim().length > 0)
+      : [article.description];
+
+    setArticleParagraphs(initial);
+
+    // If initial text is short (< 3 paragraphs), automatically fetch full article from publisher
+    let isCancelled = false;
+
+    async function loadFullArticle() {
+      if (!article) return;
+      setIsLoadingFullText(true);
+      try {
+        const params = new URLSearchParams();
+        params.set('url', article.url);
+        params.set('title', article.title);
+        params.set('description', article.description || '');
+        params.set('source', article.source.name || '');
+
+        const res = await fetch(`/api/news/article-content?${params.toString()}`);
+        if (res.ok && !isCancelled) {
+          const data = await res.json();
+          if (data.paragraphs && Array.isArray(data.paragraphs) && data.paragraphs.length > 0) {
+            setArticleParagraphs(data.paragraphs);
+          }
+        }
+      } catch (err) {
+        console.warn('Failed to load expanded article content:', err);
+      } finally {
+        if (!isCancelled) setIsLoadingFullText(false);
+      }
     }
+
+    loadFullArticle();
+
+    return () => {
+      isCancelled = true;
+    };
   }, [article]);
 
   const handleFetchGroqSummary = async () => {
@@ -69,7 +115,7 @@ export default function ModernArticleReader({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           title: article.title,
-          content: article.content || article.description,
+          content: articleParagraphs.join('\n\n') || article.content || article.description,
           sourceName: article.source.name,
         }),
       });
@@ -116,7 +162,7 @@ export default function ModernArticleReader({
     }
 
     window.speechSynthesis.cancel();
-    const textToRead = `${article.title}. Dispatched by ${article.author || article.source.name}. ${article.description}. ${article.content}`;
+    const textToRead = `${article.title}. Published by ${article.author || article.source.name}. ${article.description}. ${articleParagraphs.join('. ')}`;
     const utterance = new SpeechSynthesisUtterance(textToRead);
     utterance.rate = playbackSpeed;
 
@@ -161,47 +207,47 @@ export default function ModernArticleReader({
 
   const fontSizeClasses = {
     sm: 'text-sm leading-relaxed',
-    md: 'text-base leading-relaxed',
-    lg: 'text-lg leading-loose',
+    md: 'text-base leading-relaxed sm:text-[17px] sm:leading-[1.75]',
+    lg: 'text-lg leading-loose sm:text-xl sm:leading-[1.8]',
   }[fontSize];
 
-  const paragraphs = article.content
-    ? article.content.split(/\n\s*\n/).filter((p) => p.trim().length > 0)
-    : [article.description];
-
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-zinc-950/40 backdrop-blur-md flex justify-center sm:justify-end p-0 sm:p-4 animate-in fade-in duration-200">
-      <div className="relative w-full max-w-2xl liquid-glass-panel sm:rounded-[36px] shadow-2xl flex flex-col h-full sm:h-[95vh] my-auto overflow-hidden border border-white/70 animate-in slide-in-from-right duration-300">
-        {/* Sticky Modern Reader Header */}
-        <div className="shrink-0 px-6 py-4 border-b border-zinc-200/60 bg-white/75 backdrop-blur-xl flex items-center justify-between gap-4 z-20">
-          {/* Source & Verified Pill */}
-          <div className="flex items-center space-x-2">
-            <span className="px-3 py-1 rounded-full bg-zinc-900 text-white text-xs font-bold tracking-tight shadow-2xs">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 flex justify-center sm:justify-end p-0 sm:p-4 animate-in fade-in duration-200">
+      {/* Backdrop dismissal */}
+      <div className="fixed inset-0" onClick={onClose} />
+
+      {/* Reader Panel (Claymorphic Solid Container) */}
+      <div className="relative w-full max-w-2xl bg-white sm:rounded-[32px] shadow-2xl flex flex-col h-full sm:h-[95vh] my-auto overflow-hidden border border-zinc-200 animate-in slide-in-from-right duration-300 z-10">
+        
+        {/* Sticky Clay Header */}
+        <div className="shrink-0 px-4 sm:px-6 py-3.5 border-b border-zinc-200 bg-white flex items-center justify-between gap-3 z-20">
+          {/* Source & Verified Badge */}
+          <div className="flex items-center space-x-2 min-w-0">
+            <span className="px-3 py-1 rounded-full bg-zinc-950 text-white text-xs font-bold tracking-tight shrink-0 shadow-xs">
               {article.source.name}
             </span>
-            <span className="hidden sm:inline-flex items-center text-[11px] font-semibold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200/70">
-              <ShieldCheck className="w-3.5 h-3.5 mr-1 text-emerald-600" />
-              Verified Wire
+            <span className="hidden md:inline-flex items-center text-[10px] font-mono uppercase tracking-wider text-zinc-600 bg-zinc-100 px-2 py-0.5 rounded-full border border-zinc-200">
+              Full Reading Wire
             </span>
           </div>
 
-          {/* Controls */}
-          <div className="flex items-center space-x-1.5">
+          {/* Controls Deck */}
+          <div className="flex items-center space-x-1 sm:space-x-1.5 shrink-0">
             {/* Audio Voice Player */}
             {speechSupported && (
-              <div className="inline-flex items-center rounded-xl bg-white/80 p-0.5 border border-zinc-200/70 shadow-2xs">
+              <div className="inline-flex items-center rounded-xl bg-zinc-100 p-0.5 border border-zinc-200">
                 <button
                   type="button"
                   onClick={handleToggleSpeech}
-                  className={`apple-btn px-2.5 py-1 text-xs font-semibold rounded-lg inline-flex items-center space-x-1.5 transition-colors cursor-pointer ${
+                  className={`px-2.5 py-1 text-xs font-semibold rounded-lg inline-flex items-center space-x-1.5 transition-all cursor-pointer ${
                     isPlayingAudio
-                      ? 'bg-zinc-950 text-white shadow-xs'
-                      : 'text-zinc-700 hover:bg-zinc-100'
+                      ? 'clay-btn-dark shadow-xs'
+                      : 'text-zinc-700 hover:text-zinc-950'
                   }`}
                 >
                   {isPlayingAudio ? (
                     <>
-                      <Pause className="w-3.5 h-3.5 text-emerald-400" />
+                      <Pause className="w-3.5 h-3.5 text-white" />
                       <span>Pause</span>
                     </>
                   ) : (
@@ -215,7 +261,7 @@ export default function ModernArticleReader({
                   <button
                     type="button"
                     onClick={handleSpeedCycle}
-                    className="apple-btn px-2 py-1 text-[10px] font-mono text-zinc-600 hover:text-zinc-950 cursor-pointer"
+                    className="px-2 py-1 text-[10px] font-mono text-zinc-600 hover:text-zinc-950 cursor-pointer font-bold"
                   >
                     {playbackSpeed}x
                   </button>
@@ -224,18 +270,20 @@ export default function ModernArticleReader({
             )}
 
             {/* Font Scaler */}
-            <div className="hidden sm:inline-flex items-center rounded-xl bg-white/80 p-0.5 border border-zinc-200/70 text-xs shadow-2xs">
+            <div className="hidden sm:inline-flex items-center rounded-xl bg-zinc-100 p-0.5 border border-zinc-200 text-xs">
               <button
                 type="button"
                 onClick={() => setFontSize(fontSize === 'lg' ? 'md' : 'sm')}
-                className="apple-btn px-2 py-1 rounded-lg text-zinc-600 hover:bg-zinc-100 cursor-pointer font-bold"
+                className="px-2 py-1 rounded-lg text-zinc-600 hover:bg-white cursor-pointer font-bold transition-colors"
+                title="Decrease font size"
               >
                 A-
               </button>
               <button
                 type="button"
                 onClick={() => setFontSize(fontSize === 'sm' ? 'md' : 'lg')}
-                className="apple-btn px-2 py-1 rounded-lg text-zinc-600 hover:bg-zinc-100 cursor-pointer font-bold"
+                className="px-2 py-1 rounded-lg text-zinc-600 hover:bg-white cursor-pointer font-bold transition-colors"
+                title="Increase font size"
               >
                 A+
               </button>
@@ -248,20 +296,22 @@ export default function ModernArticleReader({
                 handleButtonClickGlow(e);
                 onToggleBookmark(article);
               }}
-              className={`apple-glass-btn apple-btn p-2 rounded-xl transition-colors cursor-pointer ${
-                isBookmarked ? 'bg-amber-100 text-amber-800 border-amber-300' : 'text-zinc-600'
+              title={isBookmarked ? 'Remove from Saved' : 'Save Article'}
+              className={`clay-btn p-2 rounded-xl transition-all cursor-pointer ${
+                isBookmarked ? 'bg-zinc-950 text-white border-zinc-950 shadow-xs' : 'text-zinc-700'
               }`}
             >
-              <Bookmark className={`w-4 h-4 ${isBookmarked ? 'fill-amber-500 text-amber-500' : ''}`} />
+              <Bookmark className={`w-4 h-4 ${isBookmarked ? 'fill-white text-white' : ''}`} />
             </button>
 
             {/* Share */}
             <button
               type="button"
               onClick={handleCopyLink}
-              className="apple-glass-btn apple-btn p-2 rounded-xl text-zinc-600 transition-colors cursor-pointer"
+              title="Copy Story Link"
+              className="clay-btn p-2 rounded-xl text-zinc-700 cursor-pointer"
             >
-              {copiedLink ? <Check className="w-4 h-4 text-emerald-600" /> : <Share2 className="w-4 h-4" />}
+              {copiedLink ? <Check className="w-4 h-4 text-zinc-950" /> : <Share2 className="w-4 h-4" />}
             </button>
 
             {/* Close */}
@@ -271,43 +321,51 @@ export default function ModernArticleReader({
                 handleButtonClickGlow(e);
                 onClose();
               }}
-              className="apple-glass-btn apple-btn p-2 rounded-xl text-zinc-800 transition-colors cursor-pointer"
+              title="Close Reader (Esc)"
+              className="clay-btn p-2 rounded-xl text-zinc-950 cursor-pointer hover:bg-zinc-100"
             >
               <X className="w-4 h-4" />
             </button>
           </div>
         </div>
 
-        {/* Scrollable Reader Body */}
-        <div className="overflow-y-auto px-6 sm:px-10 py-8 space-y-6">
+        {/* Scrollable Reader Content Canvas */}
+        <div className="flex-1 overflow-y-auto px-5 sm:px-10 py-6 sm:py-8 space-y-6">
+          
           {/* Header Metadata */}
           <div>
-            <div className="flex items-center space-x-2 text-xs font-bold text-zinc-400 uppercase tracking-wide mb-2">
-              <span className="text-zinc-950">{article.category}</span>
-              <span>•</span>
-              <span className="font-mono text-zinc-500">
-                {new Date(article.publishedAt).toLocaleDateString('en-US', { dateStyle: 'medium' })}
+            <div className="flex flex-wrap items-center gap-2 text-xs font-mono text-zinc-500 uppercase tracking-wide mb-3">
+              <span className="px-2.5 py-0.5 rounded-full bg-zinc-100 text-zinc-900 font-bold border border-zinc-200">
+                {article.category}
               </span>
               <span>•</span>
-              <span className="inline-flex items-center font-mono text-zinc-500">
+              <span>
+                {new Date(article.publishedAt).toLocaleDateString('en-US', { dateStyle: 'long' })}
+              </span>
+              <span>•</span>
+              <span className="inline-flex items-center">
                 <Clock className="w-3 h-3 mr-1" />
                 {article.readTime} min read
               </span>
             </div>
 
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-zinc-950 tracking-tight leading-tight">
+            {/* Headline in Editorial Serif Font */}
+            <h1 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-zinc-950 tracking-tight leading-tight">
               {article.title}
             </h1>
 
-            <div className="mt-3 flex items-center justify-between text-xs text-zinc-500 border-b border-zinc-200/60 pb-4">
-              <span>By <strong className="text-zinc-900">{article.author || article.source.name}</strong></span>
+            {/* Publisher & Author Byline */}
+            <div className="mt-4 flex items-center justify-between text-xs text-zinc-600 border-b border-zinc-200 pb-4">
+              <span>
+                By <strong className="text-zinc-950 font-semibold">{article.author || article.source.name}</strong>
+              </span>
               <a
                 href={article.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center space-x-1 text-zinc-900 font-semibold hover:underline"
+                className="inline-flex items-center space-x-1 text-zinc-950 font-bold hover:underline"
               >
-                <span>Original Wire</span>
+                <span>Original Publication</span>
                 <ExternalLink className="w-3.5 h-3.5" />
               </a>
             </div>
@@ -315,7 +373,7 @@ export default function ModernArticleReader({
 
           {/* Cover Media */}
           {article.imageUrl && (
-            <div className="aspect-[16/10] rounded-3xl overflow-hidden bg-zinc-100 border border-white/70 shadow-sm">
+            <div className="aspect-[16/10] rounded-2xl sm:rounded-3xl overflow-hidden bg-zinc-100 border border-zinc-200 shadow-sm">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={article.imageUrl}
@@ -325,75 +383,104 @@ export default function ModernArticleReader({
             </div>
           )}
 
-          {/* Groq AI Key Takeaways Card */}
-          <div className="p-5 rounded-3xl bg-zinc-50 border border-zinc-200/80 space-y-3 shadow-xs">
+          {/* Lead Editorial Description (Highlighted) */}
+          {article.description && (
+            <div className="p-4 sm:p-5 rounded-2xl bg-zinc-50 border-l-4 border-zinc-950 border-y border-r border-zinc-200 shadow-2xs">
+              <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 block mb-1">
+                Executive Dispatch Lead
+              </span>
+              <p className="font-serif text-base sm:text-lg text-zinc-900 leading-relaxed italic font-normal">
+                "{article.description}"
+              </p>
+            </div>
+          )}
+
+          {/* Groq AI Synthesis Card */}
+          <div className="clay-card p-5 space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2 text-xs font-bold text-zinc-950 font-mono uppercase tracking-wider">
-                <Sparkles className="w-4 h-4 text-emerald-600" />
-                <span>Executive AI Distillation (Groq)</span>
+                <Sparkles className="w-4 h-4 text-zinc-950" />
+                <span>Executive Synthesis</span>
               </div>
               <button
                 type="button"
                 onClick={handleFetchGroqSummary}
                 disabled={isLoadingSummary}
-                className="text-[11px] font-bold text-emerald-700 hover:text-emerald-800 disabled:opacity-40 cursor-pointer flex items-center space-x-1"
+                className="text-xs font-bold text-zinc-900 hover:text-black disabled:opacity-40 cursor-pointer flex items-center space-x-1 underline"
               >
-                <span>{isLoadingSummary ? 'Synthesizing...' : 'Re-Synthesize'}</span>
+                <span>{isLoadingSummary ? 'Analyzing...' : 'Distill Story'}</span>
               </button>
             </div>
 
             {groqSummary?.keyTakeaway && (
-              <p className="text-xs font-semibold text-zinc-900 border-l-2 border-emerald-500 pl-2.5 py-0.5 italic">
-                "{groqSummary.keyTakeaway}"
+              <p className="text-xs font-semibold text-zinc-900 border-l-2 border-zinc-950 pl-3 py-0.5">
+                {groqSummary.keyTakeaway}
               </p>
             )}
 
-            <ul className="space-y-1.5 text-xs text-zinc-700 font-sans">
+            <ul className="space-y-1.5 text-xs text-zinc-700">
               {(groqSummary?.bulletPoints || article.bulletPoints || [
                 `${article.title} reported by ${article.source.name}.`,
-                'High-confidence verified wire dispatch.',
-                'Actionable market and industry policy signals.',
+                'Verified dispatch with complete primary telemetry.',
+                'Direct industry and policy developments recorded.',
               ]).map((bp, i) => (
                 <li key={i} className="flex items-start space-x-2">
-                  <span className="text-emerald-600 font-bold">•</span>
+                  <span className="text-zinc-950 font-bold">•</span>
                   <span>{bp}</span>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Main Body */}
-          <div className={`text-zinc-800 ${fontSizeClasses} space-y-4 font-normal`}>
-            {paragraphs.map((p, idx) => (
-              <p key={idx}>{p}</p>
-            ))}
+          {/* Main Full Article Paragraphs */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between pb-1 border-b border-zinc-200">
+              <span className="text-xs font-mono uppercase tracking-wider text-zinc-500 font-bold flex items-center space-x-1.5">
+                <BookOpen className="w-3.5 h-3.5" />
+                <span>Article Body</span>
+              </span>
+              {isLoadingFullText && (
+                <span className="text-[11px] font-mono text-zinc-500 inline-flex items-center space-x-1">
+                  <RotateCw className="w-3 h-3 animate-spin mr-1" />
+                  <span>Loading full narrative...</span>
+                </span>
+              )}
+            </div>
+
+            <div className={`text-zinc-900 ${fontSizeClasses} space-y-4 font-normal`}>
+              {articleParagraphs.map((p, idx) => (
+                <p key={idx} className="leading-relaxed text-zinc-800">
+                  {p}
+                </p>
+              ))}
+            </div>
           </div>
 
           {/* Original Source Callout */}
-          <div className="p-4.5 rounded-3xl bg-white/80 border border-zinc-200/70 flex items-center justify-between shadow-xs">
+          <div className="p-4 rounded-2xl bg-zinc-50 border border-zinc-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
             <div className="text-xs text-zinc-600">
-              Wire report indexed from <strong>{article.source.name}</strong>.
+              Primary wire indexed from <strong className="text-zinc-950">{article.source.name}</strong>.
             </div>
             <a
               href={article.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="apple-prominent-btn apple-btn inline-flex items-center space-x-1 px-3.5 py-2 rounded-xl text-xs font-semibold shadow-xs"
+              className="clay-btn-dark inline-flex items-center justify-center space-x-1 px-4 py-2 rounded-xl text-xs font-bold shrink-0"
             >
               <span>Visit Publisher</span>
-              <ExternalLink className="w-3.5 h-3.5" />
+              <ExternalLink className="w-3.5 h-3.5 ml-1" />
             </a>
           </div>
 
-          {/* Supabase Research Notes Box */}
-          <div className="pt-4 border-t border-zinc-200/60 space-y-2">
+          {/* Private Notes (Supabase Synced) */}
+          <div className="pt-4 border-t border-zinc-200 space-y-2.5">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-bold text-zinc-900 flex items-center space-x-1.5">
-                <MessageSquare className="w-3.5 h-3.5 text-zinc-500" />
-                <span>Private Notes (Supabase Cloud Synced)</span>
+              <label className="text-xs font-bold text-zinc-950 flex items-center space-x-1.5">
+                <MessageSquare className="w-3.5 h-3.5 text-zinc-700" />
+                <span>Private Editorial Notes</span>
               </label>
               {notesSavedToast && (
-                <span className="text-xs text-emerald-700 font-bold inline-flex items-center">
+                <span className="text-xs text-zinc-900 font-bold inline-flex items-center">
                   <Check className="w-3 h-3 mr-1" /> Saved
                 </span>
               )}
@@ -401,19 +488,19 @@ export default function ModernArticleReader({
             <textarea
               value={userNotes}
               onChange={(e) => setUserNotes(e.target.value)}
-              placeholder="Save your personal insights, investment takeaways, or follow-ups here..."
+              placeholder="Record your personal notes, takeaways, or investment follow-ups here..."
               rows={3}
-              className="w-full p-3.5 bg-white/80 border border-zinc-200/80 rounded-2xl text-xs text-zinc-900 focus:bg-white focus:outline-none focus:border-zinc-900 transition-colors shadow-2xs"
+              className="w-full p-3.5 bg-zinc-50 border border-zinc-200 rounded-2xl text-xs text-zinc-900 focus:bg-white focus:outline-none focus:border-zinc-950 transition-colors shadow-inner"
             />
             <div className="flex justify-end">
               <button
                 type="button"
                 onClick={handleSaveNotes}
                 disabled={isSavingNotes}
-                className="apple-prominent-btn apple-btn inline-flex items-center space-x-1.5 px-4 py-2 text-xs font-semibold rounded-xl cursor-pointer shadow-xs"
+                className="clay-btn-dark inline-flex items-center space-x-1.5 px-4 py-2 text-xs font-semibold rounded-xl cursor-pointer"
               >
                 <Save className="w-3 h-3" />
-                <span>{isSavingNotes ? 'Saving...' : 'Save to Cloud'}</span>
+                <span>{isSavingNotes ? 'Saving...' : 'Save Note'}</span>
               </button>
             </div>
           </div>

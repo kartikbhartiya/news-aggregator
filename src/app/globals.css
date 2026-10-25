@@ -2,17 +2,15 @@
 
 @layer base {
   :root {
-    --background: #FFFFFF;
+    --background: #FBFBFB;
     --foreground: #09090B;
-    --glass-bg: rgba(255, 255, 255, 0.85);
-    --glass-border: rgba(228, 228, 231, 0.8);
-    --glass-border-subtle: rgba(228, 228, 231, 0.5);
-    --glass-highlight: rgba(255, 255, 255, 0.95);
-    --font-sans: var(--font-sans), -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Segoe UI', Roboto, sans-serif;
+    --font-serif: var(--font-serif), Newsreader, Georgia, Cambria, 'Times New Roman', serif;
+    --font-sans: var(--font-sans), 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-mono: var(--font-mono), 'JetBrains Mono', Menlo, Monaco, Consolas, monospace;
   }
 
   body {
-    background-color: #FFFFFF;
+    background-color: #FBFBFB;
     color: var(--foreground);
     font-family: var(--font-sans);
     letter-spacing: -0.015em;
@@ -21,179 +19,307 @@
     -webkit-tap-highlight-color: transparent;
     padding-bottom: env(safe-area-inset-bottom);
   }
-}
 
-/* ================= Apple Liquid Glass Materials ================= */
-
-@keyframes appleItemEntrance {
-  0% {
-    opacity: 0;
-    transform: translateY(16px) scale(0.985);
-  }
-  60% {
-    opacity: 0.92;
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
+  h1, h2, h3, .font-serif {
+    font-family: var(--font-serif);
   }
 }
 
-.apple-item-entrance {
-  animation: appleItemEntrance 480ms cubic-bezier(0.16, 1, 0.3, 1) both;
+/* ================= Premium Black & White Claymorphism ================= */
+
+/* Primary Tactile Clay Card */
+.clay-card {
+  background: #FFFFFF;
+  border: 1px solid #E4E4E7;
+  border-radius: 1.5rem;
+  box-shadow: 
+    0 10px 28px -4px rgba(0, 0, 0, 0.05),
+    0 2px 8px -1px rgba(0, 0, 0, 0.02),
+    inset 0 1.5px 1px 0 rgba(255, 255, 255, 1),
+    inset 0 -2px 3px 0 rgba(0, 0, 0, 0.035);
+  transition: transform 200ms cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 200ms cubic-bezier(0.2, 0.8, 0.2, 1), border-color 200ms ease;
 }
 
-@keyframes shimmer {
-  100% {
-    transform: translateX(100%);
-  }
+.clay-card:hover {
+  border-color: #D4D4D8;
+  transform: translateY(-2px);
+  box-shadow: 
+    0 18px 36px -6px rgba(0, 0, 0, 0.08),
+    0 4px 12px -2px rgba(0, 0, 0, 0.03),
+    inset 0 1.5px 1px 0 rgba(255, 255, 255, 1),
+    inset 0 -2px 3px 0 rgba(0, 0, 0, 0.035);
 }
 
+/* Dark Sculpted Clay Card */
+.clay-card-dark {
+  background: #0B0B0D;
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 1.5rem;
+  box-shadow: 
+    0 14px 34px -4px rgba(0, 0, 0, 0.45),
+    0 4px 12px -2px rgba(0, 0, 0, 0.3),
+    inset 0 1.2px 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -2.5px 4px 0 rgba(0, 0, 0, 0.7);
+  transition: transform 200ms cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 200ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Clay Inset Recessed Surface (Inputs, tab track, search container) */
+.clay-inset {
+  background: #F4F4F6;
+  border: 1px solid #E4E4E7;
+  box-shadow: 
+    inset 0 2px 4px 0 rgba(0, 0, 0, 0.06),
+    inset 0 1px 1px 0 rgba(0, 0, 0, 0.02);
+}
+
+/* Tactile Clay Button (Light Porcelain) */
+.clay-btn {
+  background: #FFFFFF;
+  color: #09090B;
+  border: 1px solid #E4E4E7;
+  box-shadow: 
+    0 3px 8px -1px rgba(0, 0, 0, 0.05),
+    0 1px 2px 0 rgba(0, 0, 0, 0.02),
+    inset 0 1.2px 1px 0 rgba(255, 255, 255, 1),
+    inset 0 -1.5px 2px 0 rgba(0, 0, 0, 0.04);
+  transition: all 140ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.clay-btn:hover {
+  background: #FAFAFA;
+  border-color: #D4D4D8;
+  transform: translateY(-1px);
+  box-shadow: 
+    0 6px 14px -2px rgba(0, 0, 0, 0.07),
+    inset 0 1.2px 1px 0 rgba(255, 255, 255, 1),
+    inset 0 -1.5px 2px 0 rgba(0, 0, 0, 0.04);
+}
+
+.clay-btn:active {
+  transform: translateY(1px) scale(0.98);
+  box-shadow: 
+    0 1px 2px 0 rgba(0, 0, 0, 0.03),
+    inset 0 2px 4px 0 rgba(0, 0, 0, 0.08);
+}
+
+/* Tactile Clay Button (Obsidian Dark) */
+.clay-btn-dark {
+  background: #09090B;
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 
+    0 4px 14px -2px rgba(0, 0, 0, 0.35),
+    inset 0 1.2px 1px 0 rgba(255, 255, 255, 0.25),
+    inset 0 -2px 3px 0 rgba(0, 0, 0, 0.7);
+  transition: all 140ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.clay-btn-dark:hover {
+  background: #18181B;
+  transform: translateY(-1px);
+  box-shadow: 
+    0 7px 18px -3px rgba(0, 0, 0, 0.42),
+    inset 0 1.2px 1.5px 0 rgba(255, 255, 255, 0.3),
+    inset 0 -2px 3px 0 rgba(0, 0, 0, 0.7);
+}
+
+.clay-btn-dark:active {
+  transform: translateY(1px) scale(0.98);
+  box-shadow: 
+    0 1px 3px 0 rgba(0, 0, 0, 0.2),
+    inset 0 2.5px 5px 0 rgba(0, 0, 0, 0.9);
+}
+
+/* Tactile Clay Navigation Bar */
+.clay-nav {
+  background: #FFFFFF;
+  border: 1px solid #E4E4E7;
+  box-shadow: 
+    0 14px 36px -8px rgba(0, 0, 0, 0.06),
+    0 2px 6px -1px rgba(0, 0, 0, 0.02),
+    inset 0 1.5px 1px 0 rgba(255, 255, 255, 1),
+    inset 0 -1.5px 2px 0 rgba(0, 0, 0, 0.03);
+}
+
+/* Tactile Clay Pill */
+.clay-pill {
+  border-radius: 9999px;
+  background: #FFFFFF;
+  border: 1px solid #E4E4E7;
+  box-shadow: 
+    0 2px 5px -1px rgba(0, 0, 0, 0.04),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 1),
+    inset 0 -1px 2px 0 rgba(0, 0, 0, 0.03);
+  transition: all 140ms ease;
+}
+
+.clay-pill:hover {
+  background: #F8F8F9;
+  border-color: #D4D4D8;
+}
+
+.clay-pill-active {
+  border-radius: 9999px;
+  background: #09090B !important;
+  color: #FFFFFF !important;
+  border: 1px solid #09090B !important;
+  box-shadow: 
+    0 4px 12px -2px rgba(0, 0, 0, 0.3),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.25),
+    inset 0 -1.5px 2px 0 rgba(0, 0, 0, 0.6) !important;
+}
+
+/* ================= Backward Compatibility & Glass Removal ================= */
+
+/* Map previous glass classes to pure opaque clay classes */
 .liquid-glass-nav {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(24px) saturate(140%);
-  -webkit-backdrop-filter: blur(24px) saturate(140%);
-  border-bottom: 1px solid rgba(228, 228, 231, 0.8);
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.03);
+  background: #FFFFFF !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-bottom: 1px solid #E4E4E7 !important;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04) !important;
 }
 
 .liquid-glass-panel {
-  background: rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(20px) saturate(140%);
-  -webkit-backdrop-filter: blur(20px) saturate(140%);
-  border: 1px solid rgba(228, 228, 231, 0.8);
+  background: #FFFFFF !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: 1px solid #E4E4E7 !important;
   box-shadow: 
-    0 8px 30px -4px rgba(0, 0, 0, 0.04),
-    0 2px 8px -2px rgba(0, 0, 0, 0.02);
+    0 16px 40px -6px rgba(0, 0, 0, 0.08),
+    0 4px 12px -2px rgba(0, 0, 0, 0.03),
+    inset 0 1.5px 1px 0 rgba(255, 255, 255, 1),
+    inset 0 -2px 3px 0 rgba(0, 0, 0, 0.035) !important;
 }
 
 .liquid-glass-card {
-  background: #FFFFFF;
-  border: 1px solid rgba(228, 228, 231, 0.85);
+  background: #FFFFFF !important;
+  border: 1px solid #E4E4E7 !important;
   box-shadow: 
-    0 4px 16px -2px rgba(0, 0, 0, 0.04),
-    0 1px 3px -1px rgba(0, 0, 0, 0.02);
-  transition: all 250ms cubic-bezier(0.16, 1, 0.3, 1);
+    0 8px 24px -4px rgba(0, 0, 0, 0.05),
+    0 2px 6px -1px rgba(0, 0, 0, 0.02),
+    inset 0 1.5px 1px 0 rgba(255, 255, 255, 1),
+    inset 0 -2px 3px 0 rgba(0, 0, 0, 0.03) !important;
+  transition: all 200ms cubic-bezier(0.2, 0.8, 0.2, 1) !important;
 }
 
 .liquid-glass-card:hover {
-  background: #FFFFFF;
-  border-color: rgba(212, 212, 216, 1);
-  transform: translateY(-2px);
+  border-color: #D4D4D8 !important;
+  transform: translateY(-2px) !important;
   box-shadow: 
-    0 16px 36px -6px rgba(0, 0, 0, 0.07),
-    0 4px 12px -2px rgba(0, 0, 0, 0.03);
+    0 16px 36px -6px rgba(0, 0, 0, 0.08),
+    0 4px 12px -2px rgba(0, 0, 0, 0.03),
+    inset 0 1.5px 1px 0 rgba(255, 255, 255, 1) !important;
 }
 
 .liquid-glass-pill {
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(16px) saturate(130%);
-  -webkit-backdrop-filter: blur(16px) saturate(130%);
-  border: 1px solid rgba(228, 228, 231, 0.7);
-  box-shadow: 0 2px 6px -1px rgba(0, 0, 0, 0.04);
+  background: #FFFFFF !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: 1px solid #E4E4E7 !important;
+  box-shadow: 0 2px 6px -1px rgba(0, 0, 0, 0.04), inset 0 1px 1px 0 rgba(255, 255, 255, 1) !important;
 }
 
 .apple-glass-island {
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(24px) saturate(140%);
-  -webkit-backdrop-filter: blur(24px) saturate(140%);
-  border: 1px solid rgba(228, 228, 231, 0.85);
+  background: #FFFFFF !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: 1px solid #E4E4E7 !important;
   box-shadow: 
-    0 8px 28px -4px rgba(0, 0, 0, 0.04),
-    0 2px 8px -2px rgba(0, 0, 0, 0.02);
+    0 12px 32px -6px rgba(0, 0, 0, 0.05),
+    0 2px 6px -1px rgba(0, 0, 0, 0.02),
+    inset 0 1.5px 1px 0 rgba(255, 255, 255, 1),
+    inset 0 -2px 3px 0 rgba(0, 0, 0, 0.03) !important;
 }
 
-/* ================= On Button Click Glow & Tactile Response ================= */
-
-@keyframes apple-glow-burst {
-  0% {
-    transform: translate(-50%, -50%) scale(0.1);
-    opacity: 0.9;
-  }
-  60% {
-    opacity: 0.65;
-  }
-  100% {
-    transform: translate(-50%, -50%) scale(1.15);
-    opacity: 0;
-  }
+.apple-glass-btn {
+  background: #FFFFFF !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: 1px solid #E4E4E7 !important;
+  box-shadow: 0 2px 6px -1px rgba(0, 0, 0, 0.05), inset 0 1px 1px 0 rgba(255, 255, 255, 1), inset 0 -1px 2px 0 rgba(0, 0, 0, 0.03) !important;
+  transition: all 140ms cubic-bezier(0.2, 0.8, 0.2, 1) !important;
 }
 
-.apple-click-glow {
-  position: absolute;
-  border-radius: 9999px;
-  pointer-events: none;
-  z-index: 30;
+.apple-glass-btn:hover {
+  background: #FAFAFA !important;
+  border-color: #D4D4D8 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 10px -2px rgba(0, 0, 0, 0.06), inset 0 1px 1px 0 rgba(255, 255, 255, 1) !important;
+}
+
+.apple-glass-btn:active {
+  transform: translateY(1px) scale(0.98) !important;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.04), inset 0 2px 3px 0 rgba(0, 0, 0, 0.07) !important;
+}
+
+.apple-prominent-btn {
+  background: #09090B !important;
+  color: #FFFFFF !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  box-shadow: 
+    0 4px 14px -2px rgba(0, 0, 0, 0.35),
+    inset 0 1.2px 1px 0 rgba(255, 255, 255, 0.25),
+    inset 0 -2px 3px 0 rgba(0, 0, 0, 0.7) !important;
+  transition: all 140ms cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+}
+
+.apple-prominent-btn:hover {
+  background: #18181B !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 7px 18px -3px rgba(0, 0, 0, 0.42), inset 0 1.2px 1.5px 0 rgba(255, 255, 255, 0.3) !important;
+}
+
+.apple-prominent-btn:active {
+  transform: translateY(1px) scale(0.98) !important;
 }
 
 .apple-btn {
   position: relative;
-  overflow: hidden;
   transition: transform 120ms cubic-bezier(0.2, 0.8, 0.2, 1), background-color 150ms ease, box-shadow 150ms ease;
   user-select: none;
   -webkit-user-select: none;
 }
 
 .apple-btn:active {
-  transform: scale(0.97);
+  transform: scale(0.98) translateY(1px);
 }
 
-/* Secondary prominent buttons */
-.apple-glass-btn {
-  position: relative;
-  overflow: hidden;
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(20px) saturate(140%);
-  -webkit-backdrop-filter: blur(20px) saturate(140%);
-  border: 1px solid rgba(255, 255, 255, 0.7);
-  box-shadow: 0 2px 8px -1px rgba(0, 0, 0, 0.04), inset 0 1px 1px 0 rgba(255, 255, 255, 0.9);
-  transition: all 140ms cubic-bezier(0.2, 0.8, 0.2, 1);
+/* Editorial entrance animation */
+@keyframes editorialEntrance {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.apple-glass-btn:hover {
-  background: rgba(255, 255, 255, 0.95);
-  box-shadow: 0 4px 14px -2px rgba(0, 0, 0, 0.06), inset 0 1px 1.5px 0 rgba(255, 255, 255, 1);
-}
-
-.apple-glass-btn:active {
-  transform: scale(0.965);
-  background: rgba(244, 244, 245, 0.9);
-}
-
-/* Dark Primary Action Button (Apple Prominent Action) */
-.apple-prominent-btn {
-  position: relative;
-  overflow: hidden;
-  background: #09090B;
-  color: #FFFFFF;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 0 4px 14px -2px rgba(0, 0, 0, 0.2), inset 0 1px 1px 0 rgba(255, 255, 255, 0.35);
-  transition: all 140ms cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-.apple-prominent-btn:hover {
-  background: #18181B;
-  box-shadow: 0 6px 20px -3px rgba(0, 0, 0, 0.28), inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.45);
-}
-
-.apple-prominent-btn:active {
-  transform: scale(0.965);
+.apple-item-entrance {
+  animation: editorialEntrance 360ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 /* Subtle modern scrollbar */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(161, 161, 170, 0.4);
+  background: rgba(161, 161, 170, 0.35);
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(113, 113, 122, 0.7);
+  background: rgba(113, 113, 122, 0.6);
 }
 
 /* Ticker Animation */
@@ -209,25 +335,9 @@
 .animate-ticker {
   display: flex;
   width: max-content;
-  animation: ticker 60s linear infinite;
+  animation: ticker 50s linear infinite;
 }
 
 .animate-ticker:hover {
   animation-play-state: paused;
-}
-
-/* Clean pulse indicator */
-@keyframes modern-pulse {
-  0%, 100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  50% {
-    transform: scale(1.3);
-    opacity: 0.5;
-  }
-}
-
-.animate-live-pulse {
-  animation: modern-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }

@@ -15,7 +15,6 @@ import InstallAppSheet from '@/components/InstallAppSheet';
 import MobileTabBar from '@/components/MobileTabBar';
 import EditorialSkeleton from '@/components/EditorialSkeleton';
 import AuthScreen from '@/components/AuthScreen';
-import PrismLoadingScreen from '@/components/PrismLoadingScreen';
 import OnboardingModal from '@/components/OnboardingModal';
 import UserProfileModal from '@/components/UserProfileModal';
 import NewsShortsModal from '@/components/NewsShortsModal';
@@ -73,7 +72,6 @@ export default function ClientHomePage({
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
   const [isShortsOpen, setIsShortsOpen] = useState(false);
-  const [isInitialBooting, setIsInitialBooting] = useState(true);
 
   // Modals state
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
@@ -138,13 +136,6 @@ export default function ClientHomePage({
       }
     }
     loadArticles(false, edition);
-  }, []);
-
-  useEffect(() => {
-    const bootTimer = setTimeout(() => {
-      setIsInitialBooting(false);
-    }, 1400);
-    return () => clearTimeout(bootTimer);
   }, []);
 
   useEffect(() => {
@@ -366,9 +357,9 @@ export default function ClientHomePage({
           /* Premium Editorial Skeleton Screen — Zero Rotating Bars, Zero Loading Bars */
           <EditorialSkeleton edition={edition} />
         ) : filteredAndSortedArticles.length === 0 ? (
-          <div className="py-24 text-center bg-white/95 backdrop-blur-xl rounded-3xl p-8 max-w-md mx-auto shadow-sm border border-zinc-200">
-            <h3 className="text-lg font-bold text-zinc-900">No Dispatches Match Criteria</h3>
-            <p className="mt-1 text-xs text-zinc-500">
+          <div className="py-20 text-center clay-card p-8 max-w-md mx-auto">
+            <h3 className="font-serif text-lg font-bold text-zinc-950">No Dispatches Match Criteria</h3>
+            <p className="mt-1.5 text-xs text-zinc-500">
               Try adjusting your source or duration filter, or reset all filters.
             </p>
             <button
@@ -380,15 +371,15 @@ export default function ClientHomePage({
                 setReadTimeFilter('all');
                 setVerifiedOnly(false);
               }}
-              className="apple-prominent-btn apple-btn mt-4 px-4 py-2 text-white rounded-xl text-xs font-bold shadow-sm"
+              className="clay-btn-dark mt-4 px-4 py-2 rounded-xl text-xs font-bold"
             >
               Reset Filters
             </button>
           </div>
         ) : viewMode === 'stream' ? (
           /* ================= STREAM LIST VIEW ================= */
-          <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-sm overflow-hidden divide-y divide-zinc-200/60 border border-zinc-200">
-            <div className="p-4 bg-zinc-50/80 border-b border-zinc-200/60 flex items-center justify-between text-xs text-zinc-600 font-semibold uppercase tracking-wider">
+          <div className="clay-card overflow-hidden divide-y divide-zinc-200">
+            <div className="p-4 bg-zinc-50/80 border-b border-zinc-200 flex items-center justify-between text-xs text-zinc-600 font-semibold uppercase tracking-wider font-mono">
               <span>{edition === 'india' ? '🇮🇳 India Edition Stream' : '🌐 Global Wire Stream'} ({filteredAndSortedArticles.length} dispatches)</span>
               <span>Sorted by {sortBy}</span>
             </div>
@@ -413,13 +404,13 @@ export default function ClientHomePage({
           <div className="space-y-8">
             {/* LOGGED IN USER: DEDICATED PERSONALIZED DASHBOARD HEADER */}
             {currentUser && (
-              <div className="p-5 sm:p-6 rounded-[28px] bg-white/95 backdrop-blur-xl border border-zinc-200/90 shadow-sm transition-all animate-in fade-in duration-300">
+              <div className="clay-card p-5 sm:p-6 transition-all">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                   {/* Left: Greeting & Interests */}
                   <div>
                     <div className="flex items-center space-x-2 mb-1.5">
-                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] font-mono font-bold uppercase tracking-wider flex items-center space-x-1">
-                        <Sparkles className="w-3 h-3 text-emerald-600 mr-1" />
+                      <span className="px-2.5 py-0.5 rounded-full bg-zinc-950 text-white text-[10px] font-mono font-bold uppercase tracking-wider flex items-center space-x-1">
+                        <Sparkles className="w-3 h-3 text-white mr-1" />
                         <span>PERSONALIZED INTELLIGENCE</span>
                       </span>
                       <span className="text-zinc-400 text-xs">•</span>
@@ -428,7 +419,7 @@ export default function ClientHomePage({
                       </span>
                     </div>
 
-                    <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight text-zinc-950">
+                    <h2 className="font-serif text-xl sm:text-2xl font-bold tracking-tight text-zinc-950">
                       Welcome, {currentUser.fullName || currentUser.email.split('@')[0]}
                     </h2>
 
@@ -440,7 +431,7 @@ export default function ClientHomePage({
                       {(currentUser.preferences?.categories || ['tech', 'markets', 'business']).map((cat) => (
                         <span
                           key={cat}
-                          className="px-2.5 py-1 rounded-full text-xs font-semibold bg-zinc-100 text-zinc-800 border border-zinc-200 capitalize"
+                          className="px-2.5 py-1 rounded-full text-xs font-semibold bg-zinc-100 text-zinc-900 border border-zinc-200 capitalize"
                         >
                           {cat === 'tech' ? 'Tech & AI' : cat === 'markets' ? 'Capital Markets' : cat === 'business' ? 'Macro Economy' : cat}
                         </span>
@@ -449,7 +440,7 @@ export default function ClientHomePage({
                       <button
                         type="button"
                         onClick={() => setIsOnboardingOpen(true)}
-                        className="apple-btn ml-1 px-2.5 py-1 rounded-full text-xs font-semibold text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100 border border-dashed border-zinc-300 transition-colors cursor-pointer"
+                        className="clay-btn ml-1 px-2.5 py-1 rounded-full text-xs font-semibold text-zinc-700 cursor-pointer"
                         title="Change selected focus categories"
                       >
                         Adjust Interests
@@ -558,36 +549,35 @@ export default function ClientHomePage({
 
               {/* Side Signal Bento Column (4 Cols) */}
               <div className="lg:col-span-4 flex flex-col justify-between gap-4">
-                {/* AI Executive Digest Card with Specular Border */}
+                {/* AI Executive Digest Card with Solid Black Claymorphism (Zero Green Lights) */}
                 <div
                   onClick={(e) => {
                     handleButtonClickGlow(e);
                     setIsBriefingOpen(true);
                   }}
-                  className="apple-btn p-5 rounded-[28px] bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 text-white cursor-pointer hover:shadow-2xl transition-all duration-300 group flex flex-col justify-between border border-zinc-800 shadow-md"
+                  className="clay-card-dark p-5 cursor-pointer group flex flex-col justify-between"
                 >
                   <div>
                     <div className="flex items-center justify-between mb-3">
-                      <span className="px-2.5 py-0.5 rounded-full bg-white/10 backdrop-blur-md text-[10px] font-mono font-bold text-amber-300 flex items-center space-x-1 border border-white/10">
+                      <span className="px-2.5 py-0.5 rounded-full bg-zinc-800 text-[10px] font-mono font-bold text-zinc-200 flex items-center space-x-1 border border-zinc-700">
                         <Sparkles className="w-3 h-3 mr-1" />
                         <span>EXECUTIVE SYNTHESIS</span>
                       </span>
-                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-live-pulse" />
                     </div>
 
-                    <h4 className="text-lg font-extrabold tracking-tight text-white group-hover:text-amber-100 transition-colors">
-                      3-Minute AI Intelligence Brief
+                    <h4 className="font-serif text-xl font-bold tracking-tight text-white group-hover:text-zinc-200 transition-colors">
+                      3-Minute Executive Intelligence Brief
                     </h4>
 
-                    <p className="mt-2 text-xs text-zinc-300 leading-relaxed line-clamp-3 font-normal">
+                    <p className="mt-2 text-xs text-zinc-400 leading-relaxed line-clamp-3 font-normal">
                       {edition === 'india' 
-                        ? "Real-time AI synthesis of today's key Indian economic, market, tech, and policy developments."
-                        : "Real-time AI synthesis of today's leading market, AI, and geopolitical developments."}
+                        ? "Real-time editorial synthesis of today's key Indian economic, market, tech, and policy developments."
+                        : "Real-time editorial synthesis of today's leading market, tech, and geopolitical developments."}
                     </p>
                   </div>
 
-                  <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-xs text-zinc-300">
-                    <span className="font-semibold text-emerald-400">Audio Readout Available</span>
+                  <div className="mt-4 pt-3 border-t border-zinc-800 flex items-center justify-between text-xs text-zinc-400">
+                    <span className="font-semibold text-zinc-300">Audio Readout Available</span>
                     <span className="inline-flex items-center text-white font-bold group-hover:translate-x-1 transition-transform">
                       Open Brief <ArrowRight className="w-3.5 h-3.5 ml-1" />
                     </span>
@@ -603,16 +593,16 @@ export default function ClientHomePage({
                       handleButtonClickGlow(e);
                       setSelectedArticle(art);
                     }}
-                    className="apple-item-entrance apple-btn p-4 rounded-2xl bg-white/95 hover:bg-white backdrop-blur-md border border-zinc-200/90 hover:border-zinc-300 shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:shadow-md transition-all cursor-pointer group"
+                    className="apple-item-entrance clay-card p-4 cursor-pointer group"
                   >
                     <div className="flex items-center justify-between text-[11px] mb-1.5 font-mono">
-                      <span className="font-bold text-zinc-900 uppercase">{art.source.name}</span>
+                      <span className="font-bold text-zinc-950 uppercase">{art.source.name}</span>
                       <span className="text-zinc-500 font-semibold">{art.category}</span>
                     </div>
-                    <h5 className="font-bold text-sm text-zinc-950 group-hover:text-zinc-600 transition-colors line-clamp-2 leading-snug">
+                    <h5 className="font-serif font-bold text-sm sm:text-base text-zinc-950 group-hover:text-zinc-600 transition-colors line-clamp-2 leading-snug">
                       {art.title}
                     </h5>
-                    <p className="mt-1 text-xs text-zinc-500 line-clamp-1">
+                    <p className="mt-1 text-xs text-zinc-600 line-clamp-2 font-normal">
                       {art.description}
                     </p>
                   </div>
@@ -768,14 +758,6 @@ export default function ClientHomePage({
             }}
           />
         </div>
-      )}
-
-      {/* 10. PRISM Cinematic Optical Loading Screen */}
-      {isInitialBooting && (
-        <PrismLoadingScreen
-          edition={edition}
-          onLoaded={() => setIsInitialBooting(false)}
-        />
       )}
 
       <OnboardingModal

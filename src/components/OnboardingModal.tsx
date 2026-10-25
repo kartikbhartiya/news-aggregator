@@ -110,15 +110,15 @@ export default function OnboardingModal({ isOpen, user, onComplete }: Onboarding
       >
         {/* Header */}
         <div className="text-center mb-6">
-          <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] font-mono font-bold tracking-wider mb-2">
-            <Sparkles className="w-3 h-3 text-emerald-600" />
-            <span>MEMBER ONBOARDING</span>
+          <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-zinc-100 text-zinc-950 border border-zinc-200 text-[10px] font-mono font-bold tracking-wider mb-2">
+            <Sparkles className="w-3 h-3 text-zinc-950" />
+            <span>MEMBER PREFERENCES</span>
           </div>
-          <h2 className="text-2xl font-extrabold tracking-tight text-zinc-950">
+          <h2 className="font-serif text-2xl font-bold tracking-tight text-zinc-950">
             Configure Your Personal Intelligence Feed
           </h2>
           <p className="mt-1 text-xs text-zinc-500 max-w-md mx-auto">
-            Choose your focus topics and set your security credentials. Your personal dashboard will filter news specifically for your selections.
+            Choose your focus topics. Your personal feed will curate verified wire stories specifically for your selections.
           </p>
         </div>
 
@@ -126,7 +126,7 @@ export default function OnboardingModal({ isOpen, user, onComplete }: Onboarding
           {/* 1. Category Selection Grid */}
           <div>
             <label className="block text-xs font-mono font-bold uppercase text-zinc-600 mb-2.5">
-              1. Select Intelligence Topics (Multi-Select)
+              1. Select Focus Topics
             </label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               {TOPIC_OPTIONS.map((topic) => {
@@ -136,19 +136,19 @@ export default function OnboardingModal({ isOpen, user, onComplete }: Onboarding
                   <div
                     key={topic.id}
                     onClick={(e) => toggleCategory(topic.id, e)}
-                    className={`apple-btn p-3 rounded-2xl border transition-all cursor-pointer flex items-start space-x-3 ${
+                    className={`clay-card p-3 rounded-2xl border transition-all cursor-pointer flex items-start space-x-3 ${
                       isSelected
                         ? 'bg-zinc-950 text-white border-zinc-900 shadow-sm'
-                        : 'bg-zinc-50 hover:bg-zinc-100 text-zinc-800 border-zinc-200/80'
+                        : 'bg-zinc-50 hover:bg-zinc-100 text-zinc-800 border-zinc-200'
                     }`}
                   >
                     <div className={`p-2 rounded-xl mt-0.5 ${isSelected ? 'bg-white/10' : 'bg-white border border-zinc-200'}`}>
-                      <Icon className={`w-4 h-4 ${isSelected ? 'text-amber-300' : 'text-zinc-700'}`} />
+                      <Icon className={`w-4 h-4 ${isSelected ? 'text-white' : 'text-zinc-700'}`} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-bold truncate">{topic.label}</span>
-                        {isSelected && <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />}
+                        {isSelected && <Check className="w-3.5 h-3.5 text-white shrink-0" />}
                       </div>
                       <p className={`text-[11px] mt-0.5 line-clamp-1 ${isSelected ? 'text-zinc-300' : 'text-zinc-500'}`}>
                         {topic.desc}
