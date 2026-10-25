@@ -14,7 +14,8 @@ import GlassFilterBar from '@/components/GlassFilterBar';
 import InstallAppSheet from '@/components/InstallAppSheet';
 import MobileTabBar from '@/components/MobileTabBar';
 import EditorialSkeleton from '@/components/EditorialSkeleton';
-import AuthModal from '@/components/AuthModal';
+import AuthScreen from '@/components/AuthScreen';
+import PrismLoadingScreen from '@/components/PrismLoadingScreen';
 import OnboardingModal from '@/components/OnboardingModal';
 import UserProfileModal from '@/components/UserProfileModal';
 import NewsShortsModal from '@/components/NewsShortsModal';
@@ -66,6 +67,7 @@ export default function ClientHomePage({
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
   const [isShortsOpen, setIsShortsOpen] = useState(false);
+  const [isInitialBooting, setIsInitialBooting] = useState(true);
 
   // Modals state
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
@@ -130,6 +132,13 @@ export default function ClientHomePage({
       }
     }
     loadArticles(false, edition);
+  }, []);
+
+  useEffect(() => {
+    const bootTimer = setTimeout(() => {
+      setIsInitialBooting(false);
+    }, 1400);
+    return () => clearTimeout(bootTimer);
   }, []);
 
   useEffect(() => {
@@ -567,19 +576,29 @@ export default function ClientHomePage({
         onClose={() => setIsInstallOpen(false)}
       />
 
-      {/* 9. Supabase Auth, Onboarding & Profile Modals */}
-      <AuthModal
-        isOpen={isAuthOpen}
-        onClose={() => setIsAuthOpen(false)}
-        onAuthSuccess={(user) => {
-          setCurrentUser(user);
-          if (!user.preferences?.onboardingCompleted) {
-            setIsOnboardingOpen(true);
-          } else {
-            setIsProfileOpen(true);
-          }
-        }}
-      />
+      {/* 9. Proper Full-Screen Login & Sign Up Screen (Not a Card) */}
+      {isAuthOpen && (
+        <div className="fixed inset-0 z-[9999] overflow-y-auto bg-white animate-fadeIn">
+          <AuthScreen
+            initialMode="signin"
+            onSuccess={(user) => {
+              setCurrentUser(user);
+              setIsAuthOpen(false);
+              if (user.preferences?.edition && user.preferences.edition !== edition) {
+                handleSelectEdition(user.preferences.edition);
+              }
+            }}
+          />
+        </div>
+      )}
+
+      {/* 10. PRISM Cinematic Optical Loading Screen */}
+      {isInitialBooting && (
+        <PrismLoadingScreen
+          edition={edition}
+          onLoaded={() => setIsInitialBooting(false)}
+        />
+      )}
 
       <OnboardingModal
         isOpen={isOnboardingOpen}
