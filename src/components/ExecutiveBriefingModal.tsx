@@ -8,11 +8,13 @@ import { handleButtonClickGlow } from '@/lib/button-glow';
 interface ExecutiveBriefingModalProps {
   isOpen: boolean;
   onClose: () => void;
+  edition?: 'india' | 'international';
 }
 
 export default function ExecutiveBriefingModal({
   isOpen,
   onClose,
+  edition = 'international',
 }: ExecutiveBriefingModalProps) {
   const [briefing, setBriefing] = useState<ExecutiveBriefing | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -23,7 +25,7 @@ export default function ExecutiveBriefingModal({
   const loadBriefing = async (topic = activeTopic, refresh = false) => {
     setIsLoading(true);
     try {
-      const res = await fetch(`/api/news/briefing?category=${topic}&refresh=${refresh}`);
+      const res = await fetch(`/api/news/briefing?category=${topic}&refresh=${refresh}&edition=${edition}`);
       if (res.ok) {
         const data = await res.json();
         setBriefing(data);
@@ -38,7 +40,7 @@ export default function ExecutiveBriefingModal({
   useEffect(() => {
     if (!isOpen) return;
     loadBriefing(activeTopic, false);
-  }, [isOpen, activeTopic]);
+  }, [isOpen, activeTopic, edition]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {

@@ -8,12 +8,14 @@ export async function GET(request: NextRequest) {
     const category = (searchParams.get('category') as NewsCategory) || 'all';
     const sourceId = searchParams.get('source') || 'all';
     const search = searchParams.get('search') || '';
+    const edition = (searchParams.get('edition') === 'india' ? 'india' : 'international') as 'india' | 'international';
     const forceRefresh = searchParams.get('refresh') === 'true';
 
     const articles = await fetchAllAggregatedNews({
       category,
       sourceId,
       search,
+      edition,
       forceRefresh,
     });
 

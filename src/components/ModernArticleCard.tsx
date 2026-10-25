@@ -4,6 +4,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Article } from '@/types/news';
 import { Bookmark, Clock, ArrowUpRight, Volume2, ShieldCheck, Share2, Sparkles } from 'lucide-react';
 import { handleButtonClickGlow } from '@/lib/button-glow';
+import LiquidGlassThumbnail from '@/components/LiquidGlassThumbnail';
 
 interface ModernArticleCardProps {
   article: Article;
@@ -137,24 +138,15 @@ export default function ModernArticleCard({
             </div>
           </div>
 
-          {/* Right Visual Image */}
-          <div className="lg:col-span-5 relative aspect-[16/10] rounded-[24px] overflow-hidden bg-zinc-100 border border-white/60 shadow-inner">
-            {article.imageUrl && !imageError ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={article.imageUrl}
-                alt={article.title}
-                onError={() => setImageError(true)}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-zinc-100 to-zinc-200 text-zinc-400 text-sm font-semibold p-4 text-center">
-                PRISM Global Wire
-              </div>
-            )}
-            <div className="absolute top-3 right-3 px-2.5 py-0.5 rounded-full liquid-glass-pill text-zinc-900 text-[10px] font-mono font-bold shadow-xs">
-              TOP SIGNAL
-            </div>
+          {/* Right Visual Image with Real WebGL Liquid Glass Badge */}
+          <div className="lg:col-span-5">
+            <LiquidGlassThumbnail
+              src={article.imageUrl || ''}
+              alt={article.title}
+              badgeText={article.source.name}
+              priorityBadge="TOP SIGNAL"
+              className="aspect-[16/10] rounded-[24px]"
+            />
           </div>
         </div>
       </div>
@@ -203,20 +195,14 @@ export default function ModernArticleCard({
       className={`group liquid-glass-direct liquid-glass-card rounded-[26px] p-5 flex flex-col justify-between cursor-pointer ${className}`}
     >
       <div>
-        {/* Card Thumbnail with Specular Border */}
-        {article.imageUrl && !imageError && (
-          <div className="relative aspect-[16/10] mb-3.5 rounded-2xl overflow-hidden bg-zinc-100 border border-white/60 shadow-xs">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={article.imageUrl}
-              alt={article.title}
-              onError={() => setImageError(true)}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-            />
-            <div className="absolute top-2 left-2 px-2 py-0.5 rounded-full liquid-glass-pill text-[10px] font-bold text-zinc-800 shadow-xs">
-              {article.source.name}
-            </div>
-          </div>
+        {/* Card Thumbnail with Real WebGL Liquid Glass Badge */}
+        {article.imageUrl && (
+          <LiquidGlassThumbnail
+            src={article.imageUrl}
+            alt={article.title}
+            badgeText={article.source.name}
+            className="aspect-[16/10] mb-3.5"
+          />
         )}
 
         {/* Category & Time */}

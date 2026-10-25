@@ -7,11 +7,13 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const category = searchParams.get('category') || 'all';
     const forceRefresh = searchParams.get('refresh') === 'true';
+    const edition = (searchParams.get('edition') || 'international') as 'india' | 'international';
 
     // Fetch the real-time aggregated articles
     const articles = await fetchAllAggregatedNews({
       category: category as any,
       forceRefresh,
+      edition,
     });
 
     const today = new Date().toLocaleDateString('en-US', {
@@ -65,12 +67,16 @@ export async function GET(request: NextRequest) {
         ];
 
     const briefing: ExecutiveBriefing = {
-      id: `briefing-${Date.now()}`,
-      edition: 'PRISM EXECUTIVE INTELLIGENCE BRIEF',
+      id: `briefing-${edition}-${Date.now()}`,
+      edition: edition === 'india' ? 'PRISM INDIA EXECUTIVE INTELLIGENCE BRIEF' : 'PRISM GLOBAL EXECUTIVE INTELLIGENCE BRIEF',
       date: today,
       leadHighlight,
-      globalPulse: 'Active telemetry monitoring across global semiconductor, trade corridor, and macro capital flows.',
-      marketOutlook: 'Technology equities and sovereign paper yields show firm bid strength; commodity volatility stabilizing.',
+      globalPulse: edition === 'india' 
+        ? 'Active telemetry monitoring across Indian markets, Dholera semiconductor fabs, Dalal Street, and UPI payment infrastructure.'
+        : 'Active telemetry monitoring across global semiconductor, trade corridor, and macro capital flows.',
+      marketOutlook: edition === 'india'
+        ? 'Nifty 50 and Sensex sustain resilient institutional inflows; domestic manufacturing and infra CAPEX lead quarterly momentum.'
+        : 'Technology equities and sovereign paper yields show firm bid strength; commodity volatility stabilizing.',
       keyDevelopments,
     };
 

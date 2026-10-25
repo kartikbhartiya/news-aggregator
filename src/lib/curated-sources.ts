@@ -162,3 +162,84 @@ export const CURATED_FEEDS: FeedConfig[] = [
     },
   },
 ];
+
+export const CURATED_INDIAN_FEEDS: FeedConfig[] = [
+  {
+    id: 'the-hindu-national',
+    name: 'The Hindu',
+    url: 'https://www.thehindu.com/news/national/feeder/default.rss',
+    category: 'world',
+    source: {
+      id: 'the-hindu',
+      name: 'The Hindu',
+      credibilityScore: 98,
+      badge: 'National Editorial',
+      websiteUrl: 'https://thehindu.com',
+    },
+  },
+  {
+    id: 'ndtv-top',
+    name: 'NDTV News',
+    url: 'https://feeds.feedburner.com/ndtvnews-top-stories',
+    category: 'world',
+    source: {
+      id: 'ndtv',
+      name: 'NDTV News Wire',
+      credibilityScore: 96,
+      badge: 'Live Wire',
+      websiteUrl: 'https://ndtv.com',
+    },
+  },
+  {
+    id: 'the-hindu-business',
+    name: 'The Hindu Business',
+    url: 'https://www.thehindu.com/business/feeder/default.rss',
+    category: 'business',
+    source: {
+      id: 'the-hindu-biz',
+      name: 'The Hindu Businessline',
+      credibilityScore: 97,
+      badge: 'Financial Wire',
+      websiteUrl: 'https://thehindu.com/business',
+    },
+  },
+  {
+    id: 'livemint-news',
+    name: 'Livemint',
+    url: 'https://www.livemint.com/rss/news',
+    category: 'markets',
+    source: {
+      id: 'livemint',
+      name: 'Livemint Intelligence',
+      credibilityScore: 96,
+      badge: 'Markets Wire',
+      websiteUrl: 'https://livemint.com',
+    },
+  },
+  {
+    id: 'indian-express-explained',
+    name: 'The Indian Express',
+    url: 'https://indianexpress.com/section/explained/feed/',
+    category: 'science',
+    source: {
+      id: 'indian-express',
+      name: 'The Indian Express',
+      credibilityScore: 97,
+      badge: 'Deep Inquiries',
+      websiteUrl: 'https://indianexpress.com',
+    },
+  },
+  {
+    id: 'times-of-india-top',
+    name: 'The Times of India',
+    url: 'https://timesofindia.indiatimes.com/rssfeedstopstories.cms',
+    category: 'world',
+    source: {
+      id: 'toi',
+      name: 'Times of India',
+      credibilityScore: 94,
+      badge: 'Metro & National',
+      websiteUrl: 'https://timesofindia.indiatimes.com',
+    },
+  },
+];

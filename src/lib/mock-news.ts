@@ -195,3 +195,124 @@ The diplomatic impasse highlights the friction between the urgent demands of the
     sentiment: 'critical',
   },
 ];
+
+export const EDITORIAL_INDIAN_FALLBACK_ARTICLES: Article[] = [
+  {
+    id: 'india-lead-semiconductor',
+    title: 'India Semiconductor Mission Breaks Ground on Commercial Silicon and Advanced Packaging Ecosystem in Gujarat & Assam',
+    description: 'With capital investments surpassing $15 billion, premier fabrication consortiums commence installation of ultra-cleanroom infrastructure and EUV lithography tooling, positioning India as a resilient pillar in the global chip supply chain.',
+    content: `In a landmark stride for domestic industrial capability, the India Semiconductor Mission today formalized the operational phase of its flagship mega-fabs and testing facilities in Dholera and Sanand.
+    
+The initiative, backed by sovereign fiscal incentives and strategic partnerships with Taiwanese and Japanese silicon engineering leaders, establishes the subcontinent's first high-volume commercial foundry ecosystem. Initial manufacturing lines will focus on 28-nanometer logic and power management integrated circuits critical for automotive electrification, 5G telecommunications, and defense aerospace systems.
+
+Ashwini Vaishnaw, Union Minister for Electronics and IT, characterized the milestone as an inflection point: "We are transforming India from a premier consumer of digital silicon into a sovereign fabrication powerhouse. The cleanrooms now rising will anchor employment for over 100,000 engineers and secure domestic industrial supply against geopolitical volatility."`,
+    url: 'https://thehindu.com/news/national/india-semiconductor-ecosystem-dholera',
+    source: {
+      id: 'the-hindu',
+      name: 'The Hindu',
+      credibilityScore: 98,
+      badge: 'National Flagship',
+      websiteUrl: 'https://thehindu.com',
+    },
+    author: 'Sanjay Suri, Technology & Industrial Policy',
+    publishedAt: new Date(Date.now() - 1000 * 60 * 20).toISOString(),
+    imageUrl: 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1200&auto=format&fit=crop',
+    category: 'tech',
+    readTime: 5,
+    isLeadStory: true,
+    bulletPoints: [
+      '$15B in committed capital operationalized across Dholera and Sanand silicon corridors.',
+      'High-volume production lines targeting automotive logic and 5G transceiver shipsets.',
+      'Strategic workforce pipeline establishes 100+ semiconductor training institutes nationwide.',
+    ],
+    sentiment: 'bullish',
+  },
+  {
+    id: 'india-economy-upi',
+    title: 'UPI Processes Record 16.5 Billion Monthly Transactions as Bilateral Cross-Border Linkages Expand to Europe & ASEAN',
+    description: 'The National Payments Corporation of India reports unprecedented transaction velocity, with real-time merchant settlement and bilateral instant remittances expanding across Singapore, UAE, and the Eurozone.',
+    content: `India's real-time digital payments architecture has achieved another unprecedented milestone, processing over 16.5 billion individual transactions valued at more than ₹22 lakh crore in the preceding month.
+    
+Reserve Bank of India Governor Shaktikanta Das emphasized during the monetary policy address that the Unified Payments Interface has transcended national borders to become a benchmark for frictionless cross-border retail remittances and sovereign digital public infrastructure.`,
+    url: 'https://livemint.com/technology/personal-tech/upi-cross-border-settlement-record',
+    source: {
+      id: 'livemint',
+      name: 'Livemint Intelligence',
+      credibilityScore: 97,
+      badge: 'Financial Wire',
+      websiteUrl: 'https://livemint.com',
+    },
+    author: 'Priya Narayanan, Financial Infrastructure',
+    publishedAt: new Date(Date.now() - 1000 * 60 * 45).toISOString(),
+    imageUrl: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?q=80&w=1200&auto=format&fit=crop',
+    category: 'business',
+    readTime: 4,
+    sentiment: 'bullish',
+  },
+  {
+    id: 'india-science-isro-gaganyaan',
+    title: 'ISRO Successfully Validates Cryogenic Upper Stage for Gaganyaan Human Spaceflight Mission',
+    description: 'The Indian Space Research Organisation completes hot-fire qualification tests of the human-rated CE-20 cryogenic engine at Mahendragiri Propulsion Complex, clearing the path for uncrewed orbital tests.',
+    content: `In a decisive step toward placing Indian astronauts into low-Earth orbit, the Indian Space Research Organisation (ISRO) successfully concluded the hot-fire endurance validation of the CE-20 cryogenic engine at the Liquid Propulsion Systems Centre in Mahendragiri, Tamil Nadu.
+    
+The engine operated flawlessly for its full flight duration of 720 seconds under simulated high-altitude thrust vacuum conditions, meeting all performance metrics for the LVM3 human-rated launch vehicle.`,
+    url: 'https://ndtv.com/science/isro-gaganyaan-ce20-cryogenic-engine-test-success',
+    source: {
+      id: 'ndtv',
+      name: 'NDTV News Wire',
+      credibilityScore: 96,
+      badge: 'Science Desk',
+      websiteUrl: 'https://ndtv.com',
+    },
+    author: 'Pallava Bagla, Space Sciences Editor',
+    publishedAt: new Date(Date.now() - 1000 * 60 * 90).toISOString(),
+    imageUrl: 'https://images.unsplash.com/photo-1516849841032-87cbac4d88f7?q=80&w=1200&auto=format&fit=crop',
+    category: 'science',
+    readTime: 4,
+    sentiment: 'bullish',
+  },
+  {
+    id: 'india-markets-nifty-rally',
+    title: 'Dalal Street Reaches Historic Valuations as Domestic Institutional Inflows Mirror Sustained GDP Trajectory',
+    description: 'The BSE Sensex and Nifty 50 surge to fresh all-time highs driven by capital goods, renewable infrastructure, and private banking liquidity as retail SIP flows cross ₹21,000 crore monthly.',
+    content: `Indian capital markets continued their relentless upward march today, with the benchmark indices setting fresh all-time closing highs amidst broad-based participation across capital goods, defense, and power infrastructure sectors.
+    
+Foreign Portfolio Investors (FPIs) reversed earlier quarterly caution, pumping net inflows of $2.4 billion into Indian equities as domestic institutional investors maintained record systematic investment plan (SIP) allocations.`,
+    url: 'https://timesofindia.indiatimes.com/business/markets/sensex-nifty-all-time-high-fpi-inflows',
+    source: {
+      id: 'toi',
+      name: 'Times of India',
+      credibilityScore: 95,
+      badge: 'Markets Desk',
+      websiteUrl: 'https://timesofindia.indiatimes.com',
+    },
+    author: 'Rajesh Sharma, Senior Financial Markets Writer',
+    publishedAt: new Date(Date.now() - 1000 * 60 * 110).toISOString(),
+    imageUrl: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?q=80&w=1200&auto=format&fit=crop',
+    category: 'markets',
+    readTime: 3,
+    sentiment: 'bullish',
+  },
+  {
+    id: 'india-culture-cinema',
+    title: 'New Wave of Indian Independent Filmmakers Gains Prominence Across International Cinema Circuits',
+    description: 'From Cannes to Venice, an emerging cadre of independent directors from Kerala, Bengal, and the Northeast reimagines realistic narrative forms, winning prestigious festival juries and streaming acquisitions.',
+    content: `At film festivals from Rotterdam to Busan, international critics and programmers are heralding what many describe as a golden renaissance in regional Indian cinema.
+    
+Moving beyond conventional song-and-dance spectacles, independent storytellers are crafting nuanced, hyper-local cinematic masterworks that explore contemporary social questions with exceptional emotional authenticity and visual lyricism.`,
+    url: 'https://indianexpress.com/article/entertainment/indian-indie-cinema-global-acclaim',
+    source: {
+      id: 'indian-express',
+      name: 'The Indian Express',
+      credibilityScore: 96,
+      badge: 'Arts & Culture',
+      websiteUrl: 'https://indianexpress.com',
+    },
+    author: 'Shubhra Gupta, Senior Film Critic',
+    publishedAt: new Date(Date.now() - 1000 * 60 * 180).toISOString(),
+    imageUrl: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=1200&auto=format&fit=crop',
+    category: 'culture',
+    readTime: 4,
+    sentiment: 'analytical',
+  },
+];

@@ -16,6 +16,8 @@ import {
 import { handleButtonClickGlow } from '@/lib/button-glow';
 
 interface ModernHeaderProps {
+  activeEdition: 'india' | 'international';
+  onSelectEdition: (edition: 'india' | 'international') => void;
   activeCategory: NewsCategory;
   onSelectCategory: (category: NewsCategory) => void;
   searchQuery: string;
@@ -44,6 +46,8 @@ const CATEGORIES: Array<{ id: NewsCategory; label: string; icon?: string }> = [
 ];
 
 export default function ModernHeader({
+  activeEdition,
+  onSelectEdition,
   activeCategory,
   onSelectCategory,
   searchQuery,
@@ -67,8 +71,8 @@ export default function ModernHeader({
     >
       {/* Top Main Navigation Bar */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
-        {/* Brand & Live Status */}
-        <div className="flex items-center space-x-4">
+        {/* Brand & Edition Switcher */}
+        <div className="flex items-center space-x-3">
           <div
             className="flex items-center space-x-2.5 cursor-pointer apple-btn"
             onClick={(e) => {
@@ -88,6 +92,42 @@ export default function ModernHeader({
                 </span>
               </div>
             </div>
+          </div>
+
+          {/* India vs International Edition Toggle */}
+          <div className="inline-flex items-center p-0.5 rounded-full bg-zinc-100 border border-zinc-200/80 shadow-2xs">
+            <button
+              type="button"
+              onClick={(e) => {
+                handleButtonClickGlow(e);
+                onSelectEdition('india');
+              }}
+              className={`apple-btn flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-semibold cursor-pointer transition-all ${
+                activeEdition === 'india'
+                  ? 'bg-zinc-950 text-white shadow-xs'
+                  : 'text-zinc-600 hover:text-zinc-900'
+              }`}
+              title="Switch to India Edition (The Hindu, NDTV, Livemint, Times of India, NewsData India)"
+            >
+              <span>🇮🇳</span>
+              <span>India</span>
+            </button>
+            <button
+              type="button"
+              onClick={(e) => {
+                handleButtonClickGlow(e);
+                onSelectEdition('international');
+              }}
+              className={`apple-btn flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-semibold cursor-pointer transition-all ${
+                activeEdition === 'international'
+                  ? 'bg-zinc-950 text-white shadow-xs'
+                  : 'text-zinc-600 hover:text-zinc-900'
+              }`}
+              title="Switch to International Edition (NYT, BBC, Verge, Hacker News, Global Wire)"
+            >
+              <span>🌐</span>
+              <span>Global</span>
+            </button>
           </div>
         </div>
 

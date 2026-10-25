@@ -1,16 +1,16 @@
 import { Article, NewsCategory } from '@/types/news';
-import { CURATED_FEEDS } from './curated-sources';
+import { CURATED_FEEDS, CURATED_INDIAN_FEEDS } from './curated-sources';
 import { parseRssFeed } from './rss-parser';
-import { EDITORIAL_FALLBACK_ARTICLES } from './mock-news';
+import { EDITORIAL_FALLBACK_ARTICLES, EDITORIAL_INDIAN_FALLBACK_ARTICLES } from './mock-news';
 import { fetchNewsDataArticles } from './newsdata';
 
-// In-memory cache for ultra-fast server response
+// In-memory cache for ultra-fast server response per edition
 interface CacheEntry {
   timestamp: number;
   data: Article[];
 }
 
-let globalCache: CacheEntry | null = null;
+const editionCaches: Record<string, CacheEntry> = {};
 const CACHE_TTL_MS = 3 * 60 * 1000; // 3 minutes
 
 async function fetchHackerNewsArticles(): Promise<Article[]> {
@@ -107,30 +107,40 @@ export async function fetchAllAggregatedNews(options?: {
   category?: NewsCategory;
   sourceId?: string;
   search?: string;
+  edition?: 'india' | 'international';
   forceRefresh?: boolean;
 }): Promise<Article[]> {
   const now = Date.now();
+  const edition = options?.edition || 'international';
+  const cacheKey = `edition-${edition}`;
 
   let allArticles: Article[] = [];
 
-  // Check in-memory cache
-  if (!options?.forceRefresh && globalCache && now - globalCache.timestamp < CACHE_TTL_MS) {
-    allArticles = globalCache.data;
+  // Check in-memory cache for this edition
+  const cached = editionCaches[cacheKey];
+  if (!options?.forceRefresh && cached && now - cached.timestamp < CACHE_TTL_MS) {
+    allArticles = cached.data;
   } else {
-    // Parallel fetch from NewsData.io API + curated feeds + Hacker News
-    const feedPromises = CURATED_FEEDS.map((feed) => fetchFeedSafe(feed));
+    // Select curated feeds and API parameters based on edition
+    const feedsToFetch = edition === 'india' ? CURATED_INDIAN_FEEDS : CURATED_FEEDS;
+    const feedPromises = feedsToFetch.map((feed) => fetchFeedSafe(feed));
+
+    const isIndia = edition === 'india';
     const [newsDataArticles, hnArticles, ...feedResults] = await Promise.all([
       fetchNewsDataArticles({
         category: options?.category,
+        country: isIndia ? 'in' : undefined,
         search: options?.search,
         forceRefresh: options?.forceRefresh,
       }),
-      fetchHackerNewsArticles(),
+      isIndia ? Promise.resolve([]) : fetchHackerNewsArticles(),
       ...feedPromises,
     ]);
 
+    const fallbackArticles = isIndia ? EDITORIAL_INDIAN_FALLBACK_ARTICLES : EDITORIAL_FALLBACK_ARTICLES;
+
     const gathered = [
-      ...EDITORIAL_FALLBACK_ARTICLES,
+      ...fallbackArticles,
       ...newsDataArticles,
       ...hnArticles,
       ...feedResults.flat(),
@@ -165,7 +175,7 @@ export async function fetchAllAggregatedNews(options?: {
     }
 
     allArticles = uniqueArticles;
-    globalCache = {
+    editionCaches[cacheKey] = {
       timestamp: now,
       data: allArticles,
     };

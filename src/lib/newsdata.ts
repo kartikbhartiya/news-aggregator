@@ -45,6 +45,7 @@ function mapNewsDataCategoryToApp(categories?: string[]): NewsCategory {
 
 export async function fetchNewsDataArticles(options?: {
   category?: NewsCategory;
+  country?: string;
   search?: string;
   forceRefresh?: boolean;
 }): Promise<Article[]> {
@@ -52,8 +53,9 @@ export async function fetchNewsDataArticles(options?: {
   if (!apiKey) return [];
 
   const category = options?.category || 'all';
+  const country = options?.country || '';
   const search = options?.search?.trim() || '';
-  const cacheKey = `${category}-${search}`;
+  const cacheKey = `${category}-${country}-${search}`;
   const now = Date.now();
 
   if (!options?.forceRefresh && cache[cacheKey] && now - cache[cacheKey].timestamp < CACHE_TTL) {
@@ -65,6 +67,9 @@ export async function fetchNewsDataArticles(options?: {
     url.searchParams.set('apikey', apiKey);
     url.searchParams.set('language', 'en');
 
+    if (country) {
+      url.searchParams.set('country', country);
+    }
     if (category !== 'all') {
       url.searchParams.set('category', mapCategoryToNewsData(category));
     }

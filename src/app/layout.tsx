@@ -21,7 +21,7 @@ export const viewport: Viewport = {
   maximumScale: 1,
   userScalable: false,
   viewportFit: 'cover',
-  themeColor: '#FAF9FC',
+  themeColor: '#FFFFFF',
 };
 
 export const metadata: Metadata = {
@@ -46,7 +46,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${plusJakarta.variable} ${inter.variable} antialiased`}>
-      <body className="min-h-screen bg-[#FAF9FC] text-zinc-900 selection:bg-zinc-950 selection:text-white font-sans overflow-x-hidden">
+      <body className="min-h-screen bg-white text-zinc-900 selection:bg-zinc-950 selection:text-white font-sans overflow-x-hidden">
         {children}
       </body>
     </html>

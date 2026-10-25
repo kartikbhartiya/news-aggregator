@@ -10,14 +10,13 @@ import ExecutiveBriefingModal from '@/components/ExecutiveBriefingModal';
 import BookmarksDrawer from '@/components/BookmarksDrawer';
 import SupabaseSettingsModal from '@/components/SupabaseSettingsModal';
 import CommandPalette from '@/components/CommandPalette';
-import LiquidGlassBackground from '@/components/LiquidGlassBackground';
-import LiquidGlassView from '@/components/LiquidGlassView';
 import GlassFilterBar from '@/components/GlassFilterBar';
 import InstallAppSheet from '@/components/InstallAppSheet';
 import MobileTabBar from '@/components/MobileTabBar';
+import EditorialSkeleton from '@/components/EditorialSkeleton';
 import { fetchBookmarks, saveBookmarkToSupabase, removeBookmarkFromSupabase, checkSupabaseHealth } from '@/lib/supabase';
 import { handleButtonClickGlow } from '@/lib/button-glow';
-import { EDITORIAL_FALLBACK_ARTICLES } from '@/lib/mock-news';
+import { EDITORIAL_FALLBACK_ARTICLES, EDITORIAL_INDIAN_FALLBACK_ARTICLES } from '@/lib/mock-news';
 import { 
   Sparkles, 
   Flame, 
@@ -27,11 +26,20 @@ import {
 
 interface ClientHomePageProps {
   initialArticles?: Article[];
+  initialEdition?: 'india' | 'international';
 }
 
-export default function ClientHomePage({ initialArticles = [] }: ClientHomePageProps) {
+export default function ClientHomePage({ 
+  initialArticles = [],
+  initialEdition = 'international' 
+}: ClientHomePageProps) {
+  // Edition state: 'india' vs 'international'
+  const [edition, setEdition] = useState<'india' | 'international'>(initialEdition);
+
   const [articles, setArticles] = useState<Article[]>(
-    initialArticles.length > 0 ? initialArticles : EDITORIAL_FALLBACK_ARTICLES
+    initialArticles.length > 0 
+      ? initialArticles 
+      : (initialEdition === 'india' ? EDITORIAL_INDIAN_FALLBACK_ARTICLES : EDITORIAL_FALLBACK_ARTICLES)
   );
   const [isLoading, setIsLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -56,12 +64,15 @@ export default function ClientHomePage({ initialArticles = [] }: ClientHomePageP
   const [isInstallOpen, setIsInstallOpen] = useState(false);
   const [mobileTab, setMobileTab] = useState<'signals' | 'search' | 'brief' | 'dossier' | 'settings'>('signals');
 
-  const loadArticles = useCallback(async (forceRefresh = false) => {
+  const loadArticles = useCallback(async (forceRefresh = false, targetEdition?: 'india' | 'international') => {
     if (forceRefresh) setIsRefreshing(true);
-    else if (articles.length === 0) setIsLoading(true);
+    else setIsLoading(true);
+
+    const activeEd = targetEdition || edition;
 
     try {
       const params = new URLSearchParams();
+      params.set('edition', activeEd);
       if (activeCategory !== 'all') params.set('category', activeCategory);
       if (selectedSource !== 'all') params.set('source', selectedSource);
       if (searchQuery.trim()) params.set('q', searchQuery.trim());
@@ -70,7 +81,7 @@ export default function ClientHomePage({ initialArticles = [] }: ClientHomePageP
       const res = await fetch(`/api/news?${params.toString()}`);
       if (res.ok) {
         const data = await res.json();
-        if (data.articles) {
+        if (data.articles && data.articles.length > 0) {
           setArticles(data.articles);
         }
       }
@@ -80,14 +91,34 @@ export default function ClientHomePage({ initialArticles = [] }: ClientHomePageP
       setIsLoading(false);
       setIsRefreshing(false);
     }
-  }, [activeCategory, selectedSource, searchQuery, articles.length]);
+  }, [edition, activeCategory, selectedSource, searchQuery]);
 
-  // If initialArticles was empty, load on mount
-  useEffect(() => {
-    if (initialArticles.length === 0) {
-      loadArticles();
+  // Handle switching edition between India and International
+  const handleSelectEdition = (newEdition: 'india' | 'international') => {
+    if (newEdition === edition) return;
+    setEdition(newEdition);
+    setSelectedSource('all');
+    setActiveCategory('all');
+    setArticles(newEdition === 'india' ? EDITORIAL_INDIAN_FALLBACK_ARTICLES : EDITORIAL_FALLBACK_ARTICLES);
+    if (typeof window !== 'undefined') {
+      window.history.replaceState(null, '', `?edition=${newEdition}`);
     }
-  }, [initialArticles.length, loadArticles]);
+    loadArticles(true, newEdition);
+  };
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const sp = new URLSearchParams(window.location.search);
+      const ed = sp.get('edition');
+      if (ed === 'india') {
+        setEdition('india');
+        setArticles(EDITORIAL_INDIAN_FALLBACK_ARTICLES);
+        loadArticles(true, 'india');
+        return;
+      }
+    }
+    loadArticles(false, edition);
+  }, []);
 
   useEffect(() => {
     async function initSupabase() {
@@ -196,18 +227,14 @@ export default function ClientHomePage({ initialArticles = [] }: ClientHomePageP
   };
 
   return (
-    <LiquidGlassView 
-      refreshKey={filteredAndSortedArticles.length}
-      className="min-h-screen flex flex-col selection:bg-zinc-950 selection:text-white pb-20 md:pb-0"
-    >
-      {/* 1. Direct Child Sibling 0: High-Chroma Apple Ambient Canvas for Real WebGL Refraction */}
-      <LiquidGlassBackground />
+    <div className="min-h-screen flex flex-col bg-white text-zinc-950 selection:bg-zinc-950 selection:text-white pb-20 md:pb-0">
+      {/* 1. Live Financial & Geopolitical Ticker Ribbon */}
+      <ModernTickerBar />
 
-      {/* 2. Direct Child Sibling 1: Live Ticker Ribbon */}
-      <ModernTickerBar className="liquid-glass-direct" />
-
-      {/* 3. Direct Child Sibling 2: Modern Liquid Glass Navigation */}
+      {/* 2. Modern Liquid Glass Navigation with India vs International Toggle */}
       <ModernHeader
+        activeEdition={edition}
+        onSelectEdition={handleSelectEdition}
         activeCategory={activeCategory}
         onSelectCategory={(cat) => {
           setActiveCategory(cat);
@@ -228,7 +255,7 @@ export default function ClientHomePage({ initialArticles = [] }: ClientHomePageP
         onToggleViewMode={setViewMode}
       />
 
-      {/* 4. Direct Child Sibling 3: Floating Apple Glass Filter & Sort Island (Replaces clunky old ribbon) */}
+      {/* 3. Floating Apple Glass Filter & Sort Island */}
       <GlassFilterBar
         selectedSource={selectedSource}
         onSelectSource={setSelectedSource}
@@ -241,23 +268,15 @@ export default function ClientHomePage({ initialArticles = [] }: ClientHomePageP
         onToggleVerified={() => setVerifiedOnly(!verifiedOnly)}
         totalArticles={articles.length}
         filteredCount={filteredAndSortedArticles.length}
-        className="liquid-glass-direct"
       />
 
-      {/* 5. Main Modern Content Canvas */}
+      {/* 4. Main Editorial Content Canvas */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {isLoading && articles.length === 0 ? (
-          <div className="py-32 text-center">
-            <div className="relative w-12 h-12 mx-auto mb-4">
-              <div className="w-12 h-12 rounded-full border-2 border-zinc-900 border-t-transparent animate-spin" />
-            </div>
-            <div className="text-base font-extrabold text-zinc-950">Synthesizing Live Dispatches...</div>
-            <p className="mt-1 text-xs text-zinc-500 font-medium">
-              Connecting to NewsData.io API, NYT, BBC, The Verge, and Hacker News streams
-            </p>
-          </div>
+          /* Premium Editorial Skeleton Screen — Zero Rotating Bars, Zero Loading Bars */
+          <EditorialSkeleton edition={edition} />
         ) : filteredAndSortedArticles.length === 0 ? (
-          <div className="py-24 text-center liquid-glass-panel rounded-3xl p-8 max-w-md mx-auto shadow-sm">
+          <div className="py-24 text-center liquid-glass-panel rounded-3xl p-8 max-w-md mx-auto shadow-sm border border-zinc-200">
             <h3 className="text-lg font-bold text-zinc-900">No Dispatches Match Criteria</h3>
             <p className="mt-1 text-xs text-zinc-500">
               Try adjusting your source or duration filter, or reset all filters.
@@ -271,37 +290,45 @@ export default function ClientHomePage({ initialArticles = [] }: ClientHomePageP
                 setReadTimeFilter('all');
                 setVerifiedOnly(false);
               }}
-              className="apple-prominent-btn apple-btn mt-4 px-4 py-2 text-white rounded-xl text-xs font-bold"
+              className="apple-prominent-btn apple-btn mt-4 px-4 py-2 text-white rounded-xl text-xs font-bold shadow-sm"
             >
               Reset Filters
             </button>
           </div>
         ) : viewMode === 'stream' ? (
           /* ================= STREAM LIST VIEW ================= */
-          <div className="liquid-glass-panel rounded-3xl shadow-sm overflow-hidden divide-y divide-zinc-200/50">
-            <div className="p-4 bg-white/40 border-b border-zinc-200/60 flex items-center justify-between text-xs text-zinc-600 font-semibold uppercase tracking-wider">
-              <span>Live Wire Stream ({filteredAndSortedArticles.length} dispatches)</span>
+          <div className="liquid-glass-panel rounded-3xl shadow-sm overflow-hidden divide-y divide-zinc-200/60 border border-zinc-200">
+            <div className="p-4 bg-zinc-50/80 border-b border-zinc-200/60 flex items-center justify-between text-xs text-zinc-600 font-semibold uppercase tracking-wider">
+              <span>{edition === 'india' ? '🇮🇳 India Edition Stream' : '🌐 Global Wire Stream'} ({filteredAndSortedArticles.length} dispatches)</span>
               <span>Sorted by {sortBy}</span>
             </div>
-            {filteredAndSortedArticles.map((art) => (
-              <ModernArticleCard
+            {filteredAndSortedArticles.map((art, idx) => (
+              <div
                 key={art.id}
-                article={art}
-                variant="row"
-                onOpenArticle={setSelectedArticle}
-                onToggleBookmark={handleToggleBookmark}
-                isBookmarked={bookmarks.some((b) => b.id === art.id)}
-              />
+                style={{ animationDelay: `${Math.min(idx * 35, 400)}ms` }}
+                className="apple-item-entrance"
+              >
+                <ModernArticleCard
+                  article={art}
+                  variant="row"
+                  onOpenArticle={setSelectedArticle}
+                  onToggleBookmark={handleToggleBookmark}
+                  isBookmarked={bookmarks.some((b) => b.id === art.id)}
+                />
+              </div>
             ))}
           </div>
         ) : (
           /* ================= BENTO GRID VIEW ================= */
           <div className="space-y-8">
             {/* TOP BENTO SECTION: Hero Widescreen + Side Signal Cards */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch animate-in fade-in slide-in-from-bottom-2 duration-500">
               {/* Flagship Hero Card (8 Cols) */}
               {leadArticle && (
-                <div className="lg:col-span-8">
+                <div 
+                  style={{ animationDelay: '0ms' }}
+                  className="lg:col-span-8 apple-item-entrance"
+                >
                   <ModernArticleCard
                     article={leadArticle}
                     variant="hero"
@@ -314,13 +341,13 @@ export default function ClientHomePage({ initialArticles = [] }: ClientHomePageP
 
               {/* Side Signal Bento Column (4 Cols) */}
               <div className="lg:col-span-4 flex flex-col justify-between gap-4">
-                {/* AI Executive Digest Card */}
+                {/* AI Executive Digest Card with Specular Border */}
                 <div
                   onClick={(e) => {
                     handleButtonClickGlow(e);
                     setIsBriefingOpen(true);
                   }}
-                  className="apple-btn p-5 rounded-[28px] bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 text-white cursor-pointer hover:shadow-2xl transition-all duration-300 group flex flex-col justify-between border border-white/20 shadow-md"
+                  className="apple-btn p-5 rounded-[28px] bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 text-white cursor-pointer hover:shadow-2xl transition-all duration-300 group flex flex-col justify-between border border-zinc-800 shadow-md"
                 >
                   <div>
                     <div className="flex items-center justify-between mb-3">
@@ -332,11 +359,13 @@ export default function ClientHomePage({ initialArticles = [] }: ClientHomePageP
                     </div>
 
                     <h4 className="text-lg font-extrabold tracking-tight text-white group-hover:text-amber-100 transition-colors">
-                      3-Minute Dynamic AI Intelligence Brief
+                      3-Minute AI Intelligence Brief
                     </h4>
 
                     <p className="mt-2 text-xs text-zinc-300 leading-relaxed line-clamp-3 font-normal">
-                      Instant audio readout and real-time synthesis of today&apos;s leading market, AI, and geopolitical developments.
+                      {edition === 'india' 
+                        ? "Real-time AI synthesis of today's key Indian economic, market, tech, and policy developments."
+                        : "Real-time AI synthesis of today's leading market, AI, and geopolitical developments."}
                     </p>
                   </div>
 
@@ -349,14 +378,15 @@ export default function ClientHomePage({ initialArticles = [] }: ClientHomePageP
                 </div>
 
                 {/* Secondary Fast Dispatch Cards */}
-                {sideArticles.map((art) => (
+                {sideArticles.map((art, idx) => (
                   <div
                     key={art.id}
+                    style={{ animationDelay: `${(idx + 1) * 80}ms` }}
                     onClick={(e) => {
                       handleButtonClickGlow(e);
                       setSelectedArticle(art);
                     }}
-                    className="apple-btn p-4 rounded-2xl liquid-glass-card cursor-pointer group"
+                    className="apple-item-entrance apple-btn p-4 rounded-2xl liquid-glass-card cursor-pointer group"
                   >
                     <div className="flex items-center justify-between text-[11px] mb-1.5 font-mono">
                       <span className="font-bold text-zinc-900 uppercase">{art.source.name}</span>
@@ -373,14 +403,14 @@ export default function ClientHomePage({ initialArticles = [] }: ClientHomePageP
               </div>
             </div>
 
-            {/* LOWER BENTO GRID: Multi-column Modern Liquid Glass Cards */}
+            {/* LOWER BENTO GRID: Multi-column Modern Liquid Glass Cards with Item Cascade Animation */}
             {remainingArticles.length > 0 && (
               <div className="pt-4">
                 <div className="flex items-center justify-between mb-5">
                   <div className="flex items-center space-x-2">
                     <Flame className="w-4 h-4 text-amber-500" />
                     <h3 className="text-sm font-extrabold uppercase tracking-wider text-zinc-950">
-                      Dispatched Signals
+                      {edition === 'india' ? 'Dispatched Indian Signals' : 'Dispatched Global Signals'}
                     </h3>
                   </div>
                   <span className="text-xs font-mono text-zinc-500 font-medium">
@@ -388,37 +418,39 @@ export default function ClientHomePage({ initialArticles = [] }: ClientHomePageP
                   </span>
                 </div>
 
-                {/* Bento Grid with local LiquidGlass refraction */}
-                <LiquidGlassView 
-                  refreshKey={remainingArticles.length}
-                  className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5"
-                >
-                  {remainingArticles.map((art) => (
-                    <ModernArticleCard
+                {/* Bento Grid with Item Cascade Entrance */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+                  {remainingArticles.map((art, idx) => (
+                    <div
                       key={art.id}
-                      article={art}
-                      variant="grid"
-                      onOpenArticle={setSelectedArticle}
-                      onToggleBookmark={handleToggleBookmark}
-                      isBookmarked={bookmarks.some((b) => b.id === art.id)}
-                    />
+                      style={{ animationDelay: `${(idx + 2) * 50}ms` }}
+                      className="apple-item-entrance"
+                    >
+                      <ModernArticleCard
+                        article={art}
+                        variant="grid"
+                        onOpenArticle={setSelectedArticle}
+                        onToggleBookmark={handleToggleBookmark}
+                        isBookmarked={bookmarks.some((b) => b.id === art.id)}
+                      />
+                    </div>
                   ))}
-                </LiquidGlassView>
+                </div>
               </div>
             )}
           </div>
         )}
       </main>
 
-      {/* 6. Modern Minimalist Liquid Glass Footer */}
-      <footer className="mt-20 border-t border-white/60 bg-white/40 backdrop-blur-xl">
+      {/* 5. Minimalist Apple White Footer */}
+      <footer className="mt-20 border-t border-zinc-200/80 bg-zinc-50/60 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-500">
           <div className="flex items-center space-x-3">
             <span className="font-extrabold text-zinc-950 tracking-tight">PRISM INTELLIGENCE</span>
             <span>•</span>
-            <span>NewsData.io Real-Time API</span>
+            <span>{edition === 'india' ? '🇮🇳 India Wire' : '🌐 Global Wire'}</span>
             <span>•</span>
-            <span>Liquid Glass WebGL Shaders</span>
+            <span>NewsData.io Real-Time API</span>
           </div>
 
           <div className="flex items-center space-x-4">
@@ -450,7 +482,7 @@ export default function ClientHomePage({ initialArticles = [] }: ClientHomePageP
         </div>
       </footer>
 
-      {/* 7. iOS Native Mobile Bottom Tab Bar */}
+      {/* 6. iOS Native Mobile Bottom Tab Bar */}
       <MobileTabBar
         activeTab={mobileTab}
         onSelectTab={handleSelectMobileTab}
@@ -459,7 +491,7 @@ export default function ClientHomePage({ initialArticles = [] }: ClientHomePageP
         showInstallButton={true}
       />
 
-      {/* 8. Slide-Over Reader & Modals */}
+      {/* 7. Slide-Over Reader & Modals */}
       <ModernArticleReader
         article={selectedArticle}
         onClose={() => setSelectedArticle(null)}
@@ -470,6 +502,7 @@ export default function ClientHomePage({ initialArticles = [] }: ClientHomePageP
       <ExecutiveBriefingModal
         isOpen={isBriefingOpen}
         onClose={() => setIsBriefingOpen(false)}
+        edition={edition}
       />
 
       <BookmarksDrawer
@@ -498,11 +531,11 @@ export default function ClientHomePage({ initialArticles = [] }: ClientHomePageP
         onRefresh={() => loadArticles(true)}
       />
 
-      {/* 9. Install Mobile Web Application Sheet */}
+      {/* 8. Install Mobile Web Application Sheet */}
       <InstallAppSheet
         isOpen={isInstallOpen}
         onClose={() => setIsInstallOpen(false)}
       />
-    </LiquidGlassView>
+    </div>
   );
 }
