@@ -27,7 +27,10 @@ import {
   Sparkles, 
   Flame, 
   ArrowRight,
-  Smartphone
+  Smartphone,
+  Send,
+  Check,
+  RotateCw
 } from 'lucide-react';
 
 interface ClientHomePageProps {
@@ -63,6 +66,9 @@ export default function ClientHomePage({
 
   // User Authentication & Profile
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
+  const [personalFeedOnly, setPersonalFeedOnly] = useState<boolean>(true);
+  const [isSendingDigest, setIsSendingDigest] = useState(false);
+  const [digestStatus, setDigestStatus] = useState<string | null>(null);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
@@ -187,6 +193,35 @@ export default function ClientHomePage({
     setBookmarks((prev) => prev.filter((b) => b.id !== articleId));
   };
 
+  // Test Hostinger SMTP newsletter dispatch directly to user's registered inbox
+  const handleSendTestDigest = async () => {
+    if (!currentUser?.email) return;
+    setIsSendingDigest(true);
+    setDigestStatus(null);
+    try {
+      const res = await fetch('/api/newsletter/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: currentUser.email,
+          userName: currentUser.fullName || currentUser.email.split('@')[0],
+          edition,
+          categories: currentUser.preferences?.categories || [],
+        }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setDigestStatus(`Morning Digest successfully dispatched to ${currentUser.email}!`);
+      } else {
+        setDigestStatus(data.error || 'Failed to dispatch email.');
+      }
+    } catch (err: any) {
+      setDigestStatus(err?.message || 'Error connecting to Hostinger SMTP mailer.');
+    } finally {
+      setIsSendingDigest(false);
+    }
+  };
+
   const availableSources = useMemo(() => {
     const map = new Map<string, string>();
     articles.forEach((a) => {
@@ -197,38 +232,54 @@ export default function ClientHomePage({
     return Array.from(map.entries()).map(([id, name]) => ({ id, name }));
   }, [articles]);
 
-  // Apply rich filters: source, reading time, verified wire, sort
+  // Apply rich filters: instant search, user interests personalization, source, reading time, verified wire, sort
   const filteredAndSortedArticles = useMemo(() => {
     let list = [...articles];
 
-    // Source Filter
+    // 1. Instant Real-Time Search Filtering
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      list = list.filter((a) =>
+        a.title.toLowerCase().includes(q) ||
+        (a.description && a.description.toLowerCase().includes(q)) ||
+        (a.content && a.content.toLowerCase().includes(q)) ||
+        (a.source?.name && a.source.name.toLowerCase().includes(q)) ||
+        (a.category && a.category.toLowerCase().includes(q)) ||
+        (a.author && a.author.toLowerCase().includes(q))
+      );
+    }
+
+    // 2. Personalized Logged-In Feed: Filter strictly to user's preferred categories
+    if (currentUser && personalFeedOnly && activeCategory === 'all') {
+      const userCategories = currentUser.preferences?.categories;
+      if (userCategories && userCategories.length > 0) {
+        list = list.filter((a) => userCategories.includes(a.category));
+      }
+    }
+
+    // 3. Category Filter
+    if (activeCategory !== 'all') {
+      list = list.filter((a) => a.category === activeCategory);
+    }
+
+    // 4. Source Filter
     if (selectedSource !== 'all') {
       list = list.filter((a) => a.source?.id === selectedSource || a.source?.name === selectedSource);
     }
 
-    // Read Time Filter
+    // 5. Read Time Filter
     if (readTimeFilter === 'short') {
       list = list.filter((a) => a.readTime <= 3);
     } else if (readTimeFilter === 'long') {
       list = list.filter((a) => a.readTime >= 6);
     }
 
-    // Verified Editorial Only
+    // 6. Verified Editorial Only
     if (verifiedOnly) {
       list = list.filter((a) => (a.source?.credibilityScore || 85) >= 90);
     }
 
-    // Personalization: If activeCategory is 'all' and user has preferred categories, prioritize them
-    if (activeCategory === 'all' && currentUser?.preferences?.categories?.length) {
-      const preferred = currentUser.preferences.categories;
-      list.sort((a, b) => {
-        const aPref = preferred.includes(a.category) ? 1 : 0;
-        const bPref = preferred.includes(b.category) ? 1 : 0;
-        return bPref - aPref;
-      });
-    }
-
-    // Sort order
+    // 7. Sort order
     if (sortBy === 'latest') {
       return list.sort(
         (a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
@@ -241,7 +292,7 @@ export default function ClientHomePage({
       return list.sort((a, b) => b.readTime - a.readTime);
     }
     return list;
-  }, [articles, selectedSource, readTimeFilter, verifiedOnly, sortBy]);
+  }, [articles, searchQuery, currentUser, personalFeedOnly, activeCategory, selectedSource, readTimeFilter, verifiedOnly, sortBy]);
 
   const leadArticle = filteredAndSortedArticles[0];
   const sideArticles = filteredAndSortedArticles.slice(1, 3);
@@ -360,6 +411,133 @@ export default function ClientHomePage({
         ) : (
           /* ================= BENTO GRID VIEW ================= */
           <div className="space-y-8">
+            {/* LOGGED IN USER: DEDICATED PERSONALIZED DASHBOARD HEADER */}
+            {currentUser && (
+              <div className="p-5 sm:p-6 rounded-[28px] bg-white/95 backdrop-blur-xl border border-zinc-200/90 shadow-sm transition-all animate-in fade-in duration-300">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  {/* Left: Greeting & Interests */}
+                  <div>
+                    <div className="flex items-center space-x-2 mb-1.5">
+                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] font-mono font-bold uppercase tracking-wider flex items-center space-x-1">
+                        <Sparkles className="w-3 h-3 text-emerald-600 mr-1" />
+                        <span>PERSONALIZED INTELLIGENCE</span>
+                      </span>
+                      <span className="text-zinc-400 text-xs">•</span>
+                      <span className="text-xs text-zinc-500 font-medium">
+                        {filteredAndSortedArticles.length} curated {filteredAndSortedArticles.length === 1 ? 'dispatch' : 'dispatches'}
+                      </span>
+                    </div>
+
+                    <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight text-zinc-950">
+                      Welcome, {currentUser.fullName || currentUser.email.split('@')[0]}
+                    </h2>
+
+                    {/* Active Interest Pills */}
+                    <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
+                      <span className="text-[11px] font-mono text-zinc-400 uppercase tracking-wider mr-1">
+                        Your Focus Domains:
+                      </span>
+                      {(currentUser.preferences?.categories || ['tech', 'markets', 'business']).map((cat) => (
+                        <span
+                          key={cat}
+                          className="px-2.5 py-1 rounded-full text-xs font-semibold bg-zinc-100 text-zinc-800 border border-zinc-200 capitalize"
+                        >
+                          {cat === 'tech' ? 'Tech & AI' : cat === 'markets' ? 'Capital Markets' : cat === 'business' ? 'Macro Economy' : cat}
+                        </span>
+                      ))}
+
+                      <button
+                        type="button"
+                        onClick={() => setIsOnboardingOpen(true)}
+                        className="apple-btn ml-1 px-2.5 py-1 rounded-full text-xs font-semibold text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100 border border-dashed border-zinc-300 transition-colors cursor-pointer"
+                        title="Change selected focus categories"
+                      >
+                        Adjust Interests
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Right: Feed View Switcher & SMTP Test Dispatch */}
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2.5 shrink-0">
+                    {/* Toggle: Personal Interests Only vs All Topics */}
+                    <div className="inline-flex items-center p-1 rounded-2xl bg-zinc-100 border border-zinc-200/80 shadow-2xs">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          handleButtonClickGlow(e);
+                          setPersonalFeedOnly(true);
+                          setActiveCategory('all');
+                        }}
+                        className={`apple-btn px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                          personalFeedOnly
+                            ? 'bg-zinc-950 text-white shadow-xs'
+                            : 'text-zinc-600 hover:text-zinc-950'
+                        }`}
+                      >
+                        <span>✦ For You (Interests)</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          handleButtonClickGlow(e);
+                          setPersonalFeedOnly(false);
+                        }}
+                        className={`apple-btn px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                          !personalFeedOnly
+                            ? 'bg-zinc-950 text-white shadow-xs'
+                            : 'text-zinc-600 hover:text-zinc-950'
+                        }`}
+                      >
+                        <span>All Wire News</span>
+                      </button>
+                    </div>
+
+                    {/* Send Morning Digest via Hostinger SMTP Button */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        handleButtonClickGlow(e);
+                        handleSendTestDigest();
+                      }}
+                      disabled={isSendingDigest}
+                      className="apple-btn inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-zinc-900 bg-white hover:bg-zinc-50 border border-zinc-200 shadow-2xs transition-all cursor-pointer disabled:opacity-50"
+                      title="Send instant curated morning briefing to your registered email via Hostinger SMTP"
+                    >
+                      {isSendingDigest ? (
+                        <>
+                          <RotateCw className="w-3.5 h-3.5 animate-spin text-zinc-600" />
+                          <span>Dispatching...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Send className="w-3.5 h-3.5 text-emerald-600" />
+                          <span>Test Email Digest</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+                {/* SMTP Status Notification Banner */}
+                {digestStatus && (
+                  <div className="mt-3.5 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 flex items-center justify-between animate-in fade-in duration-200">
+                    <div className="flex items-center space-x-2">
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>{digestStatus}</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setDigestStatus(null)}
+                      className="text-emerald-700 hover:text-emerald-950 text-xs font-bold"
+                    >
+                      Dismiss
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* TOP BENTO SECTION: Hero Widescreen + Side Signal Cards */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch animate-in fade-in slide-in-from-bottom-2 duration-500">
               {/* Flagship Hero Card (8 Cols) */}
@@ -423,11 +601,7 @@ export default function ClientHomePage({
                     style={{ animationDelay: `${(idx + 1) * 80}ms` }}
                     onClick={(e) => {
                       handleButtonClickGlow(e);
-                      if (art.url) {
-                        window.open(art.url, '_blank', 'noopener,noreferrer');
-                      } else {
-                        setSelectedArticle(art);
-                      }
+                      setSelectedArticle(art);
                     }}
                     className="apple-item-entrance apple-btn p-4 rounded-2xl bg-white/95 hover:bg-white backdrop-blur-md border border-zinc-200/90 hover:border-zinc-300 shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:shadow-md transition-all cursor-pointer group"
                   >

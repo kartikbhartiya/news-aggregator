@@ -71,73 +71,100 @@ export async function getCurrentUser(): Promise<UserProfile | null> {
 }
 
 /**
- * Sign Up with 6-digit Email OTP
+ * Sign Up with 6-digit Email OTP dispatched via Hostinger SMTP
  */
 export async function signUpWithEmailOtp(email: string) {
-  const { data, error } = await supabase.auth.signInWithOtp({
-    email,
-    options: {
-      shouldCreateUser: true,
-    },
+  const cleanEmail = email.toLowerCase().trim();
+
+  // 1. Dispatch real 6-digit OTP via server SMTP endpoint
+  const res = await fetch('/api/auth/otp/send', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: cleanEmail }),
   });
-  if (error) throw error;
-  return data;
+
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.error || 'Failed to dispatch verification code to your email.');
+  }
+
+  // 2. Also register in Supabase Auth if accessible
+  try {
+    await supabase.auth.signInWithOtp({
+      email: cleanEmail,
+      options: { shouldCreateUser: true },
+    });
+  } catch (supaErr) {
+    console.debug('Supabase background OTP note:', supaErr);
+  }
+
+  return { success: true, email: cleanEmail };
 }
 
 /**
- * Verify 6-digit Email OTP
+ * Verify 6-digit Email OTP with real server validation
  */
 export async function verifyEmailOtp(email: string, token: string): Promise<UserProfile> {
   const cleanEmail = email.toLowerCase().trim();
   const cleanToken = token.trim();
 
+  // 1. Verify code against server OTP store
+  const res = await fetch('/api/auth/otp/verify', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: cleanEmail, code: cleanToken }),
+  });
+
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.error || 'Invalid 6-digit verification code. Please check your email.');
+  }
+
+  // 2. Verification succeeded - create/retrieve user profile
   try {
-    const { data, error } = await supabase.auth.verifyOtp({
+    const supaRes = await supabase.auth.verifyOtp({
       email: cleanEmail,
       token: cleanToken,
       type: 'email',
     });
-    if (!error && data.user && data.user.email) {
-      const meta = data.user.user_metadata || {};
+    if (supaRes.data?.user) {
+      const u = supaRes.data.user;
+      const meta = u.user_metadata || {};
       const profile: UserProfile = {
-        id: data.user.id,
-        email: data.user.email,
+        id: u.id,
+        email: u.email || cleanEmail,
         fullName: meta.full_name || cleanEmail.split('@')[0],
         avatarUrl: meta.avatar_url || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(cleanEmail)}`,
         role: 'PRISM Executive Member',
         preferences: meta.preferences || DEFAULT_PREFERENCES,
-        createdAt: data.user.created_at,
+        createdAt: u.created_at,
       };
       if (typeof window !== 'undefined') {
         localStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(profile));
       }
       return profile;
     }
-  } catch (err) {
-    console.warn('Supabase verifyOtp note:', err);
+  } catch (supaErr) {
+    console.debug('Supabase verifyOtp background note:', supaErr);
   }
 
-  // Graceful fallback for 6-digit verification
-  if (/^\d{6}$/.test(cleanToken)) {
-    const fallbackProfile: UserProfile = {
-      id: `user-${Date.now()}`,
-      email: cleanEmail,
-      fullName: cleanEmail.split('@')[0],
-      avatarUrl: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(cleanEmail)}`,
-      role: 'PRISM Executive Member',
-      preferences: {
-        ...DEFAULT_PREFERENCES,
-        onboardingCompleted: false,
-      },
-      createdAt: new Date().toISOString(),
-    };
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(fallbackProfile));
-    }
-    return fallbackProfile;
-  }
+  const profile: UserProfile = {
+    id: `user-${Date.now()}`,
+    email: cleanEmail,
+    fullName: cleanEmail.split('@')[0],
+    avatarUrl: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(cleanEmail)}`,
+    role: 'PRISM Executive Member',
+    preferences: {
+      ...DEFAULT_PREFERENCES,
+      onboardingCompleted: false,
+    },
+    createdAt: new Date().toISOString(),
+  };
 
-  throw new Error('Invalid 6-digit OTP code. Please enter a valid 6-digit verification code.');
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(profile));
+  }
+  return profile;
 }
 
 /**

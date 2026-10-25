@@ -14,7 +14,8 @@ import {
   Smartphone, 
   Globe2, 
   Zap, 
-  User 
+  User,
+  X 
 } from 'lucide-react';
 import { handleButtonClickGlow } from '@/lib/button-glow';
 import { UserProfile } from '@/lib/auth';
@@ -173,6 +174,19 @@ export default function ModernHeader({
                 onChange={(e) => onSearchChange(e.target.value)}
                 className="w-full bg-transparent text-xs text-zinc-900 placeholder-zinc-400 focus:outline-none"
               />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onSearchChange('');
+                  }}
+                  className="mr-1 text-zinc-400 hover:text-zinc-700 cursor-pointer p-0.5"
+                  title="Clear search"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
               <button
                 type="button"
                 onClick={(e) => {

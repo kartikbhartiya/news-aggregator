@@ -129,15 +129,15 @@ export default function Masthead({
       {/* Main Prestigious Brand Masthead */}
       <div className="max-w-7xl mx-auto px-4 sm:px-8 py-7 sm:py-9">
         <div className="text-center relative">
-          {/* Latin Subtitle / Motto */}
+          {/* Motto */}
           <div className="text-[10px] uppercase font-mono tracking-[0.25em] text-stone-500 mb-1.5">
-            VERITAS IN NUMERIS ET LITTERIS • EST. MMXXVI
+            REAL-TIME INTELLIGENCE & GLOBAL DISPATCHES • EST. MMXXVI
           </div>
 
           {/* Masthead Title */}
           <h1 className="font-serif text-3xl sm:text-5xl md:text-6xl tracking-tight text-stone-900 font-normal hover:opacity-95 transition-opacity">
             <Link href="/" className="inline-block hover:no-underline">
-              THE VERITAS DISPATCH
+              THE PRISM DISPATCH
             </Link>
           </h1>
 

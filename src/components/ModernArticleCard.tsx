@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Article } from '@/types/news';
-import { Bookmark, Clock, ArrowUpRight, Sparkles, ImageOff } from 'lucide-react';
+import { Bookmark, Clock, ArrowUpRight, ArrowRight, Sparkles, ImageOff } from 'lucide-react';
 import { handleButtonClickGlow } from '@/lib/button-glow';
 
 function NoImageFallback({ sourceName, category, className = '' }: { sourceName: string; category?: string; className?: string }) {
@@ -103,14 +103,10 @@ export default function ModernArticleCard({
     }
   }, [article.publishedAt]);
 
-  // Open article directly in a separate new tab as requested
+  // Open article in-app on this website as requested
   const handleCardClick = (e: React.MouseEvent) => {
     handleButtonClickGlow(e);
-    if (article.url && article.url.trim() !== '') {
-      window.open(article.url, '_blank', 'noopener,noreferrer');
-    } else {
-      onOpenArticle(article);
-    }
+    onOpenArticle(article);
   };
 
   const handleBookmarkClick = (e: React.MouseEvent) => {
@@ -183,20 +179,15 @@ export default function ModernArticleCard({
             {/* Bottom Actions */}
             <div className="pt-4 border-t border-zinc-200/70 flex items-center justify-between">
               <div className="flex items-center space-x-2.5">
-                {/* Open in Separate Tab Button */}
-                <a
-                  href={article.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleButtonClickGlow(e);
-                  }}
-                  className="apple-prominent-btn apple-btn inline-flex items-center space-x-1.5 px-4 py-2 rounded-xl text-xs font-bold text-white shadow-sm"
+                {/* In-Website Reader Button */}
+                <button
+                  type="button"
+                  onClick={handleCardClick}
+                  className="apple-prominent-btn apple-btn inline-flex items-center space-x-1.5 px-4 py-2 rounded-xl text-xs font-bold text-white shadow-sm cursor-pointer"
                 >
-                  <span>Read Full Dispatch</span>
-                  <ArrowUpRight className="w-3.5 h-3.5" />
-                </a>
+                  <span>Read In PRISM</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
 
                 {/* AI Summary / Reader Modal */}
                 <button
@@ -208,6 +199,20 @@ export default function ModernArticleCard({
                   <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
                   <span>AI Summary</span>
                 </button>
+
+                {/* External link fallback */}
+                {article.url && (
+                  <a
+                    href={article.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    className="p-2 rounded-xl text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 border border-transparent hover:border-zinc-200 transition-colors cursor-pointer"
+                    title="Open on publisher website"
+                  >
+                    <ArrowUpRight className="w-3.5 h-3.5" />
+                  </a>
+                )}
 
                 {/* Bookmark Button */}
                 <button
@@ -347,18 +352,28 @@ export default function ModernArticleCard({
         <div className="flex items-center space-x-2">
           <span className="text-[11px] font-mono">{article.readTime} min read</span>
           <span className="text-zinc-300">•</span>
-          {/* Direct separate tab link */}
-          <a
-            href={article.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={(e) => e.stopPropagation()}
-            className="text-zinc-700 hover:text-zinc-950 font-bold inline-flex items-center space-x-0.5 hover:underline"
-            title="Open in new tab"
+          {/* Direct In-App Reader link */}
+          <button
+            type="button"
+            onClick={handleCardClick}
+            className="text-zinc-800 hover:text-zinc-950 font-bold inline-flex items-center space-x-1 cursor-pointer hover:underline"
+            title="Read in PRISM"
           >
-            <span>Open</span>
-            <ArrowUpRight className="w-3 h-3 ml-0.5" />
-          </a>
+            <span>Read</span>
+            <ArrowRight className="w-3 h-3 ml-0.5" />
+          </button>
+          {article.url && (
+            <a
+              href={article.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="text-zinc-400 hover:text-zinc-700 ml-1"
+              title="Open external publisher page"
+            >
+              <ArrowUpRight className="w-3 h-3" />
+            </a>
+          )}
         </div>
 
         <div className="flex items-center space-x-1.5">

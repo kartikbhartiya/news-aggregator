@@ -327,7 +327,7 @@ export default function AuthScreen({
             </div>
             <span className="font-extrabold text-xl tracking-tight text-white">PRISM</span>
             <span className="text-[10px] font-mono tracking-widest px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 uppercase font-bold">
-              VERITAS WIRE
+              LIVE NEWS WIRE
             </span>
           </Link>
         </div>
@@ -336,7 +336,7 @@ export default function AuthScreen({
         <div className="relative z-10 max-w-xl my-auto py-8">
           <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-xs text-white/90 mb-4">
             <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-            <span className="font-semibold tracking-wide">Autonomous Multi-Wire Refraction</span>
+            <span className="font-semibold tracking-wide">Real-Time News Intelligence</span>
           </div>
 
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-[1.12] text-white drop-shadow-md">

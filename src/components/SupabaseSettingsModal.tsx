@@ -249,6 +249,82 @@ export default function SupabaseSettingsModal({
                   PRISM seamlessly coordinates real-time user authentication, reading dossier bookmarks, and custom news preferences with your secure Supabase cloud infrastructure.
                 </p>
               </div>
+
+              {/* Ready-to-run SQL Migration Schema */}
+              <div className="p-4 rounded-2xl bg-zinc-900 text-white space-y-3 border border-zinc-800">
+                <div className="flex items-center justify-between">
+                  <div className="text-xs font-mono font-bold uppercase tracking-wider text-emerald-400">
+                    Supabase SQL Schema Script (supabase/schema.sql)
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const sql = `-- PRISM NEWS AGGREGATOR SUPABASE SCHEMA
+create extension if not exists "uuid-ossp";
+
+create table if not exists public.profiles (
+  id uuid references auth.users on delete cascade primary key,
+  email text unique not null,
+  full_name text,
+  avatar_url text,
+  preferences jsonb default '{"categories": ["tech", "markets", "business"], "edition": "international", "dailyDigestEmail": true, "onboardingCompleted": false}'::jsonb,
+  created_at timestamptz default timezone('utc'::text, now()) not null,
+  updated_at timestamptz default timezone('utc'::text, now()) not null
+);
+
+create table if not exists public.bookmarks (
+  id text primary key,
+  user_id uuid references auth.users on delete cascade,
+  title text not null,
+  description text,
+  content text,
+  url text not null,
+  image_url text,
+  source jsonb,
+  category text,
+  published_at timestamptz,
+  read_time integer default 3,
+  created_at timestamptz default timezone('utc'::text, now()) not null
+);
+
+create table if not exists public.reading_history (
+  id text primary key,
+  user_id uuid references auth.users on delete cascade,
+  article_id text not null,
+  read_at timestamptz default timezone('utc'::text, now()) not null
+);
+
+create table if not exists public.custom_feeds (
+  id text primary key,
+  user_id uuid references auth.users on delete cascade,
+  name text not null,
+  url text not null,
+  category text default 'world',
+  created_at timestamptz default timezone('utc'::text, now()) not null
+);
+
+alter table public.profiles enable row level security;
+alter table public.bookmarks enable row level security;
+alter table public.reading_history enable row level security;
+alter table public.custom_feeds enable row level security;
+
+create policy "Allow public profile select" on public.profiles for select using (true);
+create policy "Allow users to update own profile" on public.profiles for update using (auth.uid() = id);
+create policy "Allow user access to own bookmarks" on public.bookmarks for all using (auth.uid() = user_id or user_id is null);
+create policy "Allow user access to reading history" on public.reading_history for all using (auth.uid() = user_id or user_id is null);
+create policy "Allow user access to custom feeds" on public.custom_feeds for all using (auth.uid() = user_id or user_id is null);`;
+                      navigator.clipboard.writeText(sql);
+                      alert('Supabase SQL Schema copied to clipboard!');
+                    }}
+                    className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-mono font-bold text-white transition-colors cursor-pointer"
+                  >
+                    Copy SQL (1-Click)
+                  </button>
+                </div>
+                <p className="text-[11px] text-zinc-400">
+                  Open your Supabase Dashboard &rarr; SQL Editor &rarr; New Query &rarr; Paste & Run. File also saved at <code className="text-zinc-200">supabase/schema.sql</code>.
+                </p>
+              </div>
             </div>
           )}
 
