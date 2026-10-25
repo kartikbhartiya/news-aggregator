@@ -8,8 +8,6 @@ import {
   Sparkles, 
   RotateCw, 
   SlidersHorizontal, 
-  Database,
-  Radio,
   LayoutGrid,
   List,
   Command,
@@ -63,7 +61,10 @@ export default function ModernHeader({
   onToggleViewMode,
 }: ModernHeaderProps) {
   return (
-    <header className="sticky top-0 z-40 liquid-glass-nav transition-all">
+    <header 
+      data-config='{"blurAmount":0.22,"refraction":0.75,"chromAberration":0.08,"edgeHighlight":0.16,"specular":0.3,"fresnel":1.2,"cornerRadius":0,"zRadius":24,"button":false}'
+      className="sticky top-0 z-40 liquid-glass-direct liquid-glass-nav transition-all"
+    >
       {/* Top Main Navigation Bar */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
         {/* Brand & Live Status */}
@@ -87,34 +88,6 @@ export default function ModernHeader({
                 </span>
               </div>
             </div>
-          </div>
-
-          {/* Cloud & API Badges */}
-          <div className="hidden lg:flex items-center space-x-2 pl-3 border-l border-zinc-200/80 text-xs">
-            <button
-              onClick={(e) => {
-                handleButtonClickGlow(e);
-                onOpenSettings();
-              }}
-              className="apple-glass-btn apple-btn inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-full text-zinc-700 cursor-pointer text-[11px] font-medium"
-              title="NewsData.io API Connected"
-            >
-              <Radio className="w-3 h-3 text-emerald-500" />
-              <span>NewsData.io Wire</span>
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-live-pulse" />
-            </button>
-
-            <button
-              onClick={(e) => {
-                handleButtonClickGlow(e);
-                onOpenSettings();
-              }}
-              className="apple-glass-btn apple-btn inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-full text-zinc-700 cursor-pointer text-[11px] font-medium"
-              title="Supabase Cloud Synchronization"
-            >
-              <Database className="w-3 h-3 text-emerald-500" />
-              <span>{supabaseConnected ? 'Supabase Synced' : 'Cloud Sync'}</span>
-            </button>
           </div>
         </div>
 

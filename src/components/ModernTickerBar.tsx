@@ -6,7 +6,7 @@ import { MARKET_TICKER_ITEMS } from '@/lib/market-ticker';
 import { TrendingUp, TrendingDown } from 'lucide-react';
 import { handleButtonClickGlow } from '@/lib/button-glow';
 
-export default function ModernTickerBar() {
+export default function ModernTickerBar({ className = '' }: { className?: string }) {
   const [tickers, setTickers] = useState<MarketTickerItem[]>(MARKET_TICKER_ITEMS);
 
   useEffect(() => {
@@ -27,7 +27,7 @@ export default function ModernTickerBar() {
   }, []);
 
   return (
-    <div className="border-b border-white/60 bg-white/50 backdrop-blur-md text-xs select-none overflow-hidden">
+    <div className={`border-b border-white/60 bg-white/40 backdrop-blur-md text-xs select-none overflow-hidden ${className}`}>
       <div className="max-w-7xl mx-auto flex items-center px-4 sm:px-6">
         {/* Modern Live Pulse Badge */}
         <div className="shrink-0 flex items-center gap-1.5 py-2 pr-4 border-r border-zinc-200/60 z-10 text-zinc-700">

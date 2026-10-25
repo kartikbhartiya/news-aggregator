@@ -9,9 +9,17 @@ const parser = new XMLParser({
   parseTagValue: false,
 });
 
-function cleanHtml(html: string): string {
+function cleanHtml(html: any): string {
   if (!html) return '';
-  return html
+  let str = '';
+  if (typeof html === 'string') {
+    str = html;
+  } else if (typeof html === 'object' && html !== null) {
+    str = typeof html['#text'] === 'string' ? html['#text'] : String(html['#text'] || '');
+  } else {
+    str = String(html);
+  }
+  return str
     .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
     .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
     .replace(/<[^>]+>/g, ' ')
@@ -107,9 +115,9 @@ export function parseRssFeed(
       if (!link) continue;
 
       const rawDesc = raw.description || raw.summary || raw['content:encoded'] || '';
-      const description = cleanHtml(typeof rawDesc === 'string' ? rawDesc : '');
+      const description = cleanHtml(rawDesc);
       const rawContent = raw['content:encoded'] || raw.content || raw.description || '';
-      const content = cleanHtml(typeof rawContent === 'string' ? rawContent : description);
+      const content = cleanHtml(rawContent || description);
 
       const pubDate = raw.pubDate || raw.published || raw.updated || new Date().toISOString();
       const author = cleanHtml(raw['dc:creator'] || raw.author?.name || raw.author || sourceInfo.name);

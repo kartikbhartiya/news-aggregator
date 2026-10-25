@@ -21,19 +21,21 @@ export default function ArticleCard({
   isBookmarked,
   isRead,
 }: ArticleCardProps) {
-  const formattedDate = React.useMemo(() => {
+  const [formattedDate, setFormattedDate] = React.useState<string>('Recently');
+
+  React.useEffect(() => {
     try {
       const d = new Date(article.publishedAt);
       const diffMs = Date.now() - d.getTime();
       const diffMins = Math.floor(diffMs / 60000);
       const diffHours = Math.floor(diffMins / 60);
 
-      if (diffMins < 1) return 'Just now';
-      if (diffMins < 60) return `${diffMins}m ago`;
-      if (diffHours < 24) return `${diffHours}h ago`;
-      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      if (diffMins < 1) setFormattedDate('Just now');
+      else if (diffMins < 60) setFormattedDate(`${diffMins}m ago`);
+      else if (diffHours < 24) setFormattedDate(`${diffHours}h ago`);
+      else setFormattedDate(d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
     } catch {
-      return 'Recently';
+      setFormattedDate('Recently');
     }
   }, [article.publishedAt]);
 

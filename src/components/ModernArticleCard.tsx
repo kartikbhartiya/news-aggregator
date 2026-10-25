@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Article } from '@/types/news';
 import { Bookmark, Clock, ArrowUpRight, Volume2, ShieldCheck, Share2, Sparkles } from 'lucide-react';
 import { handleButtonClickGlow } from '@/lib/button-glow';
@@ -11,6 +11,7 @@ interface ModernArticleCardProps {
   onOpenArticle: (article: Article) => void;
   onToggleBookmark: (article: Article, e: React.MouseEvent) => void;
   isBookmarked: boolean;
+  className?: string;
 }
 
 export default function ModernArticleCard({
@@ -19,22 +20,25 @@ export default function ModernArticleCard({
   onOpenArticle,
   onToggleBookmark,
   isBookmarked,
+  className = '',
 }: ModernArticleCardProps) {
   const [imageError, setImageError] = useState(false);
 
-  const formattedDate = useMemo(() => {
+  const [formattedDate, setFormattedDate] = useState<string>('Recently');
+
+  useEffect(() => {
     try {
       const d = new Date(article.publishedAt);
       const diffMs = Date.now() - d.getTime();
       const diffMins = Math.floor(diffMs / 60000);
       const diffHours = Math.floor(diffMins / 60);
 
-      if (diffMins < 1) return 'Just now';
-      if (diffMins < 60) return `${diffMins}m ago`;
-      if (diffHours < 24) return `${diffHours}h ago`;
-      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      if (diffMins < 1) setFormattedDate('Just now');
+      else if (diffMins < 60) setFormattedDate(`${diffMins}m ago`);
+      else if (diffHours < 24) setFormattedDate(`${diffHours}h ago`);
+      else setFormattedDate(d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
     } catch {
-      return 'Recently';
+      setFormattedDate('Recently');
     }
   }, [article.publishedAt]);
 
@@ -53,8 +57,9 @@ export default function ModernArticleCard({
   if (variant === 'hero') {
     return (
       <div
+        data-config='{"blurAmount":0.22,"refraction":0.8,"chromAberration":0.08,"edgeHighlight":0.2,"specular":0.35,"fresnel":1.25,"cornerRadius":32,"zRadius":42,"button":true}'
         onClick={handleCardClick}
-        className="group relative liquid-glass-panel rounded-[32px] p-6 sm:p-8 cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden"
+        className={`group relative liquid-glass-direct liquid-glass-panel rounded-[32px] p-6 sm:p-8 cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden ${className}`}
       >
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           {/* Left Narrative */}
@@ -193,8 +198,9 @@ export default function ModernArticleCard({
   // 3. BENTO GRID CARD
   return (
     <div
+      data-config='{"blurAmount":0.2,"refraction":0.75,"chromAberration":0.07,"edgeHighlight":0.18,"specular":0.3,"fresnel":1.15,"cornerRadius":26,"zRadius":36,"button":true}'
       onClick={handleCardClick}
-      className="group liquid-glass-card rounded-[26px] p-5 flex flex-col justify-between cursor-pointer"
+      className={`group liquid-glass-direct liquid-glass-card rounded-[26px] p-5 flex flex-col justify-between cursor-pointer ${className}`}
     >
       <div>
         {/* Card Thumbnail with Specular Border */}

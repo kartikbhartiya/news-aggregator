@@ -50,7 +50,7 @@ export default function SupabaseSettingsModal({
   const [feedError, setFeedError] = useState('');
 
   // Active tab inside settings
-  const [activeTab, setActiveTab] = useState<'supabase' | 'newsdata' | 'feeds' | 'typography'>('supabase');
+  const [activeTab, setActiveTab] = useState<'supabase' | 'newsdata' | 'feeds'>('supabase');
   const [newsDataStatus, setNewsDataStatus] = useState<any>(null);
   const [isCheckingNewsData, setIsCheckingNewsData] = useState(false);
 
@@ -190,7 +190,6 @@ export default function SupabaseSettingsModal({
             { id: 'supabase', label: 'Supabase Cloud' },
             { id: 'newsdata', label: 'NewsData.io API' },
             { id: 'feeds', label: `Custom Feeds (${customFeeds.length})` },
-            { id: 'typography', label: 'Apple Principles' },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -524,38 +523,6 @@ export default function SupabaseSettingsModal({
                     ))}
                   </div>
                 )}
-              </div>
-            </div>
-          )}
-
-          {/* TAB 3: DESIGN PRINCIPLES */}
-          {activeTab === 'typography' && (
-            <div className="space-y-4 font-sans text-xs text-stone-700 leading-relaxed">
-              <h3 className="font-serif text-lg text-stone-900 font-normal">
-                Architectural & Non-Vibecoded Design Ethos
-              </h3>
-              <p>
-                The Veritas Dispatch was conceived as an antidote to cookie-cutter AI templates characterized by neon glassmorphism, hyper-saturated purple gradients, and generic UI widgets.
-              </p>
-              <div className="space-y-3 pt-2">
-                <div className="p-3.5 border border-stone-200 bg-stone-50/60">
-                  <strong className="block font-serif text-sm text-stone-900 font-medium mb-1">
-                    1. Editorial Typography Hierarchy
-                  </strong>
-                  Utilizing <em>Newsreader</em>, an optical master designed specifically for continuous long-form journalistic reading, paired with razor-sharp <em>Inter</em> for precise wire metadata.
-                </div>
-                <div className="p-3.5 border border-stone-200 bg-stone-50/60">
-                  <strong className="block font-serif text-sm text-stone-900 font-medium mb-1">
-                    2. Tactile Broadsheet Structure
-                  </strong>
-                  Asymmetrical multi-column grids honoring classic front-page newspaper architecture: flagship lead hero, flanking analytical pieces, and real-time fast-wire ticker columns.
-                </div>
-                <div className="p-3.5 border border-stone-200 bg-stone-50/60">
-                  <strong className="block font-serif text-sm text-stone-900 font-medium mb-1">
-                    3. Resilient Multi-Source Wire Engine
-                  </strong>
-                  Live parallel RSS and Atom parsers, Hacker News developer wire streams, client TTS audio narrator, and Supabase cloud synchronization.
-                </div>
               </div>
             </div>
           )}
