@@ -315,7 +315,7 @@ export default function ClientHomePage({
           /* Premium Editorial Skeleton Screen — Zero Rotating Bars, Zero Loading Bars */
           <EditorialSkeleton edition={edition} />
         ) : filteredAndSortedArticles.length === 0 ? (
-          <div className="py-24 text-center liquid-glass-panel rounded-3xl p-8 max-w-md mx-auto shadow-sm border border-zinc-200">
+          <div className="py-24 text-center bg-white/95 backdrop-blur-xl rounded-3xl p-8 max-w-md mx-auto shadow-sm border border-zinc-200">
             <h3 className="text-lg font-bold text-zinc-900">No Dispatches Match Criteria</h3>
             <p className="mt-1 text-xs text-zinc-500">
               Try adjusting your source or duration filter, or reset all filters.
@@ -336,7 +336,7 @@ export default function ClientHomePage({
           </div>
         ) : viewMode === 'stream' ? (
           /* ================= STREAM LIST VIEW ================= */
-          <div className="liquid-glass-panel rounded-3xl shadow-sm overflow-hidden divide-y divide-zinc-200/60 border border-zinc-200">
+          <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-sm overflow-hidden divide-y divide-zinc-200/60 border border-zinc-200">
             <div className="p-4 bg-zinc-50/80 border-b border-zinc-200/60 flex items-center justify-between text-xs text-zinc-600 font-semibold uppercase tracking-wider">
               <span>{edition === 'india' ? '🇮🇳 India Edition Stream' : '🌐 Global Wire Stream'} ({filteredAndSortedArticles.length} dispatches)</span>
               <span>Sorted by {sortBy}</span>
@@ -423,9 +423,13 @@ export default function ClientHomePage({
                     style={{ animationDelay: `${(idx + 1) * 80}ms` }}
                     onClick={(e) => {
                       handleButtonClickGlow(e);
-                      setSelectedArticle(art);
+                      if (art.url) {
+                        window.open(art.url, '_blank', 'noopener,noreferrer');
+                      } else {
+                        setSelectedArticle(art);
+                      }
                     }}
-                    className="apple-item-entrance apple-btn p-4 rounded-2xl liquid-glass-card cursor-pointer group"
+                    className="apple-item-entrance apple-btn p-4 rounded-2xl bg-white/95 hover:bg-white backdrop-blur-md border border-zinc-200/90 hover:border-zinc-300 shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:shadow-md transition-all cursor-pointer group"
                   >
                     <div className="flex items-center justify-between text-[11px] mb-1.5 font-mono">
                       <span className="font-bold text-zinc-900 uppercase">{art.source.name}</span>

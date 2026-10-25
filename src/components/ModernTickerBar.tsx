@@ -27,7 +27,7 @@ export default function ModernTickerBar({ className = '' }: { className?: string
   }, []);
 
   return (
-    <div className={`border-b border-white/60 bg-white/40 backdrop-blur-md text-xs select-none overflow-hidden ${className}`}>
+    <div className={`border-b border-zinc-200/80 bg-white/80 backdrop-blur-md text-xs select-none overflow-hidden ${className}`}>
       <div className="max-w-7xl mx-auto flex items-center px-4 sm:px-6">
         {/* Modern Live Pulse Badge */}
         <div className="shrink-0 flex items-center gap-1.5 py-2 pr-4 border-r border-zinc-200/60 z-10 text-zinc-700">
@@ -47,7 +47,7 @@ export default function ModernTickerBar({ className = '' }: { className?: string
               <div
                 key={`${item.symbol}-${idx}`}
                 onClick={(e) => handleButtonClickGlow(e)}
-                className="apple-btn inline-flex items-center space-x-2 px-3 py-1 rounded-full liquid-glass-pill hover:bg-white transition-all text-[11px] cursor-pointer"
+                className="apple-btn inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-zinc-100/90 hover:bg-white border border-zinc-200/80 shadow-2xs transition-all text-[11px] cursor-pointer"
               >
                 <span className="font-bold text-zinc-950">{item.symbol}</span>
                 <span className="text-zinc-500 font-mono text-[10px]">{item.price}</span>

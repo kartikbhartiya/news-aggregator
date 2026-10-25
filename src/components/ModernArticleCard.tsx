@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import { Article } from '@/types/news';
 import { Bookmark, Clock, ArrowUpRight, Sparkles, ImageOff } from 'lucide-react';
 import { handleButtonClickGlow } from '@/lib/button-glow';
-import LiquidGlassThumbnail from '@/components/LiquidGlassThumbnail';
 
 function NoImageFallback({ sourceName, category, className = '' }: { sourceName: string; category?: string; className?: string }) {
   return (
@@ -28,6 +27,47 @@ function NoImageFallback({ sourceName, category, className = '' }: { sourceName:
   );
 }
 
+function ArticleThumbnail({ 
+  src, 
+  alt, 
+  badgeText, 
+  priorityBadge, 
+  className = '' 
+}: { 
+  src: string; 
+  alt: string; 
+  badgeText: string; 
+  priorityBadge?: string; 
+  className?: string; 
+}) {
+  const [imgError, setImgError] = useState(false);
+
+  if (imgError || !src) {
+    return <NoImageFallback sourceName={badgeText} className={className} />;
+  }
+
+  return (
+    <div className={`relative rounded-2xl overflow-hidden bg-zinc-100 border border-zinc-200/70 shadow-2xs group select-none ${className}`}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={src}
+        alt={alt}
+        onError={() => setImgError(true)}
+        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 block"
+      />
+      {/* High-visibility Apple frosted badge */}
+      <div className="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-full text-[11px] font-extrabold text-zinc-950 bg-white/95 backdrop-blur-xl border border-zinc-200/80 shadow-xs z-10">
+        {badgeText}
+      </div>
+      {priorityBadge && (
+        <div className="absolute top-2.5 right-2.5 px-2.5 py-0.5 rounded-full bg-zinc-950 text-white text-[10px] font-mono font-bold tracking-wider shadow-xs z-10">
+          {priorityBadge}
+        </div>
+      )}
+    </div>
+  );
+}
+
 interface ModernArticleCardProps {
   article: Article;
   variant?: 'hero' | 'grid' | 'row';
@@ -45,8 +85,6 @@ export default function ModernArticleCard({
   isBookmarked,
   className = '',
 }: ModernArticleCardProps) {
-  const [imageError, setImageError] = useState(false);
-
   const [formattedDate, setFormattedDate] = useState<string>('Recently');
 
   useEffect(() => {
@@ -65,9 +103,14 @@ export default function ModernArticleCard({
     }
   }, [article.publishedAt]);
 
+  // Open article directly in a separate new tab as requested
   const handleCardClick = (e: React.MouseEvent) => {
     handleButtonClickGlow(e);
-    onOpenArticle(article);
+    if (article.url && article.url.trim() !== '') {
+      window.open(article.url, '_blank', 'noopener,noreferrer');
+    } else {
+      onOpenArticle(article);
+    }
   };
 
   const handleBookmarkClick = (e: React.MouseEvent) => {
@@ -76,13 +119,18 @@ export default function ModernArticleCard({
     onToggleBookmark(article, e);
   };
 
+  const handleAiReaderClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    handleButtonClickGlow(e);
+    onOpenArticle(article);
+  };
+
   // 1. HERO BENTO CARD (Widescreen Flagship)
   if (variant === 'hero') {
     return (
       <div
-        data-config='{"blurAmount":0.22,"refraction":0.8,"chromAberration":0.08,"edgeHighlight":0.2,"specular":0.35,"fresnel":1.25,"cornerRadius":32,"zRadius":42,"button":true}'
         onClick={handleCardClick}
-        className={`group relative liquid-glass-direct liquid-glass-panel rounded-[32px] p-6 sm:p-8 cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden ${className}`}
+        className={`group relative bg-white/95 hover:bg-white backdrop-blur-md rounded-[32px] p-6 sm:p-8 cursor-pointer shadow-[0_4px_20px_rgba(0,0,0,0.04)] hover:shadow-[0_16px_36px_rgba(0,0,0,0.08)] border border-zinc-200/90 hover:border-zinc-300 transition-all duration-300 overflow-hidden ${className}`}
       >
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           {/* Left Narrative */}
@@ -93,7 +141,7 @@ export default function ModernArticleCard({
                 <span className="px-3 py-1 rounded-full bg-zinc-950 text-white text-[11px] font-bold tracking-wide uppercase shadow-xs">
                   {article.category}
                 </span>
-                <span className="px-2.5 py-1 rounded-full liquid-glass-pill text-zinc-800 text-[11px] font-semibold">
+                <span className="px-2.5 py-1 rounded-full bg-zinc-100 text-zinc-800 text-[11px] font-semibold border border-zinc-200">
                   {article.source.name}
                 </span>
                 <span className="text-zinc-300 text-xs">•</span>
@@ -105,7 +153,7 @@ export default function ModernArticleCard({
                 </span>
               </div>
 
-              {/* Title */}
+              {/* Title - clickable to open in new tab */}
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-zinc-950 tracking-tight leading-[1.18] group-hover:text-zinc-700 transition-colors">
                 {article.title}
               </h2>
@@ -117,14 +165,14 @@ export default function ModernArticleCard({
 
               {/* Bullet Signals */}
               {article.bulletPoints && article.bulletPoints.length > 0 && (
-                <div className="mt-4 p-3.5 rounded-2xl bg-white/70 border border-zinc-200/60 space-y-1.5 shadow-2xs">
-                  <div className="text-[10px] font-mono uppercase tracking-wider text-zinc-400 font-bold flex items-center space-x-1">
-                    <Sparkles className="w-3 h-3 text-emerald-500" />
+                <div className="mt-4 p-3.5 rounded-2xl bg-zinc-50/80 border border-zinc-200/80 space-y-1.5 shadow-2xs">
+                  <div className="text-[10px] font-mono uppercase tracking-wider text-zinc-500 font-bold flex items-center space-x-1">
+                    <Sparkles className="w-3 h-3 text-emerald-600" />
                     <span>Key Strategic Takeaways</span>
                   </div>
                   {article.bulletPoints.slice(0, 2).map((bp, i) => (
                     <div key={i} className="flex items-start text-xs text-zinc-700 font-medium">
-                      <span className="mr-2 text-emerald-500 font-bold">•</span>
+                      <span className="mr-2 text-emerald-600 font-bold">•</span>
                       <span className="line-clamp-1">{bp}</span>
                     </div>
                   ))}
@@ -133,18 +181,42 @@ export default function ModernArticleCard({
             </div>
 
             {/* Bottom Actions */}
-            <div className="pt-4 border-t border-zinc-200/60 flex items-center justify-between">
+            <div className="pt-4 border-t border-zinc-200/70 flex items-center justify-between">
               <div className="flex items-center space-x-2.5">
-                <span className="apple-prominent-btn apple-btn inline-flex items-center space-x-1.5 px-4 py-2 rounded-xl text-xs font-bold shadow-md">
+                {/* Open in Separate Tab Button */}
+                <a
+                  href={article.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleButtonClickGlow(e);
+                  }}
+                  className="apple-prominent-btn apple-btn inline-flex items-center space-x-1.5 px-4 py-2 rounded-xl text-xs font-bold text-white shadow-sm"
+                >
                   <span>Read Full Dispatch</span>
                   <ArrowUpRight className="w-3.5 h-3.5" />
-                </span>
+                </a>
 
+                {/* AI Summary / Reader Modal */}
+                <button
+                  type="button"
+                  onClick={handleAiReaderClick}
+                  className="apple-btn inline-flex items-center space-x-1 px-3 py-2 rounded-xl text-xs font-semibold text-zinc-700 bg-zinc-100 hover:bg-zinc-200/80 border border-zinc-200 transition-colors cursor-pointer"
+                  title="Read AI Summary & Takeaways"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>AI Summary</span>
+                </button>
+
+                {/* Bookmark Button */}
                 <button
                   type="button"
                   onClick={handleBookmarkClick}
-                  className={`apple-glass-btn apple-btn p-2 rounded-xl transition-colors cursor-pointer ${
-                    isBookmarked ? 'bg-amber-100 text-amber-800 border-amber-300' : 'text-zinc-600'
+                  className={`apple-btn p-2 rounded-xl border transition-colors cursor-pointer ${
+                    isBookmarked 
+                      ? 'bg-amber-50 text-amber-800 border-amber-300' 
+                      : 'bg-zinc-100 text-zinc-600 border-zinc-200 hover:bg-zinc-200'
                   }`}
                   title={isBookmarked ? 'Saved to Dossier' : 'Save'}
                 >
@@ -160,10 +232,10 @@ export default function ModernArticleCard({
             </div>
           </div>
 
-          {/* Right Visual Image with Real WebGL Liquid Glass Badge or Clean Editorial Fallback */}
+          {/* Right Visual Image */}
           <div className="lg:col-span-5">
             {article.imageUrl && article.imageUrl.trim() !== '' ? (
-              <LiquidGlassThumbnail
+              <ArticleThumbnail
                 src={article.imageUrl}
                 alt={article.title}
                 badgeText={article.source.name}
@@ -188,7 +260,7 @@ export default function ModernArticleCard({
     return (
       <div
         onClick={handleCardClick}
-        className="group px-4 py-3.5 bg-white/70 hover:bg-white/95 border-b border-zinc-200/60 flex items-center justify-between gap-4 transition-all cursor-pointer"
+        className="group px-4 py-3.5 bg-white/80 hover:bg-white border-b border-zinc-200/70 flex items-center justify-between gap-4 transition-all cursor-pointer"
       >
         <div className="flex items-center space-x-3 truncate">
           <span className="shrink-0 px-2 py-0.5 rounded-md bg-zinc-100 text-[10px] font-bold text-zinc-700 uppercase border border-zinc-200/60">
@@ -205,6 +277,16 @@ export default function ModernArticleCard({
         <div className="shrink-0 flex items-center space-x-3 text-xs text-zinc-400 font-mono">
           <span className="text-zinc-700 font-semibold">{article.source.name}</span>
           <span>{formattedDate}</span>
+          <a
+            href={article.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            className="apple-btn p-1 hover:text-zinc-900 transition-colors"
+            title="Open in new tab"
+          >
+            <ArrowUpRight className="w-3.5 h-3.5 text-zinc-500" />
+          </a>
           <button
             type="button"
             onClick={handleBookmarkClick}
@@ -220,14 +302,13 @@ export default function ModernArticleCard({
   // 3. BENTO GRID CARD
   return (
     <div
-      data-config='{"blurAmount":0.2,"refraction":0.75,"chromAberration":0.07,"edgeHighlight":0.18,"specular":0.3,"fresnel":1.15,"cornerRadius":26,"zRadius":36,"button":true}'
       onClick={handleCardClick}
-      className={`group liquid-glass-direct liquid-glass-card rounded-[26px] p-5 flex flex-col justify-between cursor-pointer ${className}`}
+      className={`group bg-white/95 hover:bg-white backdrop-blur-md rounded-[26px] p-5 flex flex-col justify-between cursor-pointer border border-zinc-200/90 hover:border-zinc-300 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_28px_rgba(0,0,0,0.08)] transition-all duration-300 ${className}`}
     >
       <div>
-        {/* Card Thumbnail with Real WebGL Liquid Glass Badge or Clean Editorial Fallback */}
+        {/* Card Thumbnail */}
         {article.imageUrl && article.imageUrl.trim() !== '' ? (
-          <LiquidGlassThumbnail
+          <ArticleThumbnail
             src={article.imageUrl}
             alt={article.title}
             badgeText={article.source.name}
@@ -262,20 +343,50 @@ export default function ModernArticleCard({
       </div>
 
       {/* Footer Meta */}
-      <div className="mt-4 pt-3 border-t border-zinc-200/50 flex items-center justify-between text-xs text-zinc-500">
-        <span className="text-[11px] font-mono">{article.readTime} min read</span>
-        <button
-          type="button"
-          onClick={handleBookmarkClick}
-          className={`apple-btn p-1.5 rounded-xl border transition-colors cursor-pointer ${
-            isBookmarked
-              ? 'bg-amber-100 text-amber-800 border-amber-300'
-              : 'hover:bg-zinc-100 text-zinc-400 hover:text-zinc-800 border-transparent'
-          }`}
-          title={isBookmarked ? 'Saved' : 'Save'}
-        >
-          <Bookmark className={`w-3.5 h-3.5 ${isBookmarked ? 'fill-amber-500 text-amber-500' : ''}`} />
-        </button>
+      <div className="mt-4 pt-3 border-t border-zinc-200/60 flex items-center justify-between text-xs text-zinc-500">
+        <div className="flex items-center space-x-2">
+          <span className="text-[11px] font-mono">{article.readTime} min read</span>
+          <span className="text-zinc-300">•</span>
+          {/* Direct separate tab link */}
+          <a
+            href={article.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            className="text-zinc-700 hover:text-zinc-950 font-bold inline-flex items-center space-x-0.5 hover:underline"
+            title="Open in new tab"
+          >
+            <span>Open</span>
+            <ArrowUpRight className="w-3 h-3 ml-0.5" />
+          </a>
+        </div>
+
+        <div className="flex items-center space-x-1.5">
+          {/* AI Brief Quick Reader Button */}
+          <button
+            type="button"
+            onClick={handleAiReaderClick}
+            className="text-[11px] font-semibold text-zinc-500 hover:text-zinc-950 inline-flex items-center space-x-1 px-2 py-1 rounded-lg hover:bg-zinc-100 transition-colors cursor-pointer"
+            title="Read AI Summary"
+          >
+            <Sparkles className="w-3 h-3 text-emerald-600" />
+            <span className="hidden sm:inline">AI Brief</span>
+          </button>
+
+          {/* Bookmark Button */}
+          <button
+            type="button"
+            onClick={handleBookmarkClick}
+            className={`apple-btn p-1.5 rounded-xl border transition-colors cursor-pointer ${
+              isBookmarked
+                ? 'bg-amber-100 text-amber-800 border-amber-300'
+                : 'hover:bg-zinc-100 text-zinc-400 hover:text-zinc-800 border-transparent'
+            }`}
+            title={isBookmarked ? 'Saved' : 'Save'}
+          >
+            <Bookmark className={`w-3.5 h-3.5 ${isBookmarked ? 'fill-amber-500 text-amber-500' : ''}`} />
+          </button>
+        </div>
       </div>
     </div>
   );

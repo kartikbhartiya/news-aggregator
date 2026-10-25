@@ -8,17 +8,15 @@ import {
   Sparkles, 
   RotateCw, 
   SlidersHorizontal, 
-  LayoutGrid,
-  List,
-  Command,
-  Smartphone,
-  Globe2,
-  Zap,
-  User,
-  Flame
+  LayoutGrid, 
+  List, 
+  Command, 
+  Smartphone, 
+  Globe2, 
+  Zap, 
+  User 
 } from 'lucide-react';
 import { handleButtonClickGlow } from '@/lib/button-glow';
-import LiquidGlassButton from '@/components/LiquidGlassButton';
 import { UserProfile } from '@/lib/auth';
 
 interface ModernHeaderProps {
@@ -45,7 +43,7 @@ interface ModernHeaderProps {
   currentUser?: UserProfile | null;
 }
 
-const CATEGORIES: Array<{ id: NewsCategory; label: string; icon?: string }> = [
+const CATEGORIES: Array<{ id: NewsCategory; label: string }> = [
   { id: 'all', label: 'All Signals' },
   { id: 'tech', label: 'Tech & AI' },
   { id: 'markets', label: 'Markets' },
@@ -57,13 +55,8 @@ const CATEGORIES: Array<{ id: NewsCategory; label: string; icon?: string }> = [
 
 /**
  * ModernHeader
- * High-craft Apple floating glass navigation island.
- * Features:
- * - Floating curved capsule with Apple specular sheen and soft multi-pass depth.
- * - Interactive WebGL Liquid Glass buttons with hover brightening and press feedback.
- * - Responsive Spotlight omnibox (⌘K).
- * - Real-time Edition Switcher (🇮🇳 India vs 🌐 Global).
- * - Integrated VisionOS-grade category navigation rail.
+ * High-craft Apple floating frosted glass navigation island.
+ * Pure frosted & soft glass aesthetic with maximum visibility and crisp contrast.
  */
 export default function ModernHeader({
   activeEdition,
@@ -80,7 +73,6 @@ export default function ModernHeader({
   onRefresh,
   isRefreshing,
   bookmarkCount,
-  supabaseConnected,
   viewMode,
   onToggleViewMode,
   onOpenShorts,
@@ -92,17 +84,13 @@ export default function ModernHeader({
 
   return (
     <header className="sticky top-2 sm:top-3.5 z-40 max-w-7xl mx-auto px-3 sm:px-6 transition-all duration-300">
-      {/* Elevated Floating Liquid Glass Island */}
-      <div className="relative rounded-[26px] sm:rounded-[32px] bg-white/85 backdrop-blur-2xl border border-zinc-200/80 shadow-[0_16px_40px_-8px_rgba(0,0,0,0.06),0_2px_8px_-2px_rgba(0,0,0,0.02)] p-2.5 sm:p-3 overflow-hidden">
+      {/* Elevated Floating Apple Soft Frosted Glass Island */}
+      <div className="relative rounded-[26px] sm:rounded-[32px] bg-white/90 backdrop-blur-2xl border border-zinc-200/90 shadow-[0_16px_40px_-8px_rgba(0,0,0,0.06),0_2px_8px_-2px_rgba(0,0,0,0.02)] p-2.5 sm:p-3 overflow-hidden">
         
-        {/* Subtle Specular Sheen & Optical Backing for WebGL Shader Refraction */}
+        {/* Subtle Ambient Refraction Aura Accent */}
         <div 
           aria-hidden="true" 
-          className="absolute inset-0 bg-gradient-to-r from-emerald-500/[0.04] via-teal-500/[0.03] to-cyan-500/[0.04] pointer-events-none" 
-        />
-        <div 
-          aria-hidden="true" 
-          className="absolute top-0 inset-x-8 h-[1px] bg-gradient-to-r from-transparent via-white to-transparent pointer-events-none" 
+          className="absolute -inset-0.5 bg-gradient-to-r from-emerald-500/10 via-sky-500/10 to-indigo-500/10 blur-xl opacity-50 pointer-events-none -z-10" 
         />
 
         {/* 1. TOP COMMAND ROW */}
@@ -132,31 +120,41 @@ export default function ModernHeader({
               </div>
             </div>
 
-            {/* India vs International Edition Switcher (Liquid Glass Pills) */}
+            {/* India vs International Edition Switcher (Apple Soft Frosted Pills) */}
             <div className="inline-flex items-center p-0.5 rounded-full bg-zinc-100/90 border border-zinc-200/80 shadow-2xs">
-              <LiquidGlassButton
-                active={activeEdition === 'india'}
-                variant="pill"
-                onClick={() => onSelectEdition('india')}
-                title="Switch to India Edition (The Hindu, NDTV, Livemint, Times of India, NewsData India)"
-                className="px-2.5 sm:px-3 py-1 text-xs font-semibold"
-                config={{ cornerRadius: 9999, refraction: 0.8, specular: 0.4 }}
+              <button
+                type="button"
+                onClick={(e) => {
+                  handleButtonClickGlow(e);
+                  onSelectEdition('india');
+                }}
+                title="Switch to India Edition (The Hindu, NDTV, Livemint, Times of India)"
+                className={`apple-btn px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                  activeEdition === 'india'
+                    ? 'bg-zinc-950 text-white shadow-xs'
+                    : 'text-zinc-600 hover:text-zinc-950 hover:bg-white/60'
+                }`}
               >
-                <span className="text-xs">🇮🇳</span>
+                <span className="text-xs mr-1">🇮🇳</span>
                 <span className="hidden sm:inline">India</span>
-              </LiquidGlassButton>
+              </button>
 
-              <LiquidGlassButton
-                active={activeEdition === 'international'}
-                variant="pill"
-                onClick={() => onSelectEdition('international')}
-                title="Switch to Global Edition (NYT, BBC, Verge, Hacker News, Global Wire)"
-                className="px-2.5 sm:px-3 py-1 text-xs font-semibold"
-                config={{ cornerRadius: 9999, refraction: 0.8, specular: 0.4 }}
+              <button
+                type="button"
+                onClick={(e) => {
+                  handleButtonClickGlow(e);
+                  onSelectEdition('international');
+                }}
+                title="Switch to Global Edition (NYT, BBC, Verge, Hacker News)"
+                className={`apple-btn px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                  activeEdition === 'international'
+                    ? 'bg-zinc-950 text-white shadow-xs'
+                    : 'text-zinc-600 hover:text-zinc-950 hover:bg-white/60'
+                }`}
               >
                 <Globe2 className="w-3.5 h-3.5 text-zinc-600 sm:hidden" />
                 <span className="hidden sm:inline">🌐 Global</span>
-              </LiquidGlassButton>
+              </button>
             </div>
           </div>
 
@@ -195,50 +193,61 @@ export default function ModernHeader({
           <div className="flex items-center space-x-1.5 sm:space-x-2 shrink-0">
             {/* PRISM News Shorts (YT Shorts style) */}
             {onOpenShorts && (
-              <LiquidGlassButton
-                onClick={() => onOpenShorts()}
+              <button
+                type="button"
+                onClick={(e) => {
+                  handleButtonClickGlow(e);
+                  onOpenShorts();
+                }}
                 title="Open PRISM News Shorts (Vertical QuickSignals)"
-                className="px-2.5 sm:px-3 py-1.5 text-xs font-bold text-amber-500"
-                config={{ cornerRadius: 18, refraction: 0.78, specular: 0.4 }}
+                className="apple-btn inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold text-amber-600 bg-amber-50/90 hover:bg-amber-100 border border-amber-200/80 shadow-2xs transition-all cursor-pointer"
               >
                 <Zap className="w-3.5 h-3.5 text-amber-500 fill-amber-500 mr-1" />
                 <span className="hidden sm:inline">Shorts</span>
-              </LiquidGlassButton>
+              </button>
             )}
 
             {/* Install PWA Button (Desktop/Tablet) */}
             <div className="hidden lg:block">
-              <LiquidGlassButton
-                onClick={() => onOpenInstall()}
+              <button
+                type="button"
+                onClick={(e) => {
+                  handleButtonClickGlow(e);
+                  onOpenInstall();
+                }}
                 title="Install Prism as Native App"
-                className="px-3 py-1.5 text-xs font-semibold"
-                config={{ cornerRadius: 18, refraction: 0.75, specular: 0.35 }}
+                className="apple-btn inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold text-zinc-700 bg-zinc-100/90 hover:bg-white border border-zinc-200/80 shadow-2xs transition-all cursor-pointer"
               >
                 <Smartphone className="w-3.5 h-3.5 text-emerald-600 mr-1" />
                 <span>Install</span>
-              </LiquidGlassButton>
+              </button>
             </div>
 
-            {/* AI Executive Intelligence Brief (Dark Liquid Glass Pill) */}
-            <LiquidGlassButton
-              variant="dark"
-              onClick={() => onOpenBriefing()}
+            {/* AI Executive Intelligence Brief (Dark Pill) */}
+            <button
+              type="button"
+              onClick={(e) => {
+                handleButtonClickGlow(e);
+                onOpenBriefing();
+              }}
               title="Open 3-Minute AI Executive Intelligence Brief"
-              className="px-3 sm:px-3.5 py-1.5 text-xs font-bold tracking-tight shadow-sm"
-              config={{ cornerRadius: 18, refraction: 0.82, specular: 0.5, edgeHighlight: 0.28 }}
+              className="apple-prominent-btn apple-btn inline-flex items-center px-3 sm:px-3.5 py-1.5 rounded-full text-xs font-bold text-white bg-zinc-950 hover:bg-zinc-800 border border-zinc-800 shadow-sm transition-all cursor-pointer"
             >
               <Sparkles className="w-3.5 h-3.5 text-amber-300 mr-1 animate-pulse" />
               <span className="hidden sm:inline">AI Brief</span>
               <span className="sm:hidden">Brief</span>
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 ml-1.5 animate-ping" />
-            </LiquidGlassButton>
+            </button>
 
             {/* Saved Dossier Button */}
-            <LiquidGlassButton
-              onClick={() => onOpenBookmarks()}
+            <button
+              type="button"
+              onClick={(e) => {
+                handleButtonClickGlow(e);
+                onOpenBookmarks();
+              }}
               title="Saved Dossier & Bookmarks"
-              className="px-2.5 sm:px-3 py-1.5 text-xs font-medium"
-              config={{ cornerRadius: 18, refraction: 0.75 }}
+              className="apple-btn inline-flex items-center px-2.5 sm:px-3 py-1.5 rounded-full text-xs font-semibold text-zinc-700 bg-zinc-100/90 hover:bg-white border border-zinc-200/80 shadow-2xs transition-all cursor-pointer"
             >
               <Bookmark className="w-3.5 h-3.5 text-zinc-600" />
               <span className="hidden sm:inline ml-1">Saved</span>
@@ -247,15 +256,18 @@ export default function ModernHeader({
                   {bookmarkCount}
                 </span>
               )}
-            </LiquidGlassButton>
+            </button>
 
             {/* Account Profile / Supabase Auth Button */}
             {currentUser ? (
-              <LiquidGlassButton
-                onClick={() => onOpenProfile?.()}
+              <button
+                type="button"
+                onClick={(e) => {
+                  handleButtonClickGlow(e);
+                  onOpenProfile?.();
+                }}
                 title={`Profile: ${currentUser.fullName || currentUser.email}`}
-                className="px-2.5 sm:px-3 py-1.5 text-xs font-semibold"
-                config={{ cornerRadius: 18, refraction: 0.75 }}
+                className="apple-btn inline-flex items-center px-2.5 sm:px-3 py-1.5 rounded-full text-xs font-semibold text-zinc-800 bg-zinc-100/90 hover:bg-white border border-zinc-200/80 shadow-2xs transition-all cursor-pointer"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
@@ -263,31 +275,37 @@ export default function ModernHeader({
                   alt={currentUser.fullName || 'User'}
                   className="w-4 h-4 rounded-full mr-1.5 object-cover"
                 />
-                <span className="hidden md:inline max-w-[80px] truncate">
+                <span className="hidden md:inline max-w-[80px] truncate font-bold">
                   {currentUser.fullName?.split(' ')[0] || 'Dossier'}
                 </span>
-              </LiquidGlassButton>
+              </button>
             ) : (
-              <LiquidGlassButton
-                onClick={() => onOpenAuth?.()}
+              <button
+                type="button"
+                onClick={(e) => {
+                  handleButtonClickGlow(e);
+                  onOpenAuth?.();
+                }}
                 title="Sign In with Password or Sign Up with 6-Digit OTP"
-                className="px-2.5 sm:px-3 py-1.5 text-xs font-bold text-zinc-950"
-                config={{ cornerRadius: 18, refraction: 0.75 }}
+                className="apple-btn inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold text-zinc-950 bg-zinc-100/90 hover:bg-white border border-zinc-200/90 shadow-2xs transition-all cursor-pointer"
               >
                 <User className="w-3.5 h-3.5 text-zinc-900 mr-1" />
                 <span className="hidden sm:inline">Sign In</span>
-              </LiquidGlassButton>
+              </button>
             )}
 
             {/* Settings (Cloud & API Engine) */}
-            <LiquidGlassButton
-              onClick={() => onOpenSettings()}
+            <button
+              type="button"
+              onClick={(e) => {
+                handleButtonClickGlow(e);
+                onOpenSettings();
+              }}
               title="Cloud & API Engine Settings"
-              className="p-2 text-zinc-600"
-              config={{ cornerRadius: 16, refraction: 0.75 }}
+              className="apple-btn p-2 rounded-xl text-zinc-600 hover:text-zinc-950 bg-zinc-100/90 hover:bg-white border border-zinc-200/80 shadow-2xs transition-all cursor-pointer"
             >
               <SlidersHorizontal className="w-3.5 h-3.5" />
-            </LiquidGlassButton>
+            </button>
 
             {/* View Switcher: Bento Grid vs Stream View */}
             <div className="hidden sm:inline-flex items-center p-0.5 rounded-xl bg-zinc-100 border border-zinc-200/80 shadow-2xs">
@@ -324,39 +342,42 @@ export default function ModernHeader({
             </div>
 
             {/* Wire Refresh Button */}
-            <LiquidGlassButton
-              onClick={() => onRefresh()}
+            <button
+              type="button"
+              onClick={(e) => {
+                handleButtonClickGlow(e);
+                onRefresh();
+              }}
               disabled={isRefreshing}
               title="Refresh Live Wire"
-              className="p-2 text-zinc-600"
-              config={{ cornerRadius: 16, refraction: 0.75 }}
+              className="apple-btn p-2 rounded-xl text-zinc-600 hover:text-zinc-950 bg-zinc-100/90 hover:bg-white border border-zinc-200/80 shadow-2xs transition-all cursor-pointer disabled:opacity-50"
             >
               <RotateCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-zinc-950' : ''}`} />
-            </LiquidGlassButton>
+            </button>
           </div>
         </div>
 
         {/* 2. INTEGRATED CATEGORY NAVIGATION RAIL */}
-        <div className="relative z-10 pt-2 sm:pt-2.5 mt-1 sm:mt-1.5 border-t border-zinc-200/50 flex items-center justify-between">
+        <div className="relative z-10 pt-2 sm:pt-2.5 mt-1 sm:mt-1.5 border-t border-zinc-200/60 flex items-center justify-between">
           <div className="flex items-center space-x-1.5 sm:space-x-2 overflow-x-auto no-scrollbar py-0.5 w-full">
             {CATEGORIES.map((cat) => {
               const isActive = activeCategory === cat.id;
               return (
-                <LiquidGlassButton
+                <button
                   key={cat.id}
-                  active={isActive}
-                  variant="pill"
-                  onClick={() => onSelectCategory(cat.id)}
-                  className="px-3.5 py-1 text-xs font-semibold whitespace-nowrap"
-                  config={{ 
-                    cornerRadius: 9999, 
-                    refraction: 0.78, 
-                    specular: isActive ? 0.45 : 0.3,
-                    edgeHighlight: 0.22 
+                  type="button"
+                  onClick={(e) => {
+                    handleButtonClickGlow(e);
+                    onSelectCategory(cat.id);
                   }}
+                  className={`apple-btn px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
+                    isActive
+                      ? 'bg-zinc-950 text-white font-bold shadow-xs'
+                      : 'bg-zinc-100/90 hover:bg-white text-zinc-700 hover:text-zinc-950 border border-zinc-200/80'
+                  }`}
                 >
                   {cat.label}
-                </LiquidGlassButton>
+                </button>
               );
             })}
           </div>
