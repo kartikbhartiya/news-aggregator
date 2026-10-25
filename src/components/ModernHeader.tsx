@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useRef } from 'react';
 import { NewsCategory } from '@/types/news';
 import { 
   Search, 
@@ -11,9 +11,11 @@ import {
   LayoutGrid,
   List,
   Command,
-  Smartphone
+  Smartphone,
+  Globe2
 } from 'lucide-react';
 import { handleButtonClickGlow } from '@/lib/button-glow';
+import LiquidGlassButton from '@/components/LiquidGlassButton';
 
 interface ModernHeaderProps {
   activeEdition: 'india' | 'international';
@@ -45,6 +47,16 @@ const CATEGORIES: Array<{ id: NewsCategory; label: string; icon?: string }> = [
   { id: 'culture', label: 'Culture' },
 ];
 
+/**
+ * ModernHeader
+ * High-craft Apple floating glass navigation island.
+ * Features:
+ * - Floating curved capsule with Apple specular sheen and soft multi-pass depth.
+ * - Interactive WebGL Liquid Glass buttons with hover brightening and press feedback.
+ * - Responsive Spotlight omnibox (⌘K).
+ * - Real-time Edition Switcher (🇮🇳 India vs 🌐 Global).
+ * - Integrated VisionOS-grade category navigation rail.
+ */
 export default function ModernHeader({
   activeEdition,
   onSelectEdition,
@@ -64,227 +76,237 @@ export default function ModernHeader({
   viewMode,
   onToggleViewMode,
 }: ModernHeaderProps) {
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
   return (
-    <header 
-      data-config='{"blurAmount":0.22,"refraction":0.75,"chromAberration":0.08,"edgeHighlight":0.16,"specular":0.3,"fresnel":1.2,"cornerRadius":0,"zRadius":24,"button":false}'
-      className="sticky top-0 z-40 liquid-glass-direct liquid-glass-nav transition-all"
-    >
-      {/* Top Main Navigation Bar */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
-        {/* Brand & Edition Switcher */}
-        <div className="flex items-center space-x-3">
-          <div
-            className="flex items-center space-x-2.5 cursor-pointer apple-btn"
-            onClick={(e) => {
-              handleButtonClickGlow(e);
-              onSelectCategory('all');
-            }}
-          >
-            {/* Modern Geometric Prism Logo */}
-            <div className="w-8 h-8 rounded-xl bg-zinc-950 flex items-center justify-center shadow-xs border border-white/20">
-              <div className="w-3.5 h-3.5 rounded-sm bg-gradient-to-tr from-emerald-400 to-cyan-400 rotate-45" />
-            </div>
-            <div>
-              <div className="flex items-center space-x-2">
-                <span className="text-base font-extrabold tracking-tight text-zinc-950">PRISM</span>
-                <span className="px-1.5 py-0.2 rounded-full bg-emerald-50 text-[10px] font-mono font-bold text-emerald-700 border border-emerald-200">
-                  LIVE
-                </span>
+    <header className="sticky top-2 sm:top-3.5 z-40 max-w-7xl mx-auto px-3 sm:px-6 transition-all duration-300">
+      {/* Elevated Floating Liquid Glass Island */}
+      <div className="relative rounded-[26px] sm:rounded-[32px] bg-white/85 backdrop-blur-2xl border border-zinc-200/80 shadow-[0_16px_40px_-8px_rgba(0,0,0,0.06),0_2px_8px_-2px_rgba(0,0,0,0.02)] p-2.5 sm:p-3 overflow-hidden">
+        
+        {/* Subtle Specular Sheen & Optical Backing for WebGL Shader Refraction */}
+        <div 
+          aria-hidden="true" 
+          className="absolute inset-0 bg-gradient-to-r from-emerald-500/[0.04] via-teal-500/[0.03] to-cyan-500/[0.04] pointer-events-none" 
+        />
+        <div 
+          aria-hidden="true" 
+          className="absolute top-0 inset-x-8 h-[1px] bg-gradient-to-r from-transparent via-white to-transparent pointer-events-none" 
+        />
+
+        {/* 1. TOP COMMAND ROW */}
+        <div className="relative z-10 flex items-center justify-between gap-3">
+          
+          {/* Brand & Edition Switcher */}
+          <div className="flex items-center space-x-2.5 sm:space-x-3.5 shrink-0">
+            {/* PRISM Emblem Logo */}
+            <div
+              className="flex items-center space-x-2.5 cursor-pointer apple-btn select-none group"
+              onClick={(e) => {
+                handleButtonClickGlow(e);
+                onSelectCategory('all');
+              }}
+            >
+              {/* Jewel Emblem */}
+              <div className="relative w-8 h-8 sm:w-9 sm:h-9 rounded-2xl bg-zinc-950 flex items-center justify-center shadow-md border border-zinc-800 transition-transform group-hover:scale-105 duration-200">
+                <div className="w-3.5 h-3.5 rounded-sm bg-gradient-to-tr from-emerald-400 via-teal-300 to-cyan-400 rotate-45 shadow-xs animate-pulse" />
+              </div>
+              <div className="hidden min-[380px]:block">
+                <div className="flex items-center space-x-1.5">
+                  <span className="text-sm sm:text-base font-extrabold tracking-tight text-zinc-950">PRISM</span>
+                  <span className="px-1.5 py-0.2 rounded-full bg-emerald-50 text-[9px] font-mono font-bold text-emerald-700 border border-emerald-200">
+                    LIVE
+                  </span>
+                </div>
               </div>
             </div>
+
+            {/* India vs International Edition Switcher (Liquid Glass Pills) */}
+            <div className="inline-flex items-center p-0.5 rounded-full bg-zinc-100/90 border border-zinc-200/80 shadow-2xs">
+              <LiquidGlassButton
+                active={activeEdition === 'india'}
+                variant="pill"
+                onClick={() => onSelectEdition('india')}
+                title="Switch to India Edition (The Hindu, NDTV, Livemint, Times of India, NewsData India)"
+                className="px-2.5 sm:px-3 py-1 text-xs font-semibold"
+                config={{ cornerRadius: 9999, refraction: 0.8, specular: 0.4 }}
+              >
+                <span className="text-xs">🇮🇳</span>
+                <span className="hidden sm:inline">India</span>
+              </LiquidGlassButton>
+
+              <LiquidGlassButton
+                active={activeEdition === 'international'}
+                variant="pill"
+                onClick={() => onSelectEdition('international')}
+                title="Switch to Global Edition (NYT, BBC, Verge, Hacker News, Global Wire)"
+                className="px-2.5 sm:px-3 py-1 text-xs font-semibold"
+                config={{ cornerRadius: 9999, refraction: 0.8, specular: 0.4 }}
+              >
+                <Globe2 className="w-3.5 h-3.5 text-zinc-600 sm:hidden" />
+                <span className="hidden sm:inline">🌐 Global</span>
+              </LiquidGlassButton>
+            </div>
           </div>
 
-          {/* India vs International Edition Toggle */}
-          <div className="inline-flex items-center p-0.5 rounded-full bg-zinc-100 border border-zinc-200/80 shadow-2xs">
-            <button
-              type="button"
-              onClick={(e) => {
-                handleButtonClickGlow(e);
-                onSelectEdition('india');
-              }}
-              className={`apple-btn flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-semibold cursor-pointer transition-all ${
-                activeEdition === 'india'
-                  ? 'bg-zinc-950 text-white shadow-xs'
-                  : 'text-zinc-600 hover:text-zinc-900'
-              }`}
-              title="Switch to India Edition (The Hindu, NDTV, Livemint, Times of India, NewsData India)"
+          {/* Center Apple Spotlight Search Omnibox */}
+          <div className="flex-1 max-w-md hidden md:block">
+            <div 
+              onClick={() => searchInputRef.current?.focus()}
+              className="relative flex items-center bg-zinc-100/70 hover:bg-zinc-100/95 focus-within:bg-white border border-zinc-200/80 focus-within:border-zinc-900 rounded-2xl transition-all duration-200 shadow-2xs px-3 py-1.5 cursor-text"
             >
-              <span>🇮🇳</span>
-              <span>India</span>
-            </button>
-            <button
-              type="button"
-              onClick={(e) => {
-                handleButtonClickGlow(e);
-                onSelectEdition('international');
-              }}
-              className={`apple-btn flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-semibold cursor-pointer transition-all ${
-                activeEdition === 'international'
-                  ? 'bg-zinc-950 text-white shadow-xs'
-                  : 'text-zinc-600 hover:text-zinc-900'
-              }`}
-              title="Switch to International Edition (NYT, BBC, Verge, Hacker News, Global Wire)"
-            >
-              <span>🌐</span>
-              <span>Global</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Center Search Omnibox */}
-        <div className="flex-1 max-w-lg hidden md:block">
-          <div className="relative flex items-center">
-            <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 pointer-events-none" />
-            <input
-              type="text"
-              placeholder="Search live dispatches, tickers, companies..."
-              value={searchQuery}
-              onChange={(e) => onSearchChange(e.target.value)}
-              className="w-full pl-10 pr-16 py-2 bg-white/70 hover:bg-white focus:bg-white border border-zinc-200/80 focus:border-zinc-900 rounded-xl text-xs text-zinc-900 placeholder-zinc-400 focus:outline-none transition-all shadow-2xs"
-            />
-            <button
-              type="button"
-              onClick={(e) => {
-                handleButtonClickGlow(e);
-                onOpenCommandPalette();
-              }}
-              className="apple-btn absolute right-2 px-1.5 py-0.5 rounded-md border border-zinc-200 text-[10px] font-mono text-zinc-400 bg-white hover:bg-zinc-50 cursor-pointer shadow-2xs flex items-center space-x-0.5"
-            >
-              <Command className="w-2.5 h-2.5" />
-              <span>K</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Right Action Toolbar */}
-        <div className="flex items-center space-x-2">
-          {/* Install as Native App Button */}
-          <button
-            onClick={(e) => {
-              handleButtonClickGlow(e);
-              onOpenInstall();
-            }}
-            className="apple-glass-btn apple-btn hidden sm:inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-zinc-800 cursor-pointer"
-            title="Install Prism as Native App on Mobile/Desktop"
-          >
-            <Smartphone className="w-3.5 h-3.5 text-emerald-600" />
-            <span>Install App</span>
-          </button>
-
-          {/* 3-Min AI Briefing */}
-          <button
-            onClick={(e) => {
-              handleButtonClickGlow(e);
-              onOpenBriefing();
-            }}
-            className="apple-prominent-btn apple-btn inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold tracking-tight shadow-md cursor-pointer"
-          >
-            <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-            <span>AI Brief</span>
-          </button>
-
-          {/* Saved Dossier Button */}
-          <button
-            onClick={(e) => {
-              handleButtonClickGlow(e);
-              onOpenBookmarks();
-            }}
-            className="apple-glass-btn apple-btn inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-medium text-zinc-800 cursor-pointer"
-          >
-            <Bookmark className="w-3.5 h-3.5 text-zinc-600" />
-            <span className="hidden sm:inline">Saved</span>
-            {bookmarkCount > 0 && (
-              <span className="px-1.5 py-0.2 bg-zinc-900 text-white rounded-full text-[10px] font-mono font-medium">
-                {bookmarkCount}
-              </span>
-            )}
-          </button>
-
-          {/* Settings */}
-          <button
-            onClick={(e) => {
-              handleButtonClickGlow(e);
-              onOpenSettings();
-            }}
-            className="apple-glass-btn apple-btn p-2 rounded-xl text-zinc-600 cursor-pointer"
-            title="API & Cloud Settings"
-          >
-            <SlidersHorizontal className="w-4 h-4" />
-          </button>
-
-          {/* Refresh Wire */}
-          <button
-            onClick={(e) => {
-              handleButtonClickGlow(e);
-              onRefresh();
-            }}
-            disabled={isRefreshing}
-            className="apple-glass-btn apple-btn p-2 rounded-xl text-zinc-600 disabled:opacity-50 cursor-pointer"
-            title="Refresh Wire"
-          >
-            <RotateCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-zinc-950' : ''}`} />
-          </button>
-        </div>
-      </div>
-
-      {/* Category Pills & View Switcher Shelf */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2 flex items-center justify-between border-t border-white/60">
-        {/* Category Pills */}
-        <div className="flex items-center space-x-1.5 overflow-x-auto no-scrollbar py-0.5">
-          {CATEGORIES.map((cat) => {
-            const isActive = activeCategory === cat.id;
-            return (
+              <Search className="w-3.5 h-3.5 text-zinc-400 mr-2 shrink-0" />
+              <input
+                ref={searchInputRef}
+                type="text"
+                placeholder="Search live dispatches, tickers, companies..."
+                value={searchQuery}
+                onChange={(e) => onSearchChange(e.target.value)}
+                className="w-full bg-transparent text-xs text-zinc-900 placeholder-zinc-400 focus:outline-none"
+              />
               <button
-                key={cat.id}
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleButtonClickGlow(e);
+                  onOpenCommandPalette();
+                }}
+                className="apple-btn shrink-0 ml-1.5 px-1.5 py-0.5 rounded-md border border-zinc-200 text-[10px] font-mono text-zinc-400 bg-white hover:bg-zinc-50 cursor-pointer shadow-2xs flex items-center space-x-0.5"
+                title="Open Command Spotlight (⌘K)"
+              >
+                <Command className="w-2.5 h-2.5" />
+                <span>K</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Right Action Deck */}
+          <div className="flex items-center space-x-1.5 sm:space-x-2 shrink-0">
+            {/* Install PWA Button (Desktop/Tablet) */}
+            <div className="hidden lg:block">
+              <LiquidGlassButton
+                onClick={() => onOpenInstall()}
+                title="Install Prism as Native App"
+                className="px-3 py-1.5 text-xs font-semibold"
+                config={{ cornerRadius: 18, refraction: 0.75, specular: 0.35 }}
+              >
+                <Smartphone className="w-3.5 h-3.5 text-emerald-600 mr-1" />
+                <span>Install</span>
+              </LiquidGlassButton>
+            </div>
+
+            {/* AI Executive Intelligence Brief (Dark Liquid Glass Pill) */}
+            <LiquidGlassButton
+              variant="dark"
+              onClick={() => onOpenBriefing()}
+              title="Open 3-Minute AI Executive Intelligence Brief"
+              className="px-3 sm:px-3.5 py-1.5 text-xs font-bold tracking-tight shadow-sm"
+              config={{ cornerRadius: 18, refraction: 0.82, specular: 0.5, edgeHighlight: 0.28 }}
+            >
+              <Sparkles className="w-3.5 h-3.5 text-amber-300 mr-1 animate-pulse" />
+              <span className="hidden sm:inline">AI Brief</span>
+              <span className="sm:hidden">Brief</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 ml-1.5 animate-ping" />
+            </LiquidGlassButton>
+
+            {/* Saved Dossier Button */}
+            <LiquidGlassButton
+              onClick={() => onOpenBookmarks()}
+              title="Saved Dossier & Bookmarks"
+              className="px-2.5 sm:px-3 py-1.5 text-xs font-medium"
+              config={{ cornerRadius: 18, refraction: 0.75 }}
+            >
+              <Bookmark className="w-3.5 h-3.5 text-zinc-600" />
+              <span className="hidden sm:inline ml-1">Saved</span>
+              {bookmarkCount > 0 && (
+                <span className="ml-1 px-1.5 py-0.2 bg-zinc-950 text-white rounded-full text-[10px] font-mono font-bold">
+                  {bookmarkCount}
+                </span>
+              )}
+            </LiquidGlassButton>
+
+            {/* Settings (Cloud & API Engine) */}
+            <LiquidGlassButton
+              onClick={() => onOpenSettings()}
+              title="Cloud & API Engine Settings"
+              className="p-2 text-zinc-600"
+              config={{ cornerRadius: 16, refraction: 0.75 }}
+            >
+              <SlidersHorizontal className="w-3.5 h-3.5" />
+            </LiquidGlassButton>
+
+            {/* View Switcher: Bento Grid vs Stream View */}
+            <div className="hidden sm:inline-flex items-center p-0.5 rounded-xl bg-zinc-100 border border-zinc-200/80 shadow-2xs">
+              <button
+                type="button"
                 onClick={(e) => {
                   handleButtonClickGlow(e);
-                  onSelectCategory(cat.id);
+                  onToggleViewMode('grid');
                 }}
-                className={`apple-btn px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all whitespace-nowrap cursor-pointer ${
-                  isActive
-                    ? 'apple-prominent-btn text-white shadow-xs'
-                    : 'apple-glass-btn text-zinc-600 hover:text-zinc-900'
+                className={`apple-btn p-1.5 rounded-lg transition-all cursor-pointer ${
+                  viewMode === 'grid'
+                    ? 'bg-zinc-950 text-white shadow-xs'
+                    : 'text-zinc-500 hover:text-zinc-800'
                 }`}
+                title="Bento Grid Architecture"
               >
-                {cat.label}
+                <LayoutGrid className="w-3.5 h-3.5" />
               </button>
-            );
-          })}
+              <button
+                type="button"
+                onClick={(e) => {
+                  handleButtonClickGlow(e);
+                  onToggleViewMode('stream');
+                }}
+                className={`apple-btn p-1.5 rounded-lg transition-all cursor-pointer ${
+                  viewMode === 'stream'
+                    ? 'bg-zinc-950 text-white shadow-xs'
+                    : 'text-zinc-500 hover:text-zinc-800'
+                }`}
+                title="Continuous Wire Stream"
+              >
+                <List className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            {/* Wire Refresh Button */}
+            <LiquidGlassButton
+              onClick={() => onRefresh()}
+              disabled={isRefreshing}
+              title="Refresh Live Wire"
+              className="p-2 text-zinc-600"
+              config={{ cornerRadius: 16, refraction: 0.75 }}
+            >
+              <RotateCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-zinc-950' : ''}`} />
+            </LiquidGlassButton>
+          </div>
         </div>
 
-        {/* Right View Switcher */}
-        <div className="hidden sm:flex items-center space-x-1 liquid-glass-pill p-1 rounded-xl shrink-0 ml-3">
-          <button
-            type="button"
-            onClick={(e) => {
-              handleButtonClickGlow(e);
-              onToggleViewMode('grid');
-            }}
-            className={`apple-btn p-1.5 rounded-lg transition-all cursor-pointer ${
-              viewMode === 'grid'
-                ? 'bg-zinc-950 text-white shadow-xs font-semibold'
-                : 'text-zinc-500 hover:text-zinc-800'
-            }`}
-            title="Bento Grid View"
-          >
-            <LayoutGrid className="w-3.5 h-3.5" />
-          </button>
-          <button
-            type="button"
-            onClick={(e) => {
-              handleButtonClickGlow(e);
-              onToggleViewMode('stream');
-            }}
-            className={`apple-btn p-1.5 rounded-lg transition-all cursor-pointer ${
-              viewMode === 'stream'
-                ? 'bg-zinc-950 text-white shadow-xs font-semibold'
-                : 'text-zinc-500 hover:text-zinc-800'
-            }`}
-            title="Stream Feed View"
-          >
-            <List className="w-3.5 h-3.5" />
-          </button>
+        {/* 2. INTEGRATED CATEGORY NAVIGATION RAIL */}
+        <div className="relative z-10 pt-2 sm:pt-2.5 mt-1 sm:mt-1.5 border-t border-zinc-200/50 flex items-center justify-between">
+          <div className="flex items-center space-x-1.5 sm:space-x-2 overflow-x-auto no-scrollbar py-0.5 w-full">
+            {CATEGORIES.map((cat) => {
+              const isActive = activeCategory === cat.id;
+              return (
+                <LiquidGlassButton
+                  key={cat.id}
+                  active={isActive}
+                  variant="pill"
+                  onClick={() => onSelectCategory(cat.id)}
+                  className="px-3.5 py-1 text-xs font-semibold whitespace-nowrap"
+                  config={{ 
+                    cornerRadius: 9999, 
+                    refraction: 0.78, 
+                    specular: isActive ? 0.45 : 0.3,
+                    edgeHighlight: 0.22 
+                  }}
+                >
+                  {cat.label}
+                </LiquidGlassButton>
+              );
+            })}
+          </div>
         </div>
+
       </div>
     </header>
   );
