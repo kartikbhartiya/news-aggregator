@@ -14,6 +14,11 @@ import GlassFilterBar from '@/components/GlassFilterBar';
 import InstallAppSheet from '@/components/InstallAppSheet';
 import MobileTabBar from '@/components/MobileTabBar';
 import EditorialSkeleton from '@/components/EditorialSkeleton';
+import AuthModal from '@/components/AuthModal';
+import OnboardingModal from '@/components/OnboardingModal';
+import UserProfileModal from '@/components/UserProfileModal';
+import NewsShortsModal from '@/components/NewsShortsModal';
+import { getCurrentUser, UserProfile } from '@/lib/auth';
 import { fetchBookmarks, saveBookmarkToSupabase, removeBookmarkFromSupabase, checkSupabaseHealth } from '@/lib/supabase';
 import { handleButtonClickGlow } from '@/lib/button-glow';
 import { EDITORIAL_FALLBACK_ARTICLES, EDITORIAL_INDIAN_FALLBACK_ARTICLES } from '@/lib/mock-news';
@@ -54,6 +59,13 @@ export default function ClientHomePage({
   // Supabase & Local state
   const [bookmarks, setBookmarks] = useState<Article[]>([]);
   const [supabaseConnected, setSupabaseConnected] = useState(false);
+
+  // User Authentication & Profile
+  const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
+  const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
+  const [isShortsOpen, setIsShortsOpen] = useState(false);
 
   // Modals state
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
@@ -126,6 +138,10 @@ export default function ClientHomePage({
       setSupabaseConnected(health.connected);
       const saved = await fetchBookmarks();
       setBookmarks(saved);
+      const u = await getCurrentUser();
+      if (u) {
+        setCurrentUser(u);
+      }
     }
     initSupabase();
   }, []);
@@ -193,6 +209,16 @@ export default function ClientHomePage({
       list = list.filter((a) => (a.source?.credibilityScore || 85) >= 90);
     }
 
+    // Personalization: If activeCategory is 'all' and user has preferred categories, prioritize them
+    if (activeCategory === 'all' && currentUser?.preferences?.categories?.length) {
+      const preferred = currentUser.preferences.categories;
+      list.sort((a, b) => {
+        const aPref = preferred.includes(a.category) ? 1 : 0;
+        const bPref = preferred.includes(b.category) ? 1 : 0;
+        return bPref - aPref;
+      });
+    }
+
     // Sort order
     if (sortBy === 'latest') {
       return list.sort(
@@ -253,6 +279,10 @@ export default function ClientHomePage({
         supabaseConnected={supabaseConnected}
         viewMode={viewMode}
         onToggleViewMode={setViewMode}
+        onOpenShorts={() => setIsShortsOpen(true)}
+        onOpenAuth={() => setIsAuthOpen(true)}
+        onOpenProfile={() => setIsProfileOpen(true)}
+        currentUser={currentUser}
       />
 
       {/* 3. Floating Apple Glass Filter & Sort Island */}
@@ -535,6 +565,51 @@ export default function ClientHomePage({
       <InstallAppSheet
         isOpen={isInstallOpen}
         onClose={() => setIsInstallOpen(false)}
+      />
+
+      {/* 9. Supabase Auth, Onboarding & Profile Modals */}
+      <AuthModal
+        isOpen={isAuthOpen}
+        onClose={() => setIsAuthOpen(false)}
+        onAuthSuccess={(user) => {
+          setCurrentUser(user);
+          if (!user.preferences?.onboardingCompleted) {
+            setIsOnboardingOpen(true);
+          } else {
+            setIsProfileOpen(true);
+          }
+        }}
+      />
+
+      <OnboardingModal
+        isOpen={isOnboardingOpen}
+        user={currentUser}
+        onComplete={(updated) => {
+          setCurrentUser(updated);
+          setIsOnboardingOpen(false);
+          if (updated.preferences?.edition && updated.preferences.edition !== edition) {
+            handleSelectEdition(updated.preferences.edition);
+          }
+        }}
+      />
+
+      <UserProfileModal
+        isOpen={isProfileOpen}
+        onClose={() => setIsProfileOpen(false)}
+        user={currentUser}
+        onOpenOnboarding={() => setIsOnboardingOpen(true)}
+        onSignOut={() => setCurrentUser(null)}
+        onOpenBriefing={() => setIsBriefingOpen(true)}
+      />
+
+      {/* 10. PRISM News Shorts Modal (YT Shorts style) */}
+      <NewsShortsModal
+        isOpen={isShortsOpen}
+        onClose={() => setIsShortsOpen(false)}
+        articles={articles}
+        onOpenArticle={(art) => setSelectedArticle(art)}
+        onToggleBookmark={handleToggleBookmark}
+        bookmarkedIds={bookmarks.map((b) => b.id)}
       />
     </div>
   );

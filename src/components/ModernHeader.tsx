@@ -12,10 +12,14 @@ import {
   List,
   Command,
   Smartphone,
-  Globe2
+  Globe2,
+  Zap,
+  User,
+  Flame
 } from 'lucide-react';
 import { handleButtonClickGlow } from '@/lib/button-glow';
 import LiquidGlassButton from '@/components/LiquidGlassButton';
+import { UserProfile } from '@/lib/auth';
 
 interface ModernHeaderProps {
   activeEdition: 'india' | 'international';
@@ -35,6 +39,10 @@ interface ModernHeaderProps {
   supabaseConnected: boolean;
   viewMode: 'grid' | 'stream';
   onToggleViewMode: (mode: 'grid' | 'stream') => void;
+  onOpenShorts?: () => void;
+  onOpenAuth?: () => void;
+  onOpenProfile?: () => void;
+  currentUser?: UserProfile | null;
 }
 
 const CATEGORIES: Array<{ id: NewsCategory; label: string; icon?: string }> = [
@@ -75,6 +83,10 @@ export default function ModernHeader({
   supabaseConnected,
   viewMode,
   onToggleViewMode,
+  onOpenShorts,
+  onOpenAuth,
+  onOpenProfile,
+  currentUser,
 }: ModernHeaderProps) {
   const searchInputRef = useRef<HTMLInputElement>(null);
 
@@ -181,6 +193,19 @@ export default function ModernHeader({
 
           {/* Right Action Deck */}
           <div className="flex items-center space-x-1.5 sm:space-x-2 shrink-0">
+            {/* PRISM News Shorts (YT Shorts style) */}
+            {onOpenShorts && (
+              <LiquidGlassButton
+                onClick={() => onOpenShorts()}
+                title="Open PRISM News Shorts (Vertical QuickSignals)"
+                className="px-2.5 sm:px-3 py-1.5 text-xs font-bold text-amber-500"
+                config={{ cornerRadius: 18, refraction: 0.78, specular: 0.4 }}
+              >
+                <Zap className="w-3.5 h-3.5 text-amber-500 fill-amber-500 mr-1" />
+                <span className="hidden sm:inline">Shorts</span>
+              </LiquidGlassButton>
+            )}
+
             {/* Install PWA Button (Desktop/Tablet) */}
             <div className="hidden lg:block">
               <LiquidGlassButton
@@ -223,6 +248,36 @@ export default function ModernHeader({
                 </span>
               )}
             </LiquidGlassButton>
+
+            {/* Account Profile / Supabase Auth Button */}
+            {currentUser ? (
+              <LiquidGlassButton
+                onClick={() => onOpenProfile?.()}
+                title={`Profile: ${currentUser.fullName || currentUser.email}`}
+                className="px-2.5 sm:px-3 py-1.5 text-xs font-semibold"
+                config={{ cornerRadius: 18, refraction: 0.75 }}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={currentUser.avatarUrl}
+                  alt={currentUser.fullName || 'User'}
+                  className="w-4 h-4 rounded-full mr-1.5 object-cover"
+                />
+                <span className="hidden md:inline max-w-[80px] truncate">
+                  {currentUser.fullName?.split(' ')[0] || 'Dossier'}
+                </span>
+              </LiquidGlassButton>
+            ) : (
+              <LiquidGlassButton
+                onClick={() => onOpenAuth?.()}
+                title="Sign In with Password or Sign Up with 6-Digit OTP"
+                className="px-2.5 sm:px-3 py-1.5 text-xs font-bold text-zinc-950"
+                config={{ cornerRadius: 18, refraction: 0.75 }}
+              >
+                <User className="w-3.5 h-3.5 text-zinc-900 mr-1" />
+                <span className="hidden sm:inline">Sign In</span>
+              </LiquidGlassButton>
+            )}
 
             {/* Settings (Cloud & API Engine) */}
             <LiquidGlassButton

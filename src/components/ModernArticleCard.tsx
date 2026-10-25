@@ -1,10 +1,32 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Article } from '@/types/news';
-import { Bookmark, Clock, ArrowUpRight, Volume2, ShieldCheck, Share2, Sparkles } from 'lucide-react';
+import { Bookmark, Clock, ArrowUpRight, Sparkles, ImageOff } from 'lucide-react';
 import { handleButtonClickGlow } from '@/lib/button-glow';
 import LiquidGlassThumbnail from '@/components/LiquidGlassThumbnail';
+
+function NoImageFallback({ sourceName, category, className = '' }: { sourceName: string; category?: string; className?: string }) {
+  return (
+    <div
+      className={`relative rounded-2xl overflow-hidden bg-gradient-to-br from-zinc-100 via-zinc-50 to-zinc-100/70 border border-zinc-200/70 flex flex-col items-center justify-center p-4 select-none ${className}`}
+    >
+      <div className="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold text-zinc-800 bg-white/95 border border-zinc-200/80 shadow-2xs">
+        {sourceName}
+      </div>
+      {category && (
+        <div className="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-md bg-zinc-200/60 text-[10px] font-mono text-zinc-600 uppercase tracking-wider">
+          {category}
+        </div>
+      )}
+      <div className="w-11 h-11 rounded-2xl bg-white border border-zinc-200/70 flex items-center justify-center text-zinc-400 mb-2 shadow-2xs group-hover:scale-105 transition-transform duration-300">
+        <ImageOff className="w-5 h-5 text-zinc-400" />
+      </div>
+      <span className="text-xs font-semibold text-zinc-700 tracking-tight">No Image Available</span>
+      <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-400 mt-0.5">Wire Dispatch • Text Only</span>
+    </div>
+  );
+}
 
 interface ModernArticleCardProps {
   article: Article;
@@ -138,15 +160,23 @@ export default function ModernArticleCard({
             </div>
           </div>
 
-          {/* Right Visual Image with Real WebGL Liquid Glass Badge */}
+          {/* Right Visual Image with Real WebGL Liquid Glass Badge or Clean Editorial Fallback */}
           <div className="lg:col-span-5">
-            <LiquidGlassThumbnail
-              src={article.imageUrl || ''}
-              alt={article.title}
-              badgeText={article.source.name}
-              priorityBadge="TOP SIGNAL"
-              className="aspect-[16/10] rounded-[24px]"
-            />
+            {article.imageUrl && article.imageUrl.trim() !== '' ? (
+              <LiquidGlassThumbnail
+                src={article.imageUrl}
+                alt={article.title}
+                badgeText={article.source.name}
+                priorityBadge="TOP SIGNAL"
+                className="aspect-[16/10] rounded-[24px]"
+              />
+            ) : (
+              <NoImageFallback
+                sourceName={article.source.name}
+                category={article.category}
+                className="aspect-[16/10] rounded-[24px]"
+              />
+            )}
           </div>
         </div>
       </div>
@@ -195,12 +225,18 @@ export default function ModernArticleCard({
       className={`group liquid-glass-direct liquid-glass-card rounded-[26px] p-5 flex flex-col justify-between cursor-pointer ${className}`}
     >
       <div>
-        {/* Card Thumbnail with Real WebGL Liquid Glass Badge */}
-        {article.imageUrl && (
+        {/* Card Thumbnail with Real WebGL Liquid Glass Badge or Clean Editorial Fallback */}
+        {article.imageUrl && article.imageUrl.trim() !== '' ? (
           <LiquidGlassThumbnail
             src={article.imageUrl}
             alt={article.title}
             badgeText={article.source.name}
+            className="aspect-[16/10] mb-3.5"
+          />
+        ) : (
+          <NoImageFallback
+            sourceName={article.source.name}
+            category={article.category}
             className="aspect-[16/10] mb-3.5"
           />
         )}

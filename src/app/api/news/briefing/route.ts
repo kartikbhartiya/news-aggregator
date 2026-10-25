@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ExecutiveBriefing } from '@/types/news';
 import { fetchAllAggregatedNews } from '@/lib/news-fetcher';
+import { generateGroqBriefing } from '@/lib/groq';
 
 export async function GET(request: NextRequest) {
   try {
@@ -23,61 +24,17 @@ export async function GET(request: NextRequest) {
       year: 'numeric',
     });
 
-    // Select top impactful stories from current live feed
-    const topLead = articles[0];
-    const secondaryStories = articles.slice(1, 6);
-
-    const leadHighlight = topLead
-      ? `${topLead.title}. ${topLead.description.slice(0, 180)}...`
-      : 'Global financial and technological indices exhibit steady resilience amid autumn monetary strategy conferences.';
-
-    const keyDevelopments = secondaryStories.length > 0
-      ? secondaryStories.map((art, idx) => {
-          const impactLevels: Array<'Critical' | 'High' | 'Medium'> = ['Critical', 'High', 'High', 'Medium', 'Medium'];
-          return {
-            title: art.title,
-            summary: art.description || `${art.title} dispatched by ${art.source.name}.`,
-            category: art.category.toUpperCase(),
-            impact: impactLevels[idx] || 'Medium',
-            timeAgo: 'Live Wire',
-          };
-        })
-      : [
-          {
-            title: 'Quantum Hardware Error Threshold Crossed',
-            summary: 'Topological non-Abelian anyon braids exhibit 99.98% error resilience under cryogenic benchmarks.',
-            category: 'Technology',
-            impact: 'Critical' as const,
-            timeAgo: '24m ago',
-          },
-          {
-            title: 'Sovereign Debt Maturity Rollover Strategy',
-            summary: 'Central bank governors signal higher-for-longer baseline neutral rates as $8 trillion in public debt faces treasury refinancing.',
-            category: 'Capital Markets',
-            impact: 'High' as const,
-            timeAgo: '1h ago',
-          },
-          {
-            title: 'Arctic Maritime Shipping Conduits Expand',
-            summary: 'Dual-fuel reinforced freight vessels trim Asia-to-Europe shipping duration to 19 days.',
-            category: 'Geopolitics',
-            impact: 'High' as const,
-            timeAgo: '2h ago',
-          },
-        ];
+    // Synthesize using Groq AI
+    const groqResult = await generateGroqBriefing(articles, edition, category);
 
     const briefing: ExecutiveBriefing = {
       id: `briefing-${edition}-${Date.now()}`,
       edition: edition === 'india' ? 'PRISM INDIA EXECUTIVE INTELLIGENCE BRIEF' : 'PRISM GLOBAL EXECUTIVE INTELLIGENCE BRIEF',
       date: today,
-      leadHighlight,
-      globalPulse: edition === 'india' 
-        ? 'Active telemetry monitoring across Indian markets, Dholera semiconductor fabs, Dalal Street, and UPI payment infrastructure.'
-        : 'Active telemetry monitoring across global semiconductor, trade corridor, and macro capital flows.',
-      marketOutlook: edition === 'india'
-        ? 'Nifty 50 and Sensex sustain resilient institutional inflows; domestic manufacturing and infra CAPEX lead quarterly momentum.'
-        : 'Technology equities and sovereign paper yields show firm bid strength; commodity volatility stabilizing.',
-      keyDevelopments,
+      leadHighlight: groqResult.leadHighlight,
+      globalPulse: groqResult.globalPulse,
+      marketOutlook: groqResult.marketOutlook,
+      keyDevelopments: groqResult.keyDevelopments,
     };
 
     return NextResponse.json(briefing, {

@@ -39,7 +39,7 @@ export default function LiquidGlassView({
       }
 
       try {
-        const { LiquidGlass } = await import('@ybouane/liquidglass');
+        const { LiquidGlass } = await import('@/lib/liquidglass');
         if (isCancelled || !rootRef.current) return;
 
         // Select all direct children marked as liquid-glass-direct

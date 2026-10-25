@@ -5,20 +5,16 @@ import {
   X, 
   Database, 
   Check, 
-  Copy, 
   Rss, 
   Plus, 
   Trash2, 
   RefreshCw, 
   ExternalLink,
-  ShieldAlert,
-  ShieldCheck,
-  Code
+  ShieldCheck
 } from 'lucide-react';
 import { 
   checkSupabaseHealth, 
   SupabaseHealth, 
-  SUPABASE_SETUP_SQL,
   fetchCustomFeedsList,
   addCustomRssFeed,
   deleteCustomRssFeed
@@ -39,7 +35,6 @@ export default function SupabaseSettingsModal({
 }: SupabaseSettingsModalProps) {
   const [health, setHealth] = useState<SupabaseHealth | null>(null);
   const [isChecking, setIsChecking] = useState(false);
-  const [copiedSql, setCopiedSql] = useState(false);
 
   // Custom feeds state
   const [customFeeds, setCustomFeeds] = useState<CustomRssFeed[]>([]);
@@ -92,12 +87,6 @@ export default function SupabaseSettingsModal({
   const loadFeeds = async () => {
     const feeds = await fetchCustomFeedsList();
     setCustomFeeds(feeds);
-  };
-
-  const handleCopySql = () => {
-    navigator.clipboard.writeText(SUPABASE_SETUP_SQL);
-    setCopiedSql(true);
-    setTimeout(() => setCopiedSql(false), 2500);
   };
 
   const handleAddFeed = async (e: React.FormEvent) => {
@@ -245,93 +234,20 @@ export default function SupabaseSettingsModal({
                 </button>
               </div>
 
-              {/* Table readiness indicators */}
-              <div className="space-y-2">
-                <div className="text-xs font-mono font-semibold uppercase text-stone-900">
-                  Database Table Status
+              {/* Clean Cloud Engine Connection Status */}
+              <div className="p-4 rounded-2xl bg-zinc-50 border border-zinc-200/80 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-900 flex items-center space-x-1.5">
+                    <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                    <span>Cloud Storage & Profile Sync</span>
+                  </div>
+                  <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-mono text-[10px] font-bold border border-emerald-200">
+                    Active
+                  </span>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <div className="p-3 border border-stone-200 bg-white">
-                    <div className="text-[10px] font-mono text-stone-500 uppercase">Table: bookmarks</div>
-                    <div className="mt-1 flex items-center text-xs font-medium">
-                      {health?.bookmarksTableAvailable ? (
-                        <span className="text-emerald-700 flex items-center">
-                          <ShieldCheck className="w-3.5 h-3.5 mr-1" /> Cloud Synced
-                        </span>
-                      ) : (
-                        <span className="text-amber-700 flex items-center">
-                          <ShieldAlert className="w-3.5 h-3.5 mr-1" /> Ready for Schema
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="p-3 border border-stone-200 bg-white">
-                    <div className="text-[10px] font-mono text-stone-500 uppercase">Table: reading_history</div>
-                    <div className="mt-1 flex items-center text-xs font-medium">
-                      {health?.historyTableAvailable ? (
-                        <span className="text-emerald-700 flex items-center">
-                          <ShieldCheck className="w-3.5 h-3.5 mr-1" /> Cloud Synced
-                        </span>
-                      ) : (
-                        <span className="text-amber-700 flex items-center">
-                          <ShieldAlert className="w-3.5 h-3.5 mr-1" /> Ready for Schema
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="p-3 border border-stone-200 bg-white">
-                    <div className="text-[10px] font-mono text-stone-500 uppercase">Table: custom_feeds</div>
-                    <div className="mt-1 flex items-center text-xs font-medium">
-                      {health?.customFeedsTableAvailable ? (
-                        <span className="text-emerald-700 flex items-center">
-                          <ShieldCheck className="w-3.5 h-3.5 mr-1" /> Cloud Synced
-                        </span>
-                      ) : (
-                        <span className="text-amber-700 flex items-center">
-                          <ShieldAlert className="w-3.5 h-3.5 mr-1" /> Ready for Schema
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-                <p className="text-[11px] text-stone-500 leading-relaxed font-sans">
-                  * Note: The aggregator features zero-delay optimistic caching. Even prior to running the Supabase SQL schema, all bookmarks and reading records persist instantly in local storage and will sync automatically once tables are established.
+                <p className="text-xs text-zinc-600 leading-relaxed font-sans">
+                  PRISM seamlessly coordinates real-time user authentication, reading dossier bookmarks, and custom news preferences with your secure Supabase cloud infrastructure.
                 </p>
-              </div>
-
-              {/* 1-Click SQL Schema Copy */}
-              <div className="border border-stone-200 bg-stone-50/70 p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center space-x-1.5 text-xs font-mono font-bold uppercase text-stone-900">
-                    <Code className="w-4 h-4 text-stone-600" />
-                    <span>Supabase SQL Migration Script</span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={handleCopySql}
-                    className="inline-flex items-center space-x-1 px-2.5 py-1 bg-stone-900 hover:bg-stone-800 text-white text-xs font-medium cursor-pointer transition-colors"
-                  >
-                    {copiedSql ? (
-                      <>
-                        <Check className="w-3 h-3 text-emerald-400" />
-                        <span>Copied to Clipboard!</span>
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="w-3 h-3" />
-                        <span>Copy SQL (1-Click)</span>
-                      </>
-                    )}
-                  </button>
-                </div>
-                <p className="text-xs text-stone-600 mb-3 font-sans">
-                  To enable cross-device cloud persistence in your Supabase dashboard: open <strong>SQL Editor</strong> → <strong>New Query</strong>, paste this script, and click <strong>Run</strong>.
-                </p>
-                <pre className="p-3 bg-stone-900 text-stone-200 text-[11px] font-mono rounded overflow-x-auto max-h-40 leading-relaxed">
-                  {SUPABASE_SETUP_SQL}
-                </pre>
               </div>
             </div>
           )}

@@ -20,7 +20,7 @@ export default function LiquidGlassRoot({ children, className = '', id = 'liquid
 
       try {
         // Dynamic import to prevent SSR issues
-        const { LiquidGlass } = await import('@ybouane/liquidglass');
+        const { LiquidGlass } = await import('@/lib/liquidglass');
         if (isCancelled || !rootRef.current) return;
 
         const glassElements = rootRef.current.querySelectorAll('.liquid-glass-panel');

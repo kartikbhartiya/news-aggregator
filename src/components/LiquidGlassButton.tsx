@@ -60,7 +60,7 @@ export default function LiquidGlassButton({
 
     async function initGlass() {
       try {
-        const { LiquidGlass } = await import('@ybouane/liquidglass');
+        const { LiquidGlass } = await import('@/lib/liquidglass');
         if (isCancelled || !rootRef.current || !buttonRef.current) return;
 
         instance = await LiquidGlass.init({
@@ -117,12 +117,13 @@ export default function LiquidGlassButton({
       {/* Sibling 0: Subtle Underlay Optical Texture for WebGL Refraction */}
       <div 
         aria-hidden="true"
-        className={`absolute inset-0 rounded-[${cornerRadius}px] pointer-events-none transition-opacity duration-300 ${
+        style={{ borderRadius: `${cornerRadius}px` }}
+        className={`absolute inset-0 pointer-events-none transition-all duration-300 overflow-hidden ${
           active 
-            ? 'bg-zinc-950 shadow-md' 
+            ? 'bg-zinc-950 shadow-md border border-zinc-800' 
             : variant === 'dark'
-            ? 'bg-zinc-900/90 shadow-xs'
-            : 'bg-white/60'
+            ? 'bg-zinc-950 text-white shadow-xs border border-zinc-800/80'
+            : 'bg-white/70 border border-zinc-200/60 shadow-2xs'
         }`}
       />
 

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { NewsCategory } from '@/types/news';
 import { 
   Search, 
@@ -135,9 +136,9 @@ export default function Masthead({
 
           {/* Masthead Title */}
           <h1 className="font-serif text-3xl sm:text-5xl md:text-6xl tracking-tight text-stone-900 font-normal hover:opacity-95 transition-opacity">
-            <a href="/" className="inline-block hover:no-underline">
+            <Link href="/" className="inline-block hover:no-underline">
               THE VERITAS DISPATCH
-            </a>
+            </Link>
           </h1>
 
           {/* Sub-Headline */}
