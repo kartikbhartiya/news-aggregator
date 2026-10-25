@@ -24,6 +24,7 @@ import {
   deleteCustomRssFeed
 } from '@/lib/supabase';
 import { CustomRssFeed, NewsCategory } from '@/types/news';
+import { handleButtonClickGlow } from '@/lib/button-glow';
 
 interface SupabaseSettingsModalProps {
   isOpen: boolean;
@@ -160,66 +161,52 @@ export default function SupabaseSettingsModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-stone-900/60 backdrop-blur-xs flex justify-center p-3 sm:p-6 animate-in fade-in duration-200">
-      <div className="relative w-full max-w-2xl bg-white border border-stone-200 shadow-2xl rounded-none my-auto flex flex-col max-h-[90vh] overflow-hidden">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-zinc-950/45 backdrop-blur-md flex justify-center items-center p-3 sm:p-6 animate-in fade-in duration-200">
+      <div className="relative w-full max-w-2xl liquid-glass-panel rounded-3xl sm:rounded-[36px] shadow-2xl my-auto flex flex-col max-h-[90vh] overflow-hidden border border-white/70">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-stone-200 bg-stone-50/70 flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <Database className="w-4 h-4 text-emerald-600" />
-            <h2 className="text-xs font-mono font-bold uppercase tracking-widest text-stone-900">
-              EDITORIAL SETTINGS & SUPABASE CLOUD
+        <div className="px-6 py-4.5 border-b border-zinc-200/60 bg-white/70 backdrop-blur-xl flex items-center justify-between">
+          <div className="flex items-center space-x-2.5">
+            <div className="w-8 h-8 rounded-xl bg-zinc-900 text-white flex items-center justify-center">
+              <Database className="w-4 h-4 text-emerald-400" />
+            </div>
+            <h2 className="text-sm font-extrabold text-zinc-950 tracking-tight">
+              Cloud & API Engine
             </h2>
           </div>
           <button
-            onClick={onClose}
-            className="p-1.5 text-stone-500 hover:text-stone-900 transition-colors cursor-pointer"
+            onClick={(e) => {
+              handleButtonClickGlow(e);
+              onClose();
+            }}
+            className="apple-glass-btn apple-btn p-2 rounded-xl text-zinc-600 cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Sub-tabs */}
-        <div className="px-6 border-b border-stone-200 bg-white flex space-x-6 text-xs font-mono">
-          <button
-            onClick={() => setActiveTab('supabase')}
-            className={`py-3 border-b-2 font-medium tracking-tight cursor-pointer transition-colors ${
-              activeTab === 'supabase'
-                ? 'border-stone-900 text-stone-900 font-bold'
-                : 'border-transparent text-stone-500 hover:text-stone-800'
-            }`}
-          >
-            Supabase Cloud
-          </button>
-          <button
-            onClick={() => setActiveTab('newsdata')}
-            className={`py-3 border-b-2 font-medium tracking-tight cursor-pointer transition-colors ${
-              activeTab === 'newsdata'
-                ? 'border-stone-900 text-stone-900 font-bold'
-                : 'border-transparent text-stone-500 hover:text-stone-800'
-            }`}
-          >
-            NewsData.io API
-          </button>
-          <button
-            onClick={() => setActiveTab('feeds')}
-            className={`py-3 border-b-2 font-medium tracking-tight cursor-pointer transition-colors ${
-              activeTab === 'feeds'
-                ? 'border-stone-900 text-stone-900 font-bold'
-                : 'border-transparent text-stone-500 hover:text-stone-800'
-            }`}
-          >
-            Custom Subscriptions ({customFeeds.length})
-          </button>
-          <button
-            onClick={() => setActiveTab('typography')}
-            className={`py-3 border-b-2 font-medium tracking-tight cursor-pointer transition-colors ${
-              activeTab === 'typography'
-                ? 'border-stone-900 text-stone-900 font-bold'
-                : 'border-transparent text-stone-500 hover:text-stone-800'
-            }`}
-          >
-            Design Principles
-          </button>
+        <div className="px-6 border-b border-zinc-200/60 bg-white/60 flex space-x-2 text-xs py-2 overflow-x-auto no-scrollbar">
+          {[
+            { id: 'supabase', label: 'Supabase Cloud' },
+            { id: 'newsdata', label: 'NewsData.io API' },
+            { id: 'feeds', label: `Custom Feeds (${customFeeds.length})` },
+            { id: 'typography', label: 'Apple Principles' },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={(e) => {
+                handleButtonClickGlow(e);
+                setActiveTab(tab.id as any);
+              }}
+              className={`apple-btn px-3.5 py-1.5 rounded-full text-xs font-semibold cursor-pointer transition-all ${
+                activeTab === tab.id
+                  ? 'apple-prominent-btn text-white shadow-xs'
+                  : 'apple-glass-btn text-zinc-600 hover:text-zinc-950'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
 
         {/* Tab Content */}

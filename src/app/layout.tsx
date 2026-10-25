@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Plus_Jakarta_Sans, Inter } from 'next/font/google';
 import './globals.css';
 
@@ -15,11 +15,27 @@ const inter = Inter({
   display: 'swap',
 });
 
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: 'cover',
+  themeColor: '#FAF9FC',
+};
+
 export const metadata: Metadata = {
-  title: 'PRISM — Modern News & Intelligence Aggregator',
-  description: 'Ultra-premium, real-time news aggregator powered by NewsData.io, verified global wires, and Supabase cloud sync.',
+  title: 'PRISM — Apple-Grade News & Intelligence Aggregator',
+  description: 'Ultra-premium, real-time news aggregator with Liquid Glass physics, NewsData.io integration, and Supabase cloud sync.',
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'Prism News',
+  },
   icons: {
-    icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="%2309090b"/><circle cx="50" cy="50" r="16" fill="%2310b981"/></svg>',
+    icon: '/icon-192.svg',
+    apple: '/icon-512.svg',
   },
 };
 
@@ -30,7 +46,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${plusJakarta.variable} ${inter.variable} antialiased`}>
-      <body className="min-h-screen bg-[#FBFBFC] text-zinc-900 selection:bg-zinc-900 selection:text-white font-sans">
+      <body className="min-h-screen bg-[#FAF9FC] text-zinc-900 selection:bg-zinc-950 selection:text-white font-sans overflow-x-hidden">
         {children}
       </body>
     </html>

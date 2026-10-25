@@ -10,16 +10,22 @@ import ExecutiveBriefingModal from '@/components/ExecutiveBriefingModal';
 import BookmarksDrawer from '@/components/BookmarksDrawer';
 import SupabaseSettingsModal from '@/components/SupabaseSettingsModal';
 import CommandPalette from '@/components/CommandPalette';
+import AmbientBackground from '@/components/AmbientBackground';
+import LiquidGlassRoot from '@/components/LiquidGlass';
+import InstallAppSheet from '@/components/InstallAppSheet';
+import MobileTabBar from '@/components/MobileTabBar';
 import { fetchBookmarks, saveBookmarkToSupabase, removeBookmarkFromSupabase, checkSupabaseHealth } from '@/lib/supabase';
+import { handleButtonClickGlow } from '@/lib/button-glow';
 import { 
   Filter, 
   ArrowUpDown, 
   Sparkles, 
-  Radio, 
-  ExternalLink, 
-  Layers,
-  Flame,
-  ArrowRight
+  Flame, 
+  ArrowRight,
+  Globe,
+  Clock,
+  Compass,
+  Smartphone
 } from 'lucide-react';
 
 export default function HomePage() {
@@ -29,6 +35,8 @@ export default function HomePage() {
   const [activeCategory, setActiveCategory] = useState<NewsCategory>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSource, setSelectedSource] = useState<string>('all');
+  const [selectedRegion, setSelectedRegion] = useState<string>('all');
+  const [readTimeFilter, setReadTimeFilter] = useState<'all' | 'short' | 'long'>('all');
   const [sortBy, setSortBy] = useState<'latest' | 'impact' | 'longread'>('latest');
   const [viewMode, setViewMode] = useState<'grid' | 'stream'>('grid');
 
@@ -42,6 +50,8 @@ export default function HomePage() {
   const [isBookmarksOpen, setIsBookmarksOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+  const [isInstallOpen, setIsInstallOpen] = useState(false);
+  const [mobileTab, setMobileTab] = useState<'signals' | 'search' | 'brief' | 'dossier' | 'settings'>('signals');
 
   const loadArticles = useCallback(async (forceRefresh = false) => {
     if (forceRefresh) setIsRefreshing(true);
@@ -95,7 +105,10 @@ export default function HomePage() {
   }, []);
 
   const handleToggleBookmark = async (article: Article, e?: React.MouseEvent) => {
-    if (e) e.stopPropagation();
+    if (e) {
+      e.stopPropagation();
+      handleButtonClickGlow(e);
+    }
 
     const isAlreadyBookmarked = bookmarks.some((b) => b.id === article.id);
     if (isAlreadyBookmarked) {
@@ -122,30 +135,57 @@ export default function HomePage() {
     return Array.from(map.entries()).map(([id, name]) => ({ id, name }));
   }, [articles]);
 
-  const sortedArticles = useMemo(() => {
-    const copy = [...articles];
+  // Apply rich filters: reading time, region, sort
+  const filteredAndSortedArticles = useMemo(() => {
+    let list = [...articles];
+
+    // Read Time Filter
+    if (readTimeFilter === 'short') {
+      list = list.filter((a) => a.readTime <= 3);
+    } else if (readTimeFilter === 'long') {
+      list = list.filter((a) => a.readTime >= 6);
+    }
+
+    // Sort order
     if (sortBy === 'latest') {
-      return copy.sort(
+      return list.sort(
         (a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
       );
     } else if (sortBy === 'impact') {
-      return copy.sort((a, b) => (b.source.credibilityScore || 90) - (a.source.credibilityScore || 90));
+      return list.sort((a, b) => (b.source.credibilityScore || 90) - (a.source.credibilityScore || 90));
     } else if (sortBy === 'longread') {
-      return copy.sort((a, b) => b.readTime - a.readTime);
+      return list.sort((a, b) => b.readTime - a.readTime);
     }
-    return copy;
-  }, [articles, sortBy]);
+    return list;
+  }, [articles, readTimeFilter, sortBy]);
 
-  const leadArticle = sortedArticles[0];
-  const sideArticles = sortedArticles.slice(1, 3);
-  const remainingArticles = sortedArticles.slice(3);
+  const leadArticle = filteredAndSortedArticles[0];
+  const sideArticles = filteredAndSortedArticles.slice(1, 3);
+  const remainingArticles = filteredAndSortedArticles.slice(3);
+
+  // Handle mobile bottom tab clicks
+  const handleSelectMobileTab = (tab: 'signals' | 'search' | 'brief' | 'dossier' | 'settings') => {
+    setMobileTab(tab);
+    if (tab === 'search') {
+      setIsCommandPaletteOpen(true);
+    } else if (tab === 'brief') {
+      setIsBriefingOpen(true);
+    } else if (tab === 'dossier') {
+      setIsBookmarksOpen(true);
+    } else if (tab === 'settings') {
+      setIsSettingsOpen(true);
+    }
+  };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FBFBFC] text-zinc-900 selection:bg-zinc-950 selection:text-white">
-      {/* 1. Modern Financial Ticker Ribbon */}
+    <LiquidGlassRoot className="min-h-screen flex flex-col selection:bg-zinc-950 selection:text-white pb-20 md:pb-0">
+      {/* 1. Apple Ambient Luminous Aurora Wallpaper */}
+      <AmbientBackground />
+
+      {/* 2. Modern Financial Ticker Ribbon */}
       <ModernTickerBar />
 
-      {/* 2. Sleek Modern Header */}
+      {/* 3. Sleek Apple Liquid Glass Header */}
       <ModernHeader
         activeCategory={activeCategory}
         onSelectCategory={(cat) => {
@@ -158,6 +198,7 @@ export default function HomePage() {
         onOpenBriefing={() => setIsBriefingOpen(true)}
         onOpenBookmarks={() => setIsBookmarksOpen(true)}
         onOpenSettings={() => setIsSettingsOpen(true)}
+        onOpenInstall={() => setIsInstallOpen(true)}
         onRefresh={() => loadArticles(true)}
         isRefreshing={isRefreshing}
         bookmarkCount={bookmarks.length}
@@ -166,32 +207,83 @@ export default function HomePage() {
         onToggleViewMode={setViewMode}
       />
 
-      {/* 3. Source Filtering & Sorting Pill Bar */}
-      <div className="border-b border-zinc-200/70 bg-white/50 backdrop-blur-xs py-2 px-4 sm:px-6">
+      {/* 4. Rich Filter Controls Ribbon (Region, Sources, Reading Duration, Sort) */}
+      <div className="border-b border-white/60 bg-white/40 backdrop-blur-md py-2.5 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 text-xs">
-          {/* Source Chips */}
-          <div className="flex items-center space-x-1.5 overflow-x-auto no-scrollbar py-0.5">
-            <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider mr-1 flex items-center">
-              <Filter className="w-3 h-3 mr-1" /> Source:
-            </span>
+          {/* Left: Sources & Duration Chips */}
+          <div className="flex items-center space-x-2 overflow-x-auto no-scrollbar py-0.5">
+            {/* Reading duration pills */}
+            <div className="flex items-center space-x-1 border-r border-zinc-200/80 pr-2">
+              <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase mr-1">Time:</span>
+              <button
+                type="button"
+                onClick={(e) => {
+                  handleButtonClickGlow(e);
+                  setReadTimeFilter('all');
+                }}
+                className={`apple-btn px-2.5 py-0.5 rounded-full text-xs font-semibold cursor-pointer ${
+                  readTimeFilter === 'all'
+                    ? 'bg-zinc-900 text-white shadow-xs'
+                    : 'bg-white/80 text-zinc-600 hover:bg-white'
+                }`}
+              >
+                All
+              </button>
+              <button
+                type="button"
+                onClick={(e) => {
+                  handleButtonClickGlow(e);
+                  setReadTimeFilter('short');
+                }}
+                className={`apple-btn px-2.5 py-0.5 rounded-full text-xs font-semibold cursor-pointer whitespace-nowrap ${
+                  readTimeFilter === 'short'
+                    ? 'bg-zinc-900 text-white shadow-xs'
+                    : 'bg-white/80 text-zinc-600 hover:bg-white'
+                }`}
+              >
+                &lt; 3m Quick
+              </button>
+              <button
+                type="button"
+                onClick={(e) => {
+                  handleButtonClickGlow(e);
+                  setReadTimeFilter('long');
+                }}
+                className={`apple-btn px-2.5 py-0.5 rounded-full text-xs font-semibold cursor-pointer whitespace-nowrap ${
+                  readTimeFilter === 'long'
+                    ? 'bg-zinc-900 text-white shadow-xs'
+                    : 'bg-white/80 text-zinc-600 hover:bg-white'
+                }`}
+              >
+                6m+ Deep
+              </button>
+            </div>
+
+            {/* Source Chips */}
             <button
-              onClick={() => setSelectedSource('all')}
-              className={`px-2.5 py-1 rounded-full text-xs font-semibold transition-colors cursor-pointer ${
+              onClick={(e) => {
+                handleButtonClickGlow(e);
+                setSelectedSource('all');
+              }}
+              className={`apple-btn px-2.5 py-1 rounded-full text-xs font-semibold cursor-pointer transition-colors ${
                 selectedSource === 'all'
-                  ? 'bg-zinc-900 text-white'
-                  : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
+                  ? 'bg-zinc-900 text-white shadow-xs'
+                  : 'bg-white/80 text-zinc-600 hover:bg-white'
               }`}
             >
               All Signals ({articles.length})
             </button>
-            {availableSources.slice(0, 7).map((src) => (
+            {availableSources.slice(0, 6).map((src) => (
               <button
                 key={src.id}
-                onClick={() => setSelectedSource(src.id)}
-                className={`px-2.5 py-1 rounded-full text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap ${
+                onClick={(e) => {
+                  handleButtonClickGlow(e);
+                  setSelectedSource(src.id);
+                }}
+                className={`apple-btn px-2.5 py-1 rounded-full text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap ${
                   selectedSource === src.id
-                    ? 'bg-zinc-900 text-white'
-                    : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
+                    ? 'bg-zinc-900 text-white shadow-xs'
+                    : 'bg-white/80 text-zinc-600 hover:bg-white'
                 }`}
               >
                 {src.name}
@@ -199,15 +291,15 @@ export default function HomePage() {
             ))}
           </div>
 
-          {/* Sort Order Dropdown */}
+          {/* Right: Sort Order Dropdown */}
           <div className="flex items-center space-x-2 shrink-0 ml-auto">
-            <span className="text-[11px] font-semibold text-zinc-400 uppercase flex items-center">
+            <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase flex items-center">
               <ArrowUpDown className="w-3 h-3 mr-1" /> Order:
             </span>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as any)}
-              className="bg-white border border-zinc-200/80 rounded-lg text-zinc-800 text-xs py-1 px-2.5 focus:outline-none focus:border-zinc-900 cursor-pointer shadow-2xs font-medium"
+              className="bg-white/90 border border-white/80 rounded-xl text-zinc-800 text-xs py-1 px-3 focus:outline-none focus:border-zinc-900 cursor-pointer shadow-xs font-semibold"
             >
               <option value="latest">Latest Dispatches</option>
               <option value="impact">Highest Reliability</option>
@@ -217,43 +309,45 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* 4. Main Modern Content Canvas */}
+      {/* 5. Main Modern Content Canvas */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {isLoading && articles.length === 0 ? (
           <div className="py-32 text-center">
-            <div className="relative w-10 h-10 mx-auto mb-4">
-              <div className="w-10 h-10 rounded-full border-2 border-zinc-900 border-t-transparent animate-spin" />
+            <div className="relative w-12 h-12 mx-auto mb-4">
+              <div className="w-12 h-12 rounded-full border-2 border-zinc-900 border-t-transparent animate-spin" />
             </div>
-            <div className="text-base font-bold text-zinc-900">Ingesting Live Dispatches...</div>
-            <p className="mt-1 text-xs text-zinc-500">
+            <div className="text-base font-extrabold text-zinc-950">Synthesizing Live Dispatches...</div>
+            <p className="mt-1 text-xs text-zinc-500 font-medium">
               Connecting to NewsData.io API, NYT, BBC, The Verge, and Hacker News streams
             </p>
           </div>
-        ) : articles.length === 0 ? (
-          <div className="py-24 text-center bg-white border border-zinc-200/80 rounded-3xl p-8 max-w-md mx-auto shadow-xs">
+        ) : filteredAndSortedArticles.length === 0 ? (
+          <div className="py-24 text-center liquid-glass-panel rounded-3xl p-8 max-w-md mx-auto shadow-sm">
             <h3 className="text-lg font-bold text-zinc-900">No Dispatches Match Criteria</h3>
             <p className="mt-1 text-xs text-zinc-500">
-              Try adjusting your search query or selecting &ldquo;All Signals&rdquo;.
+              Try adjusting your duration filter or selecting &ldquo;All Signals&rdquo;.
             </p>
             <button
-              onClick={() => {
+              onClick={(e) => {
+                handleButtonClickGlow(e);
                 setSearchQuery('');
                 setActiveCategory('all');
                 setSelectedSource('all');
+                setReadTimeFilter('all');
               }}
-              className="mt-4 px-4 py-2 bg-zinc-900 text-white rounded-xl text-xs font-semibold"
+              className="apple-prominent-btn apple-btn mt-4 px-4 py-2 text-white rounded-xl text-xs font-bold"
             >
               Reset Filters
             </button>
           </div>
         ) : viewMode === 'stream' ? (
           /* ================= STREAM LIST VIEW (Linear / Raycast Style) ================= */
-          <div className="bg-white border border-zinc-200/80 rounded-3xl shadow-xs overflow-hidden divide-y divide-zinc-150">
-            <div className="p-4 bg-zinc-50/60 border-b border-zinc-200/80 flex items-center justify-between text-xs text-zinc-500 font-semibold uppercase tracking-wider">
-              <span>Live Wire Stream ({articles.length} dispatches)</span>
+          <div className="liquid-glass-panel rounded-3xl shadow-sm overflow-hidden divide-y divide-zinc-200/50">
+            <div className="p-4 bg-white/60 border-b border-zinc-200/60 flex items-center justify-between text-xs text-zinc-500 font-semibold uppercase tracking-wider">
+              <span>Live Wire Stream ({filteredAndSortedArticles.length} dispatches)</span>
               <span>Sorted by {sortBy}</span>
             </div>
-            {sortedArticles.map((art) => (
+            {filteredAndSortedArticles.map((art) => (
               <ModernArticleCard
                 key={art.id}
                 article={art}
@@ -284,33 +378,36 @@ export default function HomePage() {
 
               {/* Side Signal Bento Column (4 Cols) */}
               <div className="lg:col-span-4 flex flex-col justify-between gap-4">
-                {/* AI Executive Digest Card */}
+                {/* AI Executive Digest Card with Specular Border */}
                 <div
-                  onClick={() => setIsBriefingOpen(true)}
-                  className="p-5 rounded-3xl bg-gradient-to-br from-zinc-900 to-zinc-950 text-white cursor-pointer hover:shadow-xl transition-all duration-300 group flex flex-col justify-between"
+                  onClick={(e) => {
+                    handleButtonClickGlow(e);
+                    setIsBriefingOpen(true);
+                  }}
+                  className="apple-btn p-5 rounded-[28px] bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 text-white cursor-pointer hover:shadow-2xl transition-all duration-300 group flex flex-col justify-between border border-white/20 shadow-md"
                 >
                   <div>
                     <div className="flex items-center justify-between mb-3">
-                      <span className="px-2.5 py-0.5 rounded-full bg-white/10 backdrop-blur-md text-[10px] font-mono font-medium text-amber-300 flex items-center space-x-1">
+                      <span className="px-2.5 py-0.5 rounded-full bg-white/10 backdrop-blur-md text-[10px] font-mono font-bold text-amber-300 flex items-center space-x-1 border border-white/10">
                         <Sparkles className="w-3 h-3 mr-1" />
-                        <span>TODAY&apos;S SYNTHESIS</span>
+                        <span>EXECUTIVE SYNTHESIS</span>
                       </span>
                       <span className="w-2 h-2 rounded-full bg-emerald-400 animate-live-pulse" />
                     </div>
 
-                    <h4 className="text-lg font-bold tracking-tight text-white group-hover:text-amber-100 transition-colors">
-                      3-Minute Global Intelligence Brief
+                    <h4 className="text-lg font-extrabold tracking-tight text-white group-hover:text-amber-100 transition-colors">
+                      3-Minute Dynamic AI Intelligence Brief
                     </h4>
 
-                    <p className="mt-2 text-xs text-zinc-300 leading-relaxed line-clamp-3">
-                      Synthesizing critical inflections across AI architecture, sovereign debt rollovers, and maritime shipping conduits.
+                    <p className="mt-2 text-xs text-zinc-300 leading-relaxed line-clamp-3 font-normal">
+                      Instant audio readout and real-time synthesis of today&apos;s leading market, AI, and geopolitical developments.
                     </p>
                   </div>
 
                   <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-xs text-zinc-300">
-                    <span className="font-medium">Listen Audio Brief</span>
-                    <span className="inline-flex items-center text-white font-semibold group-hover:translate-x-1 transition-transform">
-                      Open <ArrowRight className="w-3.5 h-3.5 ml-1" />
+                    <span className="font-semibold text-emerald-400">Audio Readout Available</span>
+                    <span className="inline-flex items-center text-white font-bold group-hover:translate-x-1 transition-transform">
+                      Open Brief <ArrowRight className="w-3.5 h-3.5 ml-1" />
                     </span>
                   </div>
                 </div>
@@ -319,14 +416,17 @@ export default function HomePage() {
                 {sideArticles.map((art) => (
                   <div
                     key={art.id}
-                    onClick={() => setSelectedArticle(art)}
-                    className="p-4 rounded-2xl bg-white border border-zinc-200/80 hover:border-zinc-300 hover:shadow-md transition-all cursor-pointer group"
+                    onClick={(e) => {
+                      handleButtonClickGlow(e);
+                      setSelectedArticle(art);
+                    }}
+                    className="apple-btn p-4 rounded-2xl liquid-glass-card cursor-pointer group"
                   >
-                    <div className="flex items-center justify-between text-[11px] mb-1.5">
-                      <span className="font-semibold text-zinc-900 uppercase">{art.source.name}</span>
-                      <span className="text-zinc-400 font-mono text-[10px]">{art.category}</span>
+                    <div className="flex items-center justify-between text-[11px] mb-1.5 font-mono">
+                      <span className="font-bold text-zinc-900 uppercase">{art.source.name}</span>
+                      <span className="text-zinc-500 font-semibold">{art.category}</span>
                     </div>
-                    <h5 className="font-bold text-sm text-zinc-900 group-hover:text-zinc-600 transition-colors line-clamp-2 leading-snug">
+                    <h5 className="font-bold text-sm text-zinc-950 group-hover:text-zinc-600 transition-colors line-clamp-2 leading-snug">
                       {art.title}
                     </h5>
                     <p className="mt-1 text-xs text-zinc-500 line-clamp-1">
@@ -337,17 +437,17 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* LOWER BENTO GRID: Multi-column Modern Cards */}
+            {/* LOWER BENTO GRID: Multi-column Modern Liquid Glass Cards */}
             {remainingArticles.length > 0 && (
               <div className="pt-4">
                 <div className="flex items-center justify-between mb-5">
                   <div className="flex items-center space-x-2">
                     <Flame className="w-4 h-4 text-amber-500" />
-                    <h3 className="text-sm font-bold uppercase tracking-wider text-zinc-900">
+                    <h3 className="text-sm font-extrabold uppercase tracking-wider text-zinc-950">
                       Dispatched Signals
                     </h3>
                   </div>
-                  <span className="text-xs font-mono text-zinc-400">
+                  <span className="text-xs font-mono text-zinc-500 font-medium">
                     {remainingArticles.length} active dispatches
                   </span>
                 </div>
@@ -370,33 +470,56 @@ export default function HomePage() {
         )}
       </main>
 
-      {/* 5. Modern Minimalist Footer */}
-      <footer className="mt-20 border-t border-zinc-200/70 bg-white">
+      {/* 6. Modern Minimalist Liquid Glass Footer */}
+      <footer className="mt-20 border-t border-white/60 bg-white/40 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-500">
           <div className="flex items-center space-x-3">
-            <span className="font-bold text-zinc-900">PRISM INTELLIGENCE</span>
+            <span className="font-extrabold text-zinc-950 tracking-tight">PRISM INTELLIGENCE</span>
             <span>•</span>
-            <span>NewsData.io Live Stream</span>
+            <span>NewsData.io Real-Time API</span>
             <span>•</span>
-            <span>Supabase Cloud Synced</span>
+            <span>Liquid Glass Shaders</span>
           </div>
 
           <div className="flex items-center space-x-4">
             <button
-              onClick={() => setIsSettingsOpen(true)}
-              className="hover:text-zinc-900 transition-colors cursor-pointer"
+              onClick={(e) => {
+                handleButtonClickGlow(e);
+                setIsInstallOpen(true);
+              }}
+              className="apple-btn font-semibold text-emerald-700 hover:text-emerald-950 cursor-pointer flex items-center space-x-1"
             >
-              Cloud & API Settings
+              <Smartphone className="w-3.5 h-3.5" />
+              <span>Install Mobile PWA</span>
+            </button>
+            <span>•</span>
+            <button
+              onClick={(e) => {
+                handleButtonClickGlow(e);
+                setIsSettingsOpen(true);
+              }}
+              className="apple-btn hover:text-zinc-950 transition-colors cursor-pointer"
+            >
+              Cloud & API Engine
             </button>
             <span>•</span>
             <span>
-              Press <kbd className="px-1.5 py-0.5 rounded border border-zinc-200 bg-zinc-50 font-mono text-[10px]">⌘K</kbd> to search
+              <kbd className="px-1.5 py-0.5 rounded-md border border-zinc-200 bg-white font-mono text-[10px]">⌘K</kbd> Spotlight
             </span>
           </div>
         </div>
       </footer>
 
-      {/* 6. Slide-Over Reader & Modals */}
+      {/* 7. iOS Native Mobile Bottom Tab Bar */}
+      <MobileTabBar
+        activeTab={mobileTab}
+        onSelectTab={handleSelectMobileTab}
+        bookmarkCount={bookmarks.length}
+        onOpenInstall={() => setIsInstallOpen(true)}
+        showInstallButton={true}
+      />
+
+      {/* 8. Slide-Over Reader & Modals */}
       <ModernArticleReader
         article={selectedArticle}
         onClose={() => setSelectedArticle(null)}
@@ -434,6 +557,12 @@ export default function HomePage() {
         onOpenSettings={() => setIsSettingsOpen(true)}
         onRefresh={() => loadArticles(true)}
       />
-    </div>
+
+      {/* 9. Install Mobile Web Application Sheet */}
+      <InstallAppSheet
+        isOpen={isInstallOpen}
+        onClose={() => setIsInstallOpen(false)}
+      />
+    </LiquidGlassRoot>
   );
 }
