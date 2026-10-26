@@ -23,6 +23,12 @@
   h1, h2, h3, .font-serif {
     font-family: var(--font-serif);
   }
+
+  .font-cursive {
+    font-family: var(--font-cursive), 'Pinyon Script', 'Great Vibes', cursive !important;
+    font-style: italic;
+    letter-spacing: normal !important;
+  }
 }
 
 /* ================= Premium Black & White Claymorphism ================= */

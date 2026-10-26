@@ -124,17 +124,16 @@ export default function LiquidGlassThumbnail({
         </div>
       )}
 
-      {/* Sibling 1: Real Liquid Glass Badge — Ultra-readable Frosted Apple Glass */}
+      {/* Sibling 1: Solid Tactile Clay Pill Badge */}
       <div
         ref={badgeRef}
-        data-config='{"blurAmount":0.25,"refraction":0.75,"chromAberration":0.06,"edgeHighlight":0.3,"specular":0.4,"fresnel":1.3,"cornerRadius":16,"zRadius":24,"button":true}'
-        className="absolute top-2.5 left-2.5 px-3 py-1 rounded-full text-[11px] font-extrabold text-zinc-950 bg-white/95 backdrop-blur-xl border border-white/90 shadow-[0_4px_12px_rgba(0,0,0,0.15)] cursor-pointer select-none transition-transform active:scale-95 z-10 tracking-tight"
+        className="absolute top-2.5 left-2.5 px-3 py-1 rounded-full text-[11px] font-extrabold text-zinc-950 bg-white border border-zinc-200 shadow-xs cursor-pointer select-none transition-transform active:scale-95 z-10 tracking-tight"
       >
-        <span className="relative z-10 drop-shadow-2xs">{badgeText}</span>
+        <span className="relative z-10">{badgeText}</span>
       </div>
 
       {priorityBadge && (
-        <div className="absolute top-2.5 right-2.5 px-2.5 py-0.5 rounded-full bg-zinc-950/85 backdrop-blur-md text-white text-[10px] font-mono font-bold tracking-wider shadow-xs z-10">
+        <div className="absolute top-2.5 right-2.5 px-2.5 py-0.5 rounded-full bg-zinc-950 text-white text-[10px] font-mono font-bold tracking-wider shadow-xs z-10">
           {priorityBadge}
         </div>
       )}

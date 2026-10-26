@@ -89,7 +89,7 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalP
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/60 backdrop-blur-md animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 animate-in fade-in duration-200">
       <div 
         className="relative w-full max-w-md rounded-3xl bg-white border border-zinc-200/90 shadow-2xl p-6 sm:p-8 overflow-hidden text-zinc-950"
         onClick={(e) => e.stopPropagation()}

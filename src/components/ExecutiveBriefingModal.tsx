@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ExecutiveBriefing } from '@/types/news';
-import { X, Play, Pause, Sparkles, Shield, Clock, TrendingUp, RotateCw, Volume2 } from 'lucide-react';
+import { X, Play, Pause, Sparkles, Shield, Clock, TrendingUp, RotateCw, Volume2, VolumeX } from 'lucide-react';
 import { handleButtonClickGlow } from '@/lib/button-glow';
+import { speechEngine } from '@/lib/speech';
 
 interface ExecutiveBriefingModalProps {
   isOpen: boolean;
@@ -21,6 +22,10 @@ export default function ExecutiveBriefingModal({
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const [playbackSpeed, setPlaybackSpeed] = useState<number>(1);
   const [activeTopic, setActiveTopic] = useState<'all' | 'tech' | 'markets' | 'world'>('all');
+  const [speechAvailable, setSpeechAvailable] = useState(true);
+
+  // Persistent ref prevents Chrome V8 garbage collector from terminating speech
+  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
 
   const loadBriefing = async (topic = activeTopic, refresh = false) => {
     setIsLoading(true);
@@ -42,18 +47,29 @@ export default function ExecutiveBriefingModal({
     loadBriefing(activeTopic, false);
   }, [isOpen, activeTopic, edition]);
 
+  // Audio setup & cleanup
+  useEffect(() => {
+    setSpeechAvailable(speechEngine.isSupported());
+
+    return () => {
+      speechEngine.stop();
+      setIsPlayingAudio(false);
+    };
+  }, [isOpen]);
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape') {
+        speechEngine.stop();
+        onClose();
+      }
     };
     if (isOpen) {
       window.addEventListener('keydown', handleKeyDown);
     }
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
-      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-      }
+      speechEngine.stop();
     };
   }, [isOpen, onClose]);
 
@@ -61,41 +77,51 @@ export default function ExecutiveBriefingModal({
 
   const handleToggleAudio = (e: React.MouseEvent) => {
     handleButtonClickGlow(e);
-    if (typeof window === 'undefined' || !('speechSynthesis' in window) || !briefing) return;
+    if (!speechEngine.isSupported() || !briefing) return;
 
     if (isPlayingAudio) {
-      window.speechSynthesis.cancel();
+      speechEngine.stop();
       setIsPlayingAudio(false);
       return;
     }
 
-    window.speechSynthesis.cancel();
-    const narrationText = `Prism Executive Intelligence Brief for ${briefing.date}. Strategic Lead: ${briefing.leadHighlight}. Global Pulse: ${briefing.globalPulse}. Market Outlook: ${briefing.marketOutlook}. ` +
-      briefing.keyDevelopments.map((d, i) => `Signal ${i + 1}: ${d.title}. ${d.summary}`).join('. ');
+    const narrationText = `Prism Executive Intelligence Brief. Date: ${briefing.date}. ` +
+      `Strategic Lead: ${briefing.leadHighlight}. ` +
+      `Global Pulse: ${briefing.globalPulse}. ` +
+      `Market Outlook: ${briefing.marketOutlook}. ` +
+      briefing.keyDevelopments.map((d, i) => `Key Signal ${i + 1}: ${d.title}. ${d.summary}`).join('. ');
 
-    const utterance = new SpeechSynthesisUtterance(narrationText);
-    utterance.rate = playbackSpeed;
-    utterance.pitch = 1.0;
+    const success = speechEngine.speak(narrationText, {
+      rate: playbackSpeed,
+      onStart: () => setIsPlayingAudio(true),
+      onEnd: () => setIsPlayingAudio(false),
+      onError: () => setIsPlayingAudio(false),
+    });
 
-    const voices = window.speechSynthesis.getVoices();
-    const naturalVoice = voices.find((v) => v.lang.startsWith('en') && (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Samantha')));
-    if (naturalVoice) utterance.voice = naturalVoice;
-
-    utterance.onend = () => setIsPlayingAudio(false);
-    utterance.onerror = () => setIsPlayingAudio(false);
-
-    window.speechSynthesis.speak(utterance);
-    setIsPlayingAudio(true);
+    if (success) {
+      setIsPlayingAudio(true);
+    }
   };
 
   const handleSpeedCycle = (e: React.MouseEvent) => {
     handleButtonClickGlow(e);
     const nextSpeed = playbackSpeed === 1 ? 1.25 : playbackSpeed === 1.25 ? 1.5 : 1;
     setPlaybackSpeed(nextSpeed);
-    if (isPlayingAudio) {
-      window.speechSynthesis.cancel();
+    if (isPlayingAudio && briefing) {
+      speechEngine.stop();
       setIsPlayingAudio(false);
-      setTimeout(() => handleToggleAudio(e), 100);
+      const narrationText = `Prism Executive Intelligence Brief. Date: ${briefing.date}. ` +
+        `Strategic Lead: ${briefing.leadHighlight}. ` +
+        `Global Pulse: ${briefing.globalPulse}. ` +
+        `Market Outlook: ${briefing.marketOutlook}. ` +
+        briefing.keyDevelopments.map((d, i) => `Key Signal ${i + 1}: ${d.title}. ${d.summary}`).join('. ');
+      speechEngine.speak(narrationText, {
+        rate: nextSpeed,
+        onStart: () => setIsPlayingAudio(true),
+        onEnd: () => setIsPlayingAudio(false),
+        onError: () => setIsPlayingAudio(false),
+      });
+      setIsPlayingAudio(true);
     }
   };
 
@@ -103,11 +129,11 @@ export default function ExecutiveBriefingModal({
     <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 flex justify-center items-center p-3 sm:p-6 animate-in fade-in duration-200">
       <div className="fixed inset-0" onClick={onClose} />
       
-      {/* Modal Container (Claymorphic Solid Panel) */}
+      {/* Modal Container */}
       <div className="relative w-full max-w-3xl bg-white rounded-3xl shadow-2xl my-auto flex flex-col max-h-[90vh] overflow-hidden border border-zinc-200 animate-in zoom-in-95 duration-200 z-10">
         
-        {/* Clay Header */}
-        <div className="px-5 sm:px-6 py-4 border-b border-zinc-200 bg-white flex items-center justify-between gap-4">
+        {/* Header */}
+        <div className="px-5 sm:px-6 py-4 border-b border-zinc-200 bg-white flex items-center justify-between gap-3">
           <div className="flex items-center space-x-2.5">
             <div className="clay-btn-dark w-8 h-8 rounded-xl flex items-center justify-center text-white shadow-xs">
               <Sparkles className="w-4 h-4 text-white" />
@@ -123,7 +149,7 @@ export default function ExecutiveBriefingModal({
           </div>
 
           <div className="flex items-center space-x-2">
-            {briefing && (
+            {briefing && speechAvailable && (
               <div className="flex items-center rounded-xl bg-zinc-100 border border-zinc-200 p-0.5">
                 <button
                   type="button"
@@ -136,12 +162,12 @@ export default function ExecutiveBriefingModal({
                 >
                   {isPlayingAudio ? (
                     <>
-                      <Pause className="w-3.5 h-3.5" />
+                      <Pause className="w-3.5 h-3.5 text-white" />
                       <span>Pause</span>
                     </>
                   ) : (
                     <>
-                      <Play className="w-3.5 h-3.5" />
+                      <Play className="w-3.5 h-3.5 text-zinc-900" />
                       <span>Listen</span>
                     </>
                   )}
@@ -217,24 +243,51 @@ export default function ExecutiveBriefingModal({
             </div>
           ) : briefing ? (
             <>
-              {/* Audio Waveform Indicator when playing */}
-              {isPlayingAudio && (
-                <div className="p-3.5 rounded-2xl bg-zinc-950 text-white flex items-center justify-between shadow-sm">
-                  <div className="flex items-center space-x-2 text-xs font-mono">
-                    <Volume2 className="w-4 h-4 text-white" />
-                    <span>AUDIO BRIEFING PLAYING • {playbackSpeed}X SPEED</span>
-                  </div>
-                  <div className="flex items-center space-x-1">
-                    {[40, 75, 55, 95, 60, 80, 45].map((h, i) => (
-                      <div
-                        key={i}
-                        className="w-1 bg-white rounded-full"
-                        style={{ height: `${h * 0.22}px` }}
-                      />
-                    ))}
+              {/* Prominent Audio Readout Bar */}
+              <div className="clay-card p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-zinc-50 border border-zinc-200">
+                <div className="flex items-center space-x-3">
+                  <button
+                    type="button"
+                    onClick={handleToggleAudio}
+                    className="clay-btn-dark p-3 rounded-2xl flex items-center justify-center shrink-0 shadow-md cursor-pointer"
+                  >
+                    {isPlayingAudio ? (
+                      <Pause className="w-5 h-5 text-white" />
+                    ) : (
+                      <Play className="w-5 h-5 text-white ml-0.5" />
+                    )}
+                  </button>
+                  <div>
+                    <div className="text-xs font-bold text-zinc-950">
+                      {isPlayingAudio ? 'Audio Playback Active' : 'Listen to Complete 3-Minute Briefing'}
+                    </div>
+                    <div className="text-[11px] text-zinc-500 font-mono">
+                      {isPlayingAudio ? `Speed: ${playbackSpeed}x • Click Pause to stop` : 'Click to hear high-clarity voice narration'}
+                    </div>
                   </div>
                 </div>
-              )}
+
+                <div className="flex items-center space-x-2">
+                  <button
+                    type="button"
+                    onClick={handleToggleAudio}
+                    className={`clay-btn px-3 py-1.5 rounded-xl text-xs font-bold cursor-pointer ${
+                      isPlayingAudio ? 'bg-zinc-950 text-white' : 'text-zinc-900'
+                    }`}
+                  >
+                    {isPlayingAudio ? 'Stop Reading' : 'Play Narration'}
+                  </button>
+                  {isPlayingAudio && (
+                    <button
+                      type="button"
+                      onClick={handleSpeedCycle}
+                      className="clay-btn px-2.5 py-1.5 rounded-xl text-xs font-mono font-bold text-zinc-900 cursor-pointer"
+                    >
+                      {playbackSpeed}x
+                    </button>
+                  )}
+                </div>
+              </div>
 
               {/* Lead Strategic Highlight */}
               <div className="clay-card p-5 space-y-2">

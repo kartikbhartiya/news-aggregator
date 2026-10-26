@@ -132,6 +132,8 @@ Return strictly a valid JSON object matching this schema with NO markdown fences
   };
 }
 
+const summaryCache = new Map<string, GroqSummaryResult>();
+
 /**
  * Generate instantaneous 3-bullet AI Takeaway for an individual article
  */
@@ -140,6 +142,22 @@ export async function generateGroqArticleSummary(
   content: string,
   sourceName: string
 ): Promise<GroqSummaryResult> {
+  const cacheKey = `${title}_${sourceName}`;
+  if (summaryCache.has(cacheKey)) {
+    return summaryCache.get(cacheKey)!;
+  }
+
+  // Pre-generate instant heuristic response
+  const fallbackTakeaway = content && content.length > 30
+    ? content.split('.')[0] + '.'
+    : `${title} reported by ${sourceName}.`;
+
+  const fallbackBullets = [
+    `${title} dispatched via ${sourceName} real-time wire.`,
+    'Key market, policy, or technological development tracked across global telemetry.',
+    'Verified editorial intelligence synthesized for executive decision makers.',
+  ];
+
   const prompt = `Article: "${title}" by ${sourceName}
 Content:
 ${content.slice(0, 1500)}
@@ -159,24 +177,28 @@ Generate an executive distillation. Return strictly a JSON object:
     const raw = await callGroqChat([
       { role: 'system', content: 'You are an executive intelligence AI that outputs strictly valid JSON.' },
       { role: 'user', content: prompt }
-    ], 600);
+    ], 500);
 
     const cleaned = raw.replace(/```json/g, '').replace(/```/g, '').trim();
     const parsed = JSON.parse(cleaned);
-    if (parsed.keyTakeaway && Array.isArray(parsed.bulletPoints)) {
-      return parsed;
+    if (parsed.keyTakeaway && Array.isArray(parsed.bulletPoints) && parsed.bulletPoints.length > 0) {
+      const result: GroqSummaryResult = {
+        keyTakeaway: parsed.keyTakeaway,
+        bulletPoints: parsed.bulletPoints.slice(0, 3),
+        readTime: Number(parsed.readTime) || 3,
+      };
+      summaryCache.set(cacheKey, result);
+      return result;
     }
   } catch (err) {
-    console.error('Groq article summary error:', err);
+    console.warn('Groq article summary error, using instant fallback:', err);
   }
 
-  return {
-    keyTakeaway: `${title} highlights decisive strategic shifts dispatched by ${sourceName}.`,
-    bulletPoints: [
-      'Validated by institutional newsroom wire telemetry.',
-      'Reflects primary market, industrial, and geopolitical momentum.',
-      'Actionable analysis compiled by PRISM Intelligence.',
-    ],
+  const result: GroqSummaryResult = {
+    keyTakeaway: fallbackTakeaway,
+    bulletPoints: fallbackBullets,
     readTime: Math.max(2, Math.round(content.split(' ').length / 200)),
   };
+  summaryCache.set(cacheKey, result);
+  return result;
 }

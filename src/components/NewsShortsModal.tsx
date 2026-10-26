@@ -115,7 +115,7 @@ export default function NewsShortsModal({
   const isBookmarked = bookmarkedIds.includes(current.id);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-4 bg-zinc-950/85 backdrop-blur-xl animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-4 bg-black/85 animate-in fade-in duration-200">
       {/* Shorts Container — 9:16 Aspect Ratio Frame */}
       <div 
         className="relative w-full h-full sm:h-[88vh] sm:max-w-sm sm:rounded-[36px] overflow-hidden bg-zinc-950 text-white shadow-2xl flex flex-col justify-between border sm:border-zinc-800"

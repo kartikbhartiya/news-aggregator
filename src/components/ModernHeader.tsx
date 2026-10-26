@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { handleButtonClickGlow } from '@/lib/button-glow';
 import { UserProfile } from '@/lib/auth';
+import PrismLogo from '@/components/PrismLogo';
 
 interface ModernHeaderProps {
   activeEdition: 'india' | 'international';
@@ -91,12 +92,10 @@ export default function ModernHeader({
                 onSelectCategory('all');
               }}
             >
-              <div className="clay-btn-dark w-8 h-8 sm:w-9 sm:h-9 rounded-xl sm:rounded-2xl flex items-center justify-center shrink-0">
-                <span className="font-serif font-black text-sm sm:text-base text-white">P</span>
-              </div>
-              <div className="block">
-                <span className="font-serif text-base sm:text-lg font-extrabold tracking-tight text-zinc-950">
-                  PRISM
+              <PrismLogo size="md" />
+              <div className="flex flex-col justify-center">
+                <span className="font-cursive text-2xl sm:text-3xl text-zinc-950 tracking-normal leading-none select-none font-normal">
+                  Prism
                 </span>
               </div>
             </div>
@@ -199,7 +198,7 @@ export default function ModernHeader({
               <Search className="w-4 h-4" />
             </button>
 
-            {/* AI Executive Intelligence Brief (Clean Dark Clay Pill - Zero Green Lights) */}
+            {/* AI Executive Intelligence Brief (Hidden on narrow mobile to keep navbar pristine) */}
             <button
               type="button"
               onClick={(e) => {
@@ -207,11 +206,10 @@ export default function ModernHeader({
                 onOpenBriefing();
               }}
               title="Open 3-Minute Executive Intelligence Brief"
-              className="clay-btn-dark px-3 sm:px-3.5 py-1.5 rounded-full text-xs font-bold inline-flex items-center space-x-1.5 cursor-pointer shadow-sm"
+              className="clay-btn-dark hidden md:inline-flex px-3 sm:px-3.5 py-1.5 rounded-full text-xs font-bold items-center space-x-1.5 cursor-pointer shadow-sm"
             >
               <Sparkles className="w-3.5 h-3.5 text-zinc-200" />
-              <span className="hidden sm:inline">Executive Brief</span>
-              <span className="sm:hidden">Brief</span>
+              <span>Executive Brief</span>
             </button>
 
             {/* Saved Dossier Button */}
@@ -222,7 +220,7 @@ export default function ModernHeader({
                 onOpenBookmarks();
               }}
               title="Saved Articles Dossier"
-              className="clay-btn px-2.5 sm:px-3 py-1.5 rounded-full text-xs font-semibold text-zinc-800 inline-flex items-center cursor-pointer"
+              className="clay-btn px-2.5 sm:px-3 py-1.5 rounded-full text-xs font-semibold text-zinc-800 inline-flex items-center cursor-pointer shrink-0"
             >
               <Bookmark className="w-3.5 h-3.5 text-zinc-700" />
               <span className="hidden sm:inline ml-1">Saved</span>
@@ -290,13 +288,13 @@ export default function ModernHeader({
           </div>
         )}
 
-        {/* BOTTOM ROW: CATEGORY STRIP & VIEW SWITCHER */}
-        <div className="pt-2 border-t border-zinc-200/80 flex items-center justify-between gap-2">
+        {/* BOTTOM ROW: CATEGORY STRIP & VIEW SWITCHER (Mobile-Optimized Flexbox) */}
+        <div className="pt-2 border-t border-zinc-200/80 flex items-center justify-between gap-2 overflow-hidden min-w-0">
           
           {/* Scrollable Category Track with Clay Pills */}
           <nav
             aria-label="Editorial Categories"
-            className="flex-1 overflow-x-auto no-scrollbar flex items-center space-x-1.5 py-0.5 scroll-smooth"
+            className="flex-1 min-w-0 overflow-x-auto no-scrollbar flex items-center space-x-1.5 py-0.5 scroll-smooth pr-1 shrink"
           >
             {CATEGORIES.map((cat) => {
               const isActive = activeCategory === cat.id;

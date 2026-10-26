@@ -103,7 +103,7 @@ export default function OnboardingModal({ isOpen, user, onComplete }: Onboarding
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/70 backdrop-blur-md animate-in fade-in duration-200 overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 animate-in fade-in duration-200 overflow-y-auto">
       <div 
         className="relative w-full max-w-xl rounded-[32px] bg-white border border-zinc-200/90 shadow-2xl p-6 sm:p-8 my-8 text-zinc-950"
         onClick={(e) => e.stopPropagation()}

@@ -25,6 +25,7 @@ import {
   KeyRound,
 } from 'lucide-react';
 import { handleButtonClickGlow } from '@/lib/button-glow';
+import PrismLogo from '@/components/PrismLogo';
 import {
   signUpWithEmailOtp,
   verifyEmailOtp,
@@ -322,10 +323,8 @@ export default function AuthScreen({
             href="/"
             className="inline-flex items-center space-x-2.5 text-white/90 hover:text-white transition-colors group"
           >
-            <div className="w-9 h-9 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
-              <span className="font-serif font-black text-white text-base">P</span>
-            </div>
-            <span className="font-serif font-extrabold text-xl tracking-tight text-white">PRISM</span>
+            <PrismLogo size="md" />
+            <span className="font-cursive text-3xl tracking-wide text-white font-normal">Prism</span>
             <span className="text-[10px] font-mono tracking-widest px-2.5 py-0.5 rounded-full bg-white/10 text-zinc-300 border border-white/20 uppercase font-bold">
               EDITORIAL WIRE
             </span>

@@ -6,7 +6,9 @@ import ModernHeader from '@/components/ModernHeader';
 import ModernTickerBar from '@/components/ModernTickerBar';
 import ModernArticleCard from '@/components/ModernArticleCard';
 import ModernArticleReader from '@/components/ModernArticleReader';
+import AiBriefModal from '@/components/AiBriefModal';
 import ExecutiveBriefingModal from '@/components/ExecutiveBriefingModal';
+import ModernFooter from '@/components/ModernFooter';
 import BookmarksDrawer from '@/components/BookmarksDrawer';
 import SupabaseSettingsModal from '@/components/SupabaseSettingsModal';
 import CommandPalette from '@/components/CommandPalette';
@@ -29,7 +31,8 @@ import {
   Smartphone,
   Send,
   Check,
-  RotateCw
+  RotateCw,
+  ChevronDown
 } from 'lucide-react';
 
 interface ClientHomePageProps {
@@ -75,12 +78,21 @@ export default function ClientHomePage({
 
   // Modals state
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
+  const [selectedBriefArticle, setSelectedBriefArticle] = useState<Article | null>(null);
+  const [startInAiBrief, setStartInAiBrief] = useState(false);
   const [isBriefingOpen, setIsBriefingOpen] = useState(false);
   const [isBookmarksOpen, setIsBookmarksOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [isInstallOpen, setIsInstallOpen] = useState(false);
   const [mobileTab, setMobileTab] = useState<'signals' | 'search' | 'brief' | 'dossier' | 'settings'>('signals');
+  
+  // Pagination / See More State
+  const [visibleCount, setVisibleCount] = useState<number>(12);
+
+  useEffect(() => {
+    setVisibleCount(12);
+  }, [activeCategory, selectedSource, searchQuery, edition]);
 
   const loadArticles = useCallback(async (forceRefresh = false, targetEdition?: 'india' | 'international') => {
     if (forceRefresh) setIsRefreshing(true);
@@ -285,6 +297,12 @@ export default function ClientHomePage({
     return list;
   }, [articles, searchQuery, currentUser, personalFeedOnly, activeCategory, selectedSource, readTimeFilter, verifiedOnly, sortBy]);
 
+  const visibleArticles = useMemo(() => {
+    return filteredAndSortedArticles.slice(0, visibleCount);
+  }, [filteredAndSortedArticles, visibleCount]);
+
+  const hasMoreArticles = visibleCount < filteredAndSortedArticles.length;
+
   const leadArticle = filteredAndSortedArticles[0];
   const sideArticles = filteredAndSortedArticles.slice(1, 3);
   const remainingArticles = filteredAndSortedArticles.slice(3);
@@ -378,26 +396,64 @@ export default function ClientHomePage({
           </div>
         ) : viewMode === 'stream' ? (
           /* ================= STREAM LIST VIEW ================= */
-          <div className="clay-card overflow-hidden divide-y divide-zinc-200">
-            <div className="p-4 bg-zinc-50/80 border-b border-zinc-200 flex items-center justify-between text-xs text-zinc-600 font-semibold uppercase tracking-wider font-mono">
-              <span>{edition === 'india' ? '🇮🇳 India Edition Stream' : '🌐 Global Wire Stream'} ({filteredAndSortedArticles.length} dispatches)</span>
-              <span>Sorted by {sortBy}</span>
-            </div>
-            {filteredAndSortedArticles.map((art, idx) => (
-              <div
-                key={art.id}
-                style={{ animationDelay: `${Math.min(idx * 35, 400)}ms` }}
-                className="apple-item-entrance"
-              >
-                <ModernArticleCard
-                  article={art}
-                  variant="row"
-                  onOpenArticle={setSelectedArticle}
-                  onToggleBookmark={handleToggleBookmark}
-                  isBookmarked={bookmarks.some((b) => b.id === art.id)}
-                />
+          <div className="space-y-6">
+            <div className="clay-card overflow-hidden divide-y divide-zinc-200">
+              <div className="p-4 bg-zinc-50/80 border-b border-zinc-200 flex items-center justify-between text-xs text-zinc-600 font-semibold uppercase tracking-wider font-mono">
+                <span>{edition === 'india' ? '🇮🇳 India Edition Stream' : '🌐 Global Wire Stream'} ({filteredAndSortedArticles.length} dispatches)</span>
+                <span>Sorted by {sortBy}</span>
               </div>
-            ))}
+              {visibleArticles.map((art, idx) => (
+                <div
+                  key={`${art.id}-${idx}`}
+                  style={{ animationDelay: `${Math.min(idx * 35, 400)}ms` }}
+                  className="apple-item-entrance"
+                >
+                  <ModernArticleCard
+                    article={art}
+                    variant="row"
+                    onOpenArticle={(article) => {
+                      setSelectedArticle(article);
+                      setStartInAiBrief(false);
+                    }}
+                    onOpenAiBrief={(article) => {
+                      setSelectedBriefArticle(article);
+                    }}
+                    onToggleBookmark={handleToggleBookmark}
+                    isBookmarked={bookmarks.some((b) => b.id === art.id)}
+                  />
+                </div>
+              ))}
+            </div>
+
+            {/* Pagination See More Button for Stream View */}
+            {hasMoreArticles ? (
+              <div className="pt-4 pb-2 flex flex-col items-center justify-center space-y-2">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    handleButtonClickGlow(e);
+                    setVisibleCount((prev) => prev + 12);
+                  }}
+                  className="clay-btn px-6 py-2.5 rounded-2xl text-xs font-bold text-zinc-950 inline-flex items-center space-x-2 hover:bg-zinc-100 transition-all cursor-pointer shadow-xs"
+                >
+                  <span>See More Dispatches</span>
+                  <span className="px-2 py-0.5 rounded-full bg-zinc-950 text-white text-[10px] font-mono font-bold">
+                    +{Math.min(12, filteredAndSortedArticles.length - visibleCount)}
+                  </span>
+                  <ChevronDown className="w-3.5 h-3.5 text-zinc-950" />
+                </button>
+                <span className="text-[11px] font-mono text-zinc-500">
+                  Showing {visibleArticles.length} of {filteredAndSortedArticles.length} dispatches
+                </span>
+              </div>
+            ) : (
+              <div className="pt-4 pb-2 text-center">
+                <span className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-zinc-100 border border-zinc-200 text-[11px] font-mono text-zinc-600">
+                  <Check className="w-3 h-3 text-zinc-950" />
+                  <span>All {filteredAndSortedArticles.length} Dispatches Delivered</span>
+                </span>
+              </div>
+            )}
           </div>
         ) : (
           /* ================= BENTO GRID VIEW ================= */
@@ -529,165 +585,117 @@ export default function ClientHomePage({
               </div>
             )}
 
-            {/* TOP BENTO SECTION: Hero Widescreen + Side Signal Cards */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch animate-in fade-in slide-in-from-bottom-2 duration-500">
-              {/* Flagship Hero Card (8 Cols) */}
-              {leadArticle && (
-                <div 
-                  style={{ animationDelay: '0ms' }}
-                  className="lg:col-span-8 apple-item-entrance"
-                >
-                  <ModernArticleCard
-                    article={leadArticle}
-                    variant="hero"
-                    onOpenArticle={setSelectedArticle}
-                    onToggleBookmark={handleToggleBookmark}
-                    isBookmarked={bookmarks.some((b) => b.id === leadArticle.id)}
-                  />
+            {/* Executive Synthesis Banner */}
+            <div
+              onClick={(e) => {
+                handleButtonClickGlow(e);
+                setIsBriefingOpen(true);
+              }}
+              className="clay-card-dark p-4 sm:p-5 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 cursor-pointer group shadow-md"
+            >
+              <div className="flex items-center space-x-3.5">
+                <div className="p-2.5 rounded-xl bg-zinc-800 text-white shrink-0">
+                  <Sparkles className="w-5 h-5 text-white" />
                 </div>
-              )}
-
-              {/* Side Signal Bento Column (4 Cols) */}
-              <div className="lg:col-span-4 flex flex-col justify-between gap-4">
-                {/* AI Executive Digest Card with Solid Black Claymorphism (Zero Green Lights) */}
-                <div
-                  onClick={(e) => {
-                    handleButtonClickGlow(e);
-                    setIsBriefingOpen(true);
-                  }}
-                  className="clay-card-dark p-5 cursor-pointer group flex flex-col justify-between"
-                >
-                  <div>
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="px-2.5 py-0.5 rounded-full bg-zinc-800 text-[10px] font-mono font-bold text-zinc-200 flex items-center space-x-1 border border-zinc-700">
-                        <Sparkles className="w-3 h-3 mr-1" />
-                        <span>EXECUTIVE SYNTHESIS</span>
-                      </span>
-                    </div>
-
-                    <h4 className="font-serif text-xl font-bold tracking-tight text-white group-hover:text-zinc-200 transition-colors">
-                      3-Minute Executive Intelligence Brief
-                    </h4>
-
-                    <p className="mt-2 text-xs text-zinc-400 leading-relaxed line-clamp-3 font-normal">
-                      {edition === 'india' 
-                        ? "Real-time editorial synthesis of today's key Indian economic, market, tech, and policy developments."
-                        : "Real-time editorial synthesis of today's leading market, tech, and geopolitical developments."}
-                    </p>
-                  </div>
-
-                  <div className="mt-4 pt-3 border-t border-zinc-800 flex items-center justify-between text-xs text-zinc-400">
-                    <span className="font-semibold text-zinc-300">Audio Readout Available</span>
-                    <span className="inline-flex items-center text-white font-bold group-hover:translate-x-1 transition-transform">
-                      Open Brief <ArrowRight className="w-3.5 h-3.5 ml-1" />
+                <div>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-zinc-400">
+                      EXECUTIVE INTELLIGENCE
                     </span>
+                    <span className="text-zinc-600 text-xs">•</span>
+                    <span className="text-xs text-zinc-300 font-semibold">Audio Readout Available</span>
                   </div>
+                  <h3 className="font-serif text-lg sm:text-xl font-bold text-white group-hover:text-zinc-200 transition-colors">
+                    3-Minute Executive Wire Synthesis
+                  </h3>
                 </div>
+              </div>
 
-                {/* Secondary Fast Dispatch Cards */}
-                {sideArticles.map((art, idx) => (
-                  <div
-                    key={art.id}
-                    style={{ animationDelay: `${(idx + 1) * 80}ms` }}
-                    onClick={(e) => {
-                      handleButtonClickGlow(e);
-                      setSelectedArticle(art);
-                    }}
-                    className="apple-item-entrance clay-card p-4 cursor-pointer group"
-                  >
-                    <div className="flex items-center justify-between text-[11px] mb-1.5 font-mono">
-                      <span className="font-bold text-zinc-950 uppercase">{art.source.name}</span>
-                      <span className="text-zinc-500 font-semibold">{art.category}</span>
-                    </div>
-                    <h5 className="font-serif font-bold text-sm sm:text-base text-zinc-950 group-hover:text-zinc-600 transition-colors line-clamp-2 leading-snug">
-                      {art.title}
-                    </h5>
-                    <p className="mt-1 text-xs text-zinc-600 line-clamp-2 font-normal">
-                      {art.description}
-                    </p>
-                  </div>
-                ))}
+              <div className="inline-flex items-center space-x-1.5 px-4 py-2 rounded-xl bg-white text-zinc-950 text-xs font-bold shrink-0">
+                <span>Open Executive Brief</span>
+                <ArrowRight className="w-3.5 h-3.5 ml-1" />
               </div>
             </div>
 
-            {/* LOWER BENTO GRID: Multi-column Modern Liquid Glass Cards with Item Cascade Animation */}
-            {remainingArticles.length > 0 && (
-              <div className="pt-4">
-                <div className="flex items-center justify-between mb-5">
-                  <div className="flex items-center space-x-2">
-                    <Flame className="w-4 h-4 text-amber-500" />
-                    <h3 className="text-sm font-extrabold uppercase tracking-wider text-zinc-950">
-                      {edition === 'india' ? 'Dispatched Indian Signals' : 'Dispatched Global Signals'}
-                    </h3>
+            {/* UNIFORM GRID OF ALL CARDS (Exact Same Size For Every Single Card) */}
+            <div className="pt-2">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center space-x-2">
+                  <Flame className="w-4 h-4 text-zinc-950" />
+                  <h3 className="text-sm font-extrabold uppercase tracking-wider text-zinc-950 font-mono">
+                    {edition === 'india' ? 'Dispatched Indian Signals' : 'Dispatched Global Signals'}
+                  </h3>
+                </div>
+                <span className="text-xs font-mono text-zinc-500 font-medium">
+                  {filteredAndSortedArticles.length} uniform dispatches
+                </span>
+              </div>
+
+              {/* Responsive Grid with Identical Card Sizes */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 items-stretch">
+                {visibleArticles.map((art, idx) => (
+                  <div
+                    key={`${art.id}-${idx}`}
+                    style={{ animationDelay: `${Math.min(idx * 30, 300)}ms` }}
+                    className="apple-item-entrance h-full"
+                  >
+                    <ModernArticleCard
+                      article={art}
+                      variant="grid"
+                      onOpenArticle={(article) => {
+                        setSelectedArticle(article);
+                        setStartInAiBrief(false);
+                      }}
+                      onOpenAiBrief={(article) => {
+                        setSelectedBriefArticle(article);
+                      }}
+                      onToggleBookmark={handleToggleBookmark}
+                      isBookmarked={bookmarks.some((b) => b.id === art.id)}
+                    />
                   </div>
-                  <span className="text-xs font-mono text-zinc-500 font-medium">
-                    {remainingArticles.length} active dispatches
+                ))}
+              </div>
+
+              {/* Pagination See More Button for Grid View */}
+              {hasMoreArticles ? (
+                <div className="pt-10 pb-4 flex flex-col items-center justify-center space-y-2.5">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      handleButtonClickGlow(e);
+                      setVisibleCount((prev) => prev + 12);
+                    }}
+                    className="clay-btn px-8 py-3.5 rounded-2xl text-xs sm:text-sm font-bold text-zinc-950 inline-flex items-center space-x-2.5 hover:bg-zinc-100 transition-all cursor-pointer shadow-md"
+                  >
+                    <span>See More Dispatches</span>
+                    <span className="px-2.5 py-0.5 rounded-full bg-zinc-950 text-white text-[11px] font-mono font-bold">
+                      +{Math.min(12, filteredAndSortedArticles.length - visibleCount)}
+                    </span>
+                    <ChevronDown className="w-4 h-4 text-zinc-950" />
+                  </button>
+                  <span className="text-xs font-mono text-zinc-500">
+                    Showing {visibleArticles.length} of {filteredAndSortedArticles.length} dispatches
                   </span>
                 </div>
-
-                {/* Bento Grid with Item Cascade Entrance */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
-                  {remainingArticles.map((art, idx) => (
-                    <div
-                      key={art.id}
-                      style={{ animationDelay: `${(idx + 2) * 50}ms` }}
-                      className="apple-item-entrance"
-                    >
-                      <ModernArticleCard
-                        article={art}
-                        variant="grid"
-                        onOpenArticle={setSelectedArticle}
-                        onToggleBookmark={handleToggleBookmark}
-                        isBookmarked={bookmarks.some((b) => b.id === art.id)}
-                      />
-                    </div>
-                  ))}
+              ) : (
+                <div className="pt-10 pb-4 text-center">
+                  <span className="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full bg-zinc-100 border border-zinc-200 text-xs font-mono text-zinc-600">
+                    <Check className="w-3.5 h-3.5 text-zinc-950" />
+                    <span>All {filteredAndSortedArticles.length} Dispatches Delivered • Wire Current</span>
+                  </span>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         )}
       </main>
 
-      {/* 5. Minimalist Apple White Footer */}
-      <footer className="mt-20 border-t border-zinc-200/80 bg-zinc-50/60 backdrop-blur-xl">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-500">
-          <div className="flex items-center space-x-3">
-            <span className="font-extrabold text-zinc-950 tracking-tight">PRISM INTELLIGENCE</span>
-            <span>•</span>
-            <span>{edition === 'india' ? '🇮🇳 India Wire' : '🌐 Global Wire'}</span>
-            <span>•</span>
-            <span>NewsData.io Real-Time API</span>
-          </div>
-
-          <div className="flex items-center space-x-4">
-            <button
-              onClick={(e) => {
-                handleButtonClickGlow(e);
-                setIsInstallOpen(true);
-              }}
-              className="apple-btn font-semibold text-emerald-700 hover:text-emerald-950 cursor-pointer flex items-center space-x-1"
-            >
-              <Smartphone className="w-3.5 h-3.5" />
-              <span>Install Mobile PWA</span>
-            </button>
-            <span>•</span>
-            <button
-              onClick={(e) => {
-                handleButtonClickGlow(e);
-                setIsSettingsOpen(true);
-              }}
-              className="apple-btn hover:text-zinc-950 transition-colors cursor-pointer"
-            >
-              Cloud & API Engine
-            </button>
-            <span>•</span>
-            <span>
-              <kbd className="px-1.5 py-0.5 rounded-md border border-zinc-200 bg-white font-mono text-[10px]">⌘K</kbd> Spotlight
-            </span>
-          </div>
-        </div>
-      </footer>
+      {/* 5. Minimalist Tactile Clay White Footer with Cursive Prism Masthead */}
+      <ModernFooter
+        edition={edition}
+        onSelectEdition={handleSelectEdition}
+        onOpenBriefing={() => setIsBriefingOpen(true)}
+      />
 
       {/* 6. iOS Native Mobile Bottom Tab Bar */}
       <MobileTabBar
@@ -701,9 +709,27 @@ export default function ClientHomePage({
       {/* 7. Slide-Over Reader & Modals */}
       <ModernArticleReader
         article={selectedArticle}
-        onClose={() => setSelectedArticle(null)}
+        onClose={() => {
+          setSelectedArticle(null);
+          setStartInAiBrief(false);
+        }}
         isBookmarked={selectedArticle ? bookmarks.some((b) => b.id === selectedArticle.id) : false}
         onToggleBookmark={handleToggleBookmark}
+        startInAiBrief={startInAiBrief}
+      />
+
+      {/* Dedicated Rapid AI Story Brief Modal */}
+      <AiBriefModal
+        article={selectedBriefArticle}
+        isOpen={!!selectedBriefArticle}
+        onClose={() => setSelectedBriefArticle(null)}
+        onOpenFullStory={(art) => {
+          setSelectedBriefArticle(null);
+          setSelectedArticle(art);
+          setStartInAiBrief(false);
+        }}
+        onToggleBookmark={handleToggleBookmark}
+        isBookmarked={selectedBriefArticle ? bookmarks.some((b) => b.id === selectedBriefArticle.id) : false}
       />
 
       <ExecutiveBriefingModal

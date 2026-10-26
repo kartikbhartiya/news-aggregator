@@ -51,7 +51,7 @@ export default function InstallAppSheet({ isOpen, onClose }: InstallAppSheetProp
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden bg-zinc-950/40 backdrop-blur-sm flex justify-center items-end sm:items-center p-0 sm:p-4 animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 overflow-hidden bg-black/60 flex justify-center items-end sm:items-center p-0 sm:p-4 animate-in fade-in duration-200">
       <div className="relative w-full max-w-lg clay-card rounded-t-[32px] sm:rounded-[32px] p-6 sm:p-8 animate-in slide-in-from-bottom duration-300 flex flex-col space-y-6">
         {/* iOS Sheet Grabber Handle */}
         <div className="w-10 h-1.5 rounded-full bg-zinc-300 mx-auto -mt-2 mb-1 sm:hidden" />
